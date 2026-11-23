@@ -1,0 +1,3 @@
+# The build needs only the lock file; data, work folders and logs never enter the context.
+*
+!requirements.lock

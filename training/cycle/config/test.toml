@@ -1,0 +1,144 @@
+# Profile "test": local MinIO stand-in, tiny sizes, for tests on this machine. Each config file is complete:
+# the three profiles (prod, local, test) have the same keys, checked by tests/test_config.py.
+profile = "test"                       # prod | local | test
+
+[storage]
+mode = "minio"                         # r2 | minio
+endpoint = "http://minio:9000"         # minio: "http://minio:9000"; r2: empty, from env R2_ENDPOINT
+events_bucket = "zap-test-unit-events"
+models_bucket = "zap-test-unit-models"
+public_bucket = "zap-test-unit-public"
+bundled = ["v1"]                       # bundled models init uploads; tests start from v1 alone
+
+[paths]
+data = "training/cycle/data/test"
+work = "training/cycle/work/test"
+logs = "training/logs/test"
+keep_cycles = 4
+
+[schedule]
+timezone = "America/Sao_Paulo"
+weekday = 5                            # Monday 0, Saturday 5
+time = "22:00"
+new_matches = 1000
+tick_seconds = 600
+ab_check_utc = "06:00"
+max_cycle_hours = 36
+
+[train]
+iters = 2
+decisions = 5000
+workers = 1
+threads = 1
+league_mix = "current=0.30,snapshots=0.10,v1=0.08,tuned=0.05,base=0.05,random=0.02,characters=0.16,extremes=0.14,switching=0.10"
+league_mix_live = "current=0.30,snapshots=0.10,v1=0.08,tuned=0.05,base=0.05,random=0.02,characters=0.16,extremes=0.08,switching=0.04,feints=0.12"  # with [gate] stats = "live": the feints league of training/runs/m6-adaptive-r/args.json
+feint_hands = "1,8"                    # with stats live: train.py --feint-hands, as in that run
+feint_evidence = "2,8"                 # with stats live: train.py --feint-evidence, as in that run
+league_versions = 3
+critic_warmup = 1
+max_hours_per_run = 1
+twin = "auto"                          # auto: with the human model on; off
+seed_floor_every = 4
+fixed_args = ["--imitation-iters","0","--two-styles","0.5","--partner-swap","0.2","--switch-hands","1,6","--v1-model","ai/models/bootstrap/zap-v1.zapw","--v1-manifest","ai/models/bootstrap/manifest.json","--heuristic-params","ai/models/heuristic-tuned.json","--four-players","0.5","--mineiro","0.5","--random-options","0.25","--lr","0.0003","--entropy","0.02","--magnet-kl","0.05","--magnet-every","20","--no-stats-share","0.15","--league-every","1","--eval-every","1000","--eval-pairs","8","--panel-every","0","--panel-pairs","8"]
+
+[gate]
+stats = "empty"                        # "live" only after AI_ADAPT goes on
+threads = 1
+p0 = 0.5
+p1 = 0.515
+alpha = 0.05
+beta = 0.05
+batch_pairs = 8
+cap_pairs = 32
+segment_pairs = 4
+segment_margin = 0.015
+panel_pairs = 2
+panel_margin = 0.01
+panel_versions = 3
+personas_pairs = 4
+
+[explorer]                             # explorer test of a candidate that can read the in-match statistics (zapcycle/explorer.py)
+on = true                              # runs with [gate] stats = "live"; publish refuses a reading file without its passing verdict whatever this says
+limit = 0.01                           # every verdict: one-sided 95% upper bound of the adaptation part at most this (1 point; never above it)
+seeds = "cycle"                        # every seed from the cycle id: SHA-256 of "<cycleId>:explorer:<part>"
+threads = 1                            # threads of the Node benches
+pool = "all"                           # scripted search: the original grid and the fresh family (explorer.ts --pool)
+round_pairs = 4                        # pooled pairs per candidate and player in the first of 4 halving rounds, 4 times more each round
+grid_limit = 8                         # 0: every candidate of the pool
+fresh_pairs = 4                        # fresh pairs per segment: the chosen explorer and every re-measure
+trained_iters = 2                      # PPO explorer: iterations, warm-up included
+trained_critic_warmup = 1
+trained_decisions = 2000
+trained_workers = 1
+trained_threads = 1
+trained_eval_every = 1
+trained_eval_pairs = 2
+trained_hours = 0.25                   # wall clock cap of the PPO explorer (train.py --max-hours)
+measure_pairs = 4                      # fresh pairs per segment for a trained explorer
+check_pairs = 2                        # its start on the deals of the training's periodic check
+style_matches = 2                      # matches per segment for its style numbers
+twin = "ai/models/bootstrap/zap-v2.zapw"   # network without statistics: the PPO explorer starts from it; the gain over it is context
+twin2 = "ai/models/bootstrap/zap-v2.zapw"  # second twin of explorer-trained.ts (context only): the same file, so no seed floor
+reserve_hours = 0.5                    # hours the train step leaves for this step when it will run
+
+[ab]
+share = 0.3
+days = 14
+rollback_drop = 0.02
+min_matches_per_arm = 200
+bootstrap = 2000
+
+[data]
+device_cap = 0.02
+
+[thresholds]
+human_model_matches = 500
+human_model_devices = 50
+priors_people = 100
+adapt_decisions = 150
+player_types_devices = 200
+ranking_people = 50
+ranking_matches_each = 20
+open_data_matches = 1000
+open_data_style_matches = 50
+min_cell_people = 20
+
+[human]                                # P2 owns the keys of this table
+threads = 1                            # torch threads of the human behaviour model
+
+[human.model]                          # human behaviour model (zapcycle/human/model.py)
+epochs = 4
+patience = 3                           # epochs without a better validation loss before stopping
+batch = 512
+lr = 0.001
+anchor = 0.0001                        # L2 pull towards the self-play weights it starts from
+test_share = 0.2                       # share of groups in the test split
+valid_share = 0.1                      # share of the other groups used for early stopping
+max_rows = 50000                      # rows kept (stable sample by match and decision)
+seed = 11
+league_share = 0.08                    # training matches against the human model, as opponent and partner (taken from 'current')
+
+[human.flags]                          # automation flags (zapcycle/human/flags.py)
+lookback_days = 14                     # only matches that started in these days are examined
+regular_spread = 0.40                  # regular-times: (p90 - p10) / median of decision times below this
+regular_min_decisions = 200            # over at least this many timed decisions
+clock_hours = 18                       # around-the-clock: distinct UTC hours
+clock_window_days = 1                  # within one day: a schedule that moves during the week is no bot
+volume_matches = 400                   # volume: matches within the window
+volume_window_days = 7
+identical_matches = 3                  # identical-sequences: matches with the same prefix
+identical_prefix = 40                  # own decisions compared (action and time band)
+identical_min_decisions = 20           # shorter matches are not compared
+time_bin_ms = 500
+
+[human.player_types]                   # player types (zapcycle/human/player_types.py)
+max_k = 6
+refits = 50                            # bootstrap refits for the stability check
+min_ari = 0.7                          # mean adjusted Rand index needed to keep k above 1
+restarts = 3
+seed = 7
+
+[human.open_data]                      # open data package (zapcycle/human/opendata.py)
+repo = "AndreiLud/zap"                 # GitHub repository of the releases
+time_bin_ms = 500                      # decision time bands
+max_time_s = 120                       # the last band holds every longer time
