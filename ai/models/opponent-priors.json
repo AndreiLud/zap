@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "alpha": 2,
+  "measuredAt": "2026-11-21T23:15:31.702Z",
+  "method": "v1 Zap (ai/models/bootstrap/zap-v1.zapw, shipped knobs) as the learning team against the milestone 6 league mix (current and snapshots replaced by v1 Zap; 2 against 2: second opponent the same player with chance 0.5, partner swap 0.2), random room options in 25% of the matches, 4000 matches per segment, seed 0b. Counts of every seat of every match pooled per segment; only finished hands count.",
+  "source": {
+    "model": "ai/models/bootstrap/zap-v1.zapw",
+    "sha256": "d6fd4924ab4a7ea0ab311f94907ae1106639c58412dde602df586217ca53c62d",
+    "mix": "M6 league (ai/src/league.ts M6_MIX), current and snapshots as v1 Zap"
+  },
+  "seed": "0b",
+  "matchesPerSegment": 4000,
+  "segments": {
+    "paulista-2": {
+      "raise": 0.6557965451055662,
+      "run": 0.3898671096345515,
+      "accept": 0.587375415282392,
+      "reraise": 0.022757475083056478,
+      "shown": 0.46337018572055605,
+      "cover": 0.16180449358898952,
+      "observations": {
+        "H": 52100,
+        "T": 36120,
+        "Q": 57659,
+        "W": 51006
+      }
+    },
+    "paulista-4": {
+      "raise": 0.3029567391557158,
+      "run": 0.5797395145498428,
+      "accept": 0.39630675349515004,
+      "reraise": 0.02395373195500706,
+      "shown": 0.5327438257270017,
+      "cover": 0.19953823810528667,
+      "observations": {
+        "H": 137584,
+        "T": 43918,
+        "Q": 51177,
+        "W": 80561
+      }
+    },
+    "mineiro-2": {
+      "raise": 0.7016150124231725,
+      "run": 0.3079247237569061,
+      "accept": 0.6638898480662984,
+      "reraise": 0.02818542817679558,
+      "shown": 0.46617427318341886,
+      "cover": 0.13609727512452388,
+      "observations": {
+        "H": 30588,
+        "T": 23168,
+        "Q": 39691,
+        "W": 40956
+      }
+    },
+    "mineiro-4": {
+      "raise": 0.31810082123857236,
+      "run": 0.5145355439473086,
+      "accept": 0.45397077750018927,
+      "reraise": 0.03149367855250208,
+      "shown": 0.5230803276137116,
+      "cover": 0.17037436216971757,
+      "observations": {
+        "H": 77444,
+        "T": 26418,
+        "Q": 31632,
+        "W": 59381
+      }
+    }
+  }
+}

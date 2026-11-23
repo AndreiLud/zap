@@ -1,0 +1,311 @@
+{
+  "schema": "zap-card/1",
+  "version": "v2",
+  "parent": "v1",
+  "cycleId": "20261122-1641",
+  "createdAt": 1795366114669,
+  "result": "promoted",
+  "resultAt": 1795366847867,
+  "reason": "Passed every rule of the gate (SPRT 0.5 against 0.515, alpha 0.05, beta 0.05, rounds of 400 pairs up to 40000; segments: non-inferiority 1.5 points on 2500 pairs each; panel random, base (heuristic base), tuned (heuristic tuned), v1 (zap-v1.zapw, knobs zap): 1 point on 2500 pairs per segment; statistics empty; 3 threads, local copy of the cycle (minio)).",
+  "model": {
+    "sha256": "afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632",
+    "bytes": 193512,
+    "arch": "mlp-v1",
+    "features": "v2-empty",
+    "inputs": 461,
+    "hidden": [
+      256,
+      256
+    ],
+    "adapt": null
+  },
+  "training": {
+    "args": [
+      "--run",
+      "training/runs/m6-twin",
+      "--iters",
+      "390",
+      "--imitation-iters",
+      "0",
+      "--critic-warmup",
+      "10",
+      "--decisions",
+      "120000",
+      "--workers",
+      "4",
+      "--threads",
+      "4",
+      "--eval-every",
+      "20",
+      "--eval-pairs",
+      "150",
+      "--panel-every",
+      "60",
+      "--panel-pairs",
+      "100",
+      "--league-every",
+      "10",
+      "--league-size",
+      "8",
+      "--magnet-every",
+      "20",
+      "--league-mix",
+      "current=0.30,snapshots=0.10,v1=0.08,tuned=0.05,base=0.05,random=0.02,characters=0.16,extremes=0.14,switching=0.10",
+      "--two-styles",
+      "0.5",
+      "--switch-hands",
+      "1,6",
+      "--partner-swap",
+      "0.2",
+      "--four-players",
+      "0.5",
+      "--mineiro",
+      "0.5",
+      "--random-options",
+      "0.25",
+      "--hidden",
+      "256,256",
+      "--lr",
+      "0.0003",
+      "--entropy",
+      "0.02",
+      "--magnet-kl",
+      "0.05",
+      "--features",
+      "v2-empty",
+      "--priors",
+      "ai/models/opponent-priors.json",
+      "--init-actor",
+      "training/runs/m6-init/init-actor.pt",
+      "--adapt-beta",
+      "0.1",
+      "--adapt-nw",
+      "3.0",
+      "--no-stats-share",
+      "0.15",
+      "--v1-model",
+      "ai/models/bootstrap/zap-v1.zapw",
+      "--v1-manifest",
+      "ai/models/bootstrap/manifest.json",
+      "--seed-base",
+      "6a",
+      "--max-hours",
+      "3.5",
+      "--heuristic-params",
+      "ai/models/heuristic-tuned.json"
+    ],
+    "iterations": 390,
+    "seconds": 11713.2,
+    "seedBase": "6a",
+    "leagueFiles": [],
+    "humanModel": null,
+    "commit": null
+  },
+  "data": null,
+  "gate": {
+    "schema": "zap-gate/1",
+    "candidate": {
+      "version": "v2",
+      "sha256": "afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632"
+    },
+    "current": {
+      "version": "v1",
+      "sha256": "d6fd4924ab4a7ea0ab311f94907ae1106639c58412dde602df586217ca53c62d"
+    },
+    "seed": "bed0c82b982f312a7f192274d0f029edf55e4fb93a10f9021ab0ad9c1876a82a",
+    "stats": "empty",
+    "sprt": {
+      "decision": "accept",
+      "llr": 13.493171471927221,
+      "lower": -2.9444389791664403,
+      "upper": 2.9444389791664403,
+      "pairs": 400,
+      "mean": 0.7025,
+      "perSegment": {
+        "paulista-2": {
+          "pairs": 100,
+          "mean": 0.845
+        },
+        "paulista-4": {
+          "pairs": 100,
+          "mean": 0.665
+        },
+        "mineiro-2": {
+          "pairs": 100,
+          "mean": 0.745
+        },
+        "mineiro-4": {
+          "pairs": 100,
+          "mean": 0.555
+        }
+      }
+    },
+    "segments": {
+      "paulista-2": {
+        "pairs": 2500,
+        "mean": 0.805,
+        "lo95": 0.2966314350153708,
+        "pass": true
+      },
+      "paulista-4": {
+        "pairs": 2500,
+        "mean": 0.6748,
+        "lo95": 0.16477320949831384,
+        "pass": true
+      },
+      "mineiro-2": {
+        "pairs": 2500,
+        "mean": 0.7248,
+        "lo95": 0.21595400565227393,
+        "pass": true
+      },
+      "mineiro-4": {
+        "pairs": 2500,
+        "mean": 0.6076,
+        "lo95": 0.09780387911507034,
+        "pass": true
+      }
+    },
+    "panel": [
+      {
+        "member": "random",
+        "pairs": 10000,
+        "candidate": {
+          "mean": 0.9552,
+          "lo": 0.9523667964743385,
+          "hi": 0.9580332035256616
+        },
+        "current": {
+          "mean": 0.93205,
+          "lo": 0.9286179922267958,
+          "hi": 0.9354820077732043
+        },
+        "diff": {
+          "mean": 0.02315,
+          "lo95": 0.019480830893097385
+        },
+        "pass": true
+      },
+      {
+        "member": "base",
+        "pairs": 10000,
+        "candidate": {
+          "mean": 0.79055,
+          "lo": 0.7854459974690656,
+          "hi": 0.7956540025309343
+        },
+        "current": {
+          "mean": 0.7494,
+          "lo": 0.7439680297927516,
+          "hi": 0.7548319702072483
+        },
+        "diff": {
+          "mean": 0.04115,
+          "lo95": 0.03550166140827108
+        },
+        "pass": true
+      },
+      {
+        "member": "tuned",
+        "pairs": 10000,
+        "candidate": {
+          "mean": 0.87395,
+          "lo": 0.8695218961988308,
+          "hi": 0.8783781038011692
+        },
+        "current": {
+          "mean": 0.81155,
+          "lo": 0.8064589648243689,
+          "hi": 0.8166410351756311
+        },
+        "diff": {
+          "mean": 0.0624,
+          "lo95": 0.057147173535824304
+        },
+        "pass": true
+      },
+      {
+        "member": "v1",
+        "pairs": 10000,
+        "candidate": {
+          "mean": 0.7036,
+          "lo": 0.6979889463307923,
+          "hi": 0.7092110536692077
+        },
+        "current": {
+          "mean": 0.50085,
+          "lo": 0.4967140409745619,
+          "hi": 0.5049859590254382
+        },
+        "diff": {
+          "mean": 0.20275,
+          "lo95": 0.19690167661919922
+        },
+        "pass": true
+      }
+    ],
+    "personas": {
+      "orderHolds": true,
+      "source": "training/cycle/work/release-v2/20261122-1641/gate/personas-order.json: Ot\u00e1vio minus the easiest of Bento, Lia and Ravi (ravi): -3.7 points (se 1.0); the hardest of them (bento) minus Iara: -9.1 points (se 1.0); reversed beyond noise above 1.645 se; 400 fresh pairs per segment."
+    },
+    "pass": true,
+    "reasons": [],
+    "seconds": 612.4
+  },
+  "personas": {
+    "knobsSha256": "9423383476e7339062b5f10b5234858d8de91b35503c66852876dc9c74d270f5",
+    "orderHolds": true,
+    "stats": {
+      "otavio": {
+        "trucoRate": 0.1878844145294186,
+        "bluffRate": 0.02970747354813999,
+        "runRate": 0.6571552096843926,
+        "reraiseRate": 0.05202478743334774,
+        "signalTruth": 0.3130784918684307,
+        "vsZap": 0.2659375
+      },
+      "bento": {
+        "trucoRate": 0.6126990505852212,
+        "bluffRate": 0.33364235681911825,
+        "runRate": 0.4654541541110633,
+        "reraiseRate": 0.1334481274214378,
+        "signalTruth": 0.37375204211290614,
+        "vsZap": 0.3196875
+      },
+      "lia": {
+        "trucoRate": 0.6637436539856267,
+        "bluffRate": 0.14535373385738348,
+        "runRate": 0.2769027293495251,
+        "reraiseRate": 0.27365636647829744,
+        "signalTruth": 0.4286046782264634,
+        "vsZap": 0.318125
+      },
+      "ravi": {
+        "trucoRate": 0.45815773630343165,
+        "bluffRate": 0.09727051460361613,
+        "runRate": 0.44600752922528236,
+        "reraiseRate": 0.17327125024767187,
+        "signalTruth": 0.42189372752696763,
+        "vsZap": 0.303125
+      },
+      "iara": {
+        "trucoRate": 0.35888389993585634,
+        "bluffRate": 0.0915482378391371,
+        "runRate": 0.5270857716100986,
+        "reraiseRate": 0.11687008861394416,
+        "signalTruth": 0.467237687366167,
+        "vsZap": 0.41031249999999997
+      },
+      "zap": {
+        "trucoRate": 0.3758738862234407,
+        "bluffRate": 0.14474753337202553,
+        "runRate": 0.5108366935483871,
+        "reraiseRate": 0.09828629032258064,
+        "signalTruth": 0.4712684158009039,
+        "vsZap": 0.5
+      }
+    }
+  },
+  "twin": null,
+  "ab": null
+}
