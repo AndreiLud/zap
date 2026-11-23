@@ -1,0 +1,8 @@
+{
+  "storyModel": { "version": "v2", "path": "ai/models/bootstrap/zap-v2.zapw", "manifest": "ai/models/bootstrap/manifest-v2.json", "stats": "empty" },
+  "curve": [
+    { "version": "v1", "run": "training/runs/main", "snapshot": 150, "from": null },
+    { "version": "v2", "run": "training/runs/m6-twin", "snapshot": 390, "from": "v1" }
+  ],
+  "sim": { "seed": "d7", "matchesPerSegment": 20000, "personaMatchesPerSegment": 2000, "threads": 3 }
+}

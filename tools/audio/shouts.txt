@@ -1,0 +1,10 @@
+# name|text|pitch|speed
+truco|Truco!|38|150
+seis|Seis!|40|150
+oito|Oito!|40|150
+nove|Nove!|40|150
+dez|Dez!|40|150
+doze|Doze!|40|150
+desce|Desce!|36|160
+corro|Corro!|30|140
+zap|Zap!|42|150
