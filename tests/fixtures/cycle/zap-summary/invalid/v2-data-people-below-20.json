@@ -1,0 +1,129 @@
+{
+  "schema": "zap-summary/2",
+  "generatedAt": 1763800000000,
+  "minPeople": 20,
+  "training": {
+    "state": "ok",
+    "finishedAt": 1763800000000,
+    "current": "v2",
+    "nextAfter": 1765009600000
+  },
+  "humansVsZap": {
+    "matches": 40,
+    "humanWins": 12,
+    "since": 1763627200000
+  },
+  "versions": [
+    {
+      "version": "v1",
+      "promotedAt": 1762936000000,
+      "result": "bootstrap",
+      "anchors": null,
+      "twin": null,
+      "personas": null,
+      "data": null
+    },
+    {
+      "version": "v2",
+      "promotedAt": 1763800000000,
+      "result": "promoted",
+      "anchors": {
+        "random": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "base": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "tuned": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "v1": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        }
+      },
+      "twin": {
+        "pairs": 400,
+        "mean": 0.5,
+        "lo": 0.47,
+        "hi": 0.53
+      },
+      "personas": null,
+      "data": {
+        "validMatches": 40,
+        "people": 12
+      }
+    }
+  ],
+  "ab": null,
+  "layers": {
+    "humanModel": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "priors": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "adaptation": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "playerTypes": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "ranking": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "openData": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "flags": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    }
+  },
+  "cells": [],
+  "playerTypes": null,
+  "seedNoise": null,
+  "scoreboard": [],
+  "disagreements": null
+}

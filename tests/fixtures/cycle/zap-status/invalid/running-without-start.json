@@ -1,0 +1,14 @@
+{
+  "schema": "zap-status/1",
+  "state": "running",
+  "startedAt": null,
+  "finishedAt": null,
+  "updatedAt": 1763803600000,
+  "cycleId": "20261121-0100",
+  "step": "train",
+  "lastPromotion": {
+    "version": "v3",
+    "at": 1763803600000
+  },
+  "message": "Training the candidate."
+}

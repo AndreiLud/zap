@@ -1,0 +1,11 @@
+{
+  "schema": "zap-status/1",
+  "state": "failed",
+  "startedAt": 1763800000000,
+  "finishedAt": 1763803600000,
+  "updatedAt": 1763803600000,
+  "cycleId": "20261121-0100",
+  "step": "gate",
+  "lastPromotion": null,
+  "message": "gate: time limit"
+}

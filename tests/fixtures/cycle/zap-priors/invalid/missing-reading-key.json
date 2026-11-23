@@ -1,0 +1,97 @@
+{
+  "schema": "zap-priors/1",
+  "createdAt": 1763800000000,
+  "source": "selfplay",
+  "people": null,
+  "numbers": {
+    "raise": {
+      "mean": 0.1,
+      "strength": 2,
+      "people": null
+    },
+    "run": {
+      "mean": 0.2,
+      "strength": 2,
+      "people": null
+    },
+    "accept": {
+      "mean": 0.30000000000000004,
+      "strength": 2,
+      "people": null
+    },
+    "reraise": {
+      "mean": 0.4,
+      "strength": 2,
+      "people": null
+    },
+    "shown": {
+      "mean": 0.5,
+      "strength": 2,
+      "people": null
+    },
+    "cover": {
+      "mean": 0.6,
+      "strength": 2,
+      "people": null
+    },
+    "bluff": {
+      "mean": 0.7,
+      "strength": 2,
+      "people": null
+    }
+  },
+  "time": {
+    "mu": 8.006367567650246,
+    "tau": 1,
+    "sigma": 1
+  },
+  "alpha": 2,
+  "segments": {
+    "paulista-2": {
+      "raise": 0.4,
+      "run": 0.45,
+      "accept": 0.5,
+      "reraise": 0.05,
+      "shown": 0.5,
+      "cover": 0.15
+    },
+    "paulista-4": {
+      "raise": 0.4,
+      "run": 0.45,
+      "accept": 0.5,
+      "reraise": 0.05,
+      "shown": 0.5,
+      "cover": 0.15
+    },
+    "mineiro-2": {
+      "raise": 0.4,
+      "run": 0.45,
+      "accept": 0.5,
+      "reraise": 0.05,
+      "shown": 0.5,
+      "cover": 0.15
+    },
+    "mineiro-4": {
+      "raise": 0.4,
+      "run": 0.45,
+      "accept": 0.5,
+      "reraise": 0.05,
+      "shown": 0.5,
+      "cover": 0.15
+    }
+  },
+  "readingSegments": {
+    "paulista-2": {
+      "bluff": 0.2
+    },
+    "paulista-4": {
+      "bluff": 0.2
+    },
+    "mineiro-2": {
+      "bluff": 0.2
+    },
+    "mineiro-4": {
+      "bluff": 0.2
+    }
+  }
+}

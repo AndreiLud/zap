@@ -1,0 +1,62 @@
+{
+  "schema": "zap-export/1",
+  "date": "2026-11-21",
+  "createdAt": 1795233605000,
+  "partial": false,
+  "rows": [
+    {
+      "matchId": "3f2b8c1e-9a4d-4e6f-8b2a-1c3d5e7f9a00",
+      "seat": 0,
+      "weight": 0.875,
+      "flagged": false,
+      "openDataOptOut": false,
+      "noAdapt": false,
+      "group": "0000000000000000"
+    },
+    {
+      "matchId": "3f2b8c1e-9a4d-4e6f-8b2a-1c3d5e7f9a01",
+      "seat": 1,
+      "weight": 1,
+      "flagged": false,
+      "openDataOptOut": false,
+      "noAdapt": true,
+      "group": "1111111111111111"
+    },
+    {
+      "matchId": "3f2b8c1e-9a4d-4e6f-8b2a-1c3d5e7f9a02",
+      "seat": 2,
+      "weight": 0,
+      "flagged": true,
+      "openDataOptOut": false,
+      "noAdapt": false,
+      "group": "2222222222222222"
+    },
+    {
+      "matchId": "3f2b8c1e-9a4d-4e6f-8b2a-1c3d5e7f9a03",
+      "seat": 3,
+      "weight": 0.5,
+      "flagged": false,
+      "openDataOptOut": true,
+      "noAdapt": true,
+      "group": "3333333333333333"
+    }
+  ],
+  "reports": [
+    {
+      "id": 7,
+      "day": "2026-11-20",
+      "reason": "cheating",
+      "matchId": "3f2b8c1e-9a4d-4e6f-8b2a-1c3d5e7f9a00",
+      "seat": 1,
+      "group": "1111111111111111"
+    },
+    {
+      "id": 8,
+      "day": "2026-11-21",
+      "reason": "nickname",
+      "matchId": null,
+      "seat": 2,
+      "group": null
+    }
+  ]
+}

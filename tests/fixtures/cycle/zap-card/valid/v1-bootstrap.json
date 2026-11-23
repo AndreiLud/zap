@@ -1,0 +1,28 @@
+{
+  "schema": "zap-card/1",
+  "version": "v1",
+  "parent": null,
+  "cycleId": null,
+  "createdAt": 1762936000000,
+  "result": "bootstrap",
+  "resultAt": 1762936000000,
+  "reason": "First model, shipped in the Worker bundle.",
+  "model": {
+    "sha256": "d6fd4924ab4a7ea0ab311f94907ae1106639c58412dde602df586217ca53c62d",
+    "bytes": 184976,
+    "arch": "mlp-v1",
+    "features": "v1",
+    "inputs": 431,
+    "hidden": [
+      256,
+      256
+    ],
+    "adapt": null
+  },
+  "training": null,
+  "data": null,
+  "gate": null,
+  "personas": null,
+  "twin": null,
+  "ab": null
+}

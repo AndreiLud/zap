@@ -1,0 +1,9 @@
+{
+  "schema": "zap-manifest/1",
+  "current": "v1",
+  "control": null,
+  "controlShare": 0.3,
+  "controlUntil": null,
+  "updatedAt": 1762936000000,
+  "models": {}
+}

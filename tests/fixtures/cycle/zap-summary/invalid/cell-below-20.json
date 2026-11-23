@@ -1,0 +1,160 @@
+{
+  "schema": "zap-summary/1",
+  "generatedAt": 1763800000000,
+  "minPeople": 20,
+  "training": {
+    "state": "ok",
+    "finishedAt": 1763803600000,
+    "current": "v3",
+    "nextAfter": 1765096000000
+  },
+  "humansVsZap": {
+    "matches": 1500,
+    "humanWins": 600,
+    "since": 1763022400000
+  },
+  "versions": [
+    {
+      "version": "v1",
+      "promotedAt": 1762936000000,
+      "result": "bootstrap",
+      "anchors": null
+    },
+    {
+      "version": "v3",
+      "promotedAt": 1763803600000,
+      "result": "promoted",
+      "anchors": {
+        "random": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "base": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "tuned": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "v1": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        }
+      }
+    }
+  ],
+  "ab": {
+    "version": "v3",
+    "control": "v2",
+    "share": 0.3,
+    "from": 1763803600000,
+    "until": 1765096000000,
+    "detectablePoints": null,
+    "result": null
+  },
+  "layers": {
+    "humanModel": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "priors": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "adaptation": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "playerTypes": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "ranking": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "openData": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    },
+    "flags": {
+      "on": false,
+      "why": "Waits for more matches.",
+      "progress": {
+        "matches": 120,
+        "people": null
+      }
+    }
+  },
+  "cells": [
+    {
+      "week": "2026-W47",
+      "variant": "paulista",
+      "players": 4,
+      "people": 19,
+      "matches": 400,
+      "humanWinRate": 0.41
+    }
+  ],
+  "playerTypes": {
+    "k": 2,
+    "ari": 0.82,
+    "types": [
+      {
+        "share": 0.6,
+        "center": {
+          "raise": 0.5,
+          "run": 0.5,
+          "accept": 0.5,
+          "reraise": 0.5,
+          "shown": 0.5,
+          "cover": 0.5,
+          "bluff": 0.5,
+          "signalTruth": 0.5
+        }
+      },
+      {
+        "share": 0.4,
+        "center": {
+          "raise": 0.5,
+          "run": 0.5,
+          "accept": 0.5,
+          "reraise": 0.5,
+          "shown": 0.5,
+          "cover": 0.5,
+          "bluff": 0.5,
+          "signalTruth": 0.5
+        }
+      }
+    ]
+  }
+}

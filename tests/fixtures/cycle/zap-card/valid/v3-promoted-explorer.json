@@ -1,0 +1,350 @@
+{
+  "schema": "zap-card/1",
+  "version": "v3",
+  "parent": "v2",
+  "cycleId": "20261121-0100",
+  "createdAt": 1763800000000,
+  "result": "promoted",
+  "resultAt": 1763803600000,
+  "reason": "Passed every rule of the gate.",
+  "model": {
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "bytes": 200123,
+    "arch": "mlp-v1",
+    "features": "v2",
+    "inputs": 461,
+    "hidden": [
+      256,
+      256
+    ],
+    "adapt": {
+      "bmax": 0.1,
+      "nHalf": 2
+    }
+  },
+  "training": {
+    "args": [
+      "--iters",
+      "390"
+    ],
+    "iterations": 390,
+    "seconds": 30000.5,
+    "seedBase": "c4",
+    "leagueFiles": [
+      "zz-v2.zapw"
+    ],
+    "humanModel": null,
+    "commit": "9f20bbe"
+  },
+  "data": {
+    "records": 1200,
+    "valid": 1190,
+    "invalid": 10,
+    "test": 0,
+    "validMatches": 1100,
+    "linkedSeats": 1500,
+    "people": 64,
+    "recordsSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "exportDate": "2026-11-21",
+    "exportSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "excluded": {
+      "unlinked": 3,
+      "flagged": 1,
+      "friends": 20,
+      "auto": 40,
+      "forced": 900,
+      "capped": 0
+    }
+  },
+  "gate": {
+    "schema": "zap-gate/1",
+    "candidate": {
+      "version": "v3",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "current": {
+      "version": "v2",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "seed": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "stats": "empty",
+    "sprt": {
+      "decision": "accept",
+      "llr": 3.1,
+      "lower": -2.944,
+      "upper": 2.944,
+      "pairs": 2400,
+      "mean": 0.531,
+      "perSegment": {
+        "paulista-2": {
+          "pairs": 600,
+          "mean": 0.52
+        },
+        "paulista-4": {
+          "pairs": 600,
+          "mean": 0.53
+        },
+        "mineiro-2": {
+          "pairs": 600,
+          "mean": 0.54
+        },
+        "mineiro-4": {
+          "pairs": 600,
+          "mean": 0.55
+        }
+      }
+    },
+    "segments": {
+      "paulista-2": {
+        "pairs": 2500,
+        "mean": 0.53,
+        "lo95": 0.012,
+        "pass": true
+      },
+      "paulista-4": {
+        "pairs": 2500,
+        "mean": 0.53,
+        "lo95": 0.012,
+        "pass": true
+      },
+      "mineiro-2": {
+        "pairs": 2500,
+        "mean": 0.53,
+        "lo95": 0.012,
+        "pass": true
+      },
+      "mineiro-4": {
+        "pairs": 2500,
+        "mean": 0.53,
+        "lo95": 0.012,
+        "pass": true
+      }
+    },
+    "panel": [
+      {
+        "member": "random",
+        "pairs": 4000,
+        "candidate": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "current": {
+          "mean": 0.69,
+          "lo": 0.67,
+          "hi": 0.71
+        },
+        "diff": {
+          "mean": 0.01,
+          "lo95": -0.004
+        },
+        "pass": true
+      },
+      {
+        "member": "base",
+        "pairs": 4000,
+        "candidate": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "current": {
+          "mean": 0.69,
+          "lo": 0.67,
+          "hi": 0.71
+        },
+        "diff": {
+          "mean": 0.01,
+          "lo95": -0.004
+        },
+        "pass": true
+      },
+      {
+        "member": "tuned",
+        "pairs": 4000,
+        "candidate": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "current": {
+          "mean": 0.69,
+          "lo": 0.67,
+          "hi": 0.71
+        },
+        "diff": {
+          "mean": 0.01,
+          "lo95": -0.004
+        },
+        "pass": true
+      },
+      {
+        "member": "v1",
+        "pairs": 4000,
+        "candidate": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "current": {
+          "mean": 0.69,
+          "lo": 0.67,
+          "hi": 0.71
+        },
+        "diff": {
+          "mean": 0.01,
+          "lo95": -0.004
+        },
+        "pass": true
+      },
+      {
+        "member": "v2",
+        "pairs": 4000,
+        "candidate": {
+          "mean": 0.7,
+          "lo": 0.68,
+          "hi": 0.72
+        },
+        "current": {
+          "mean": 0.69,
+          "lo": 0.67,
+          "hi": 0.71
+        },
+        "diff": {
+          "mean": 0.01,
+          "lo95": -0.004
+        },
+        "pass": true
+      }
+    ],
+    "personas": {
+      "orderHolds": true,
+      "source": "work/20261121-0100/gate/personas.json"
+    },
+    "pass": true,
+    "reasons": [],
+    "seconds": 3605.2
+  },
+  "personas": {
+    "knobsSha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "orderHolds": true,
+    "stats": {
+      "zap": {
+        "trucoRate": 0.4,
+        "bluffRate": 0.1,
+        "runRate": 0.3,
+        "reraiseRate": 0.05,
+        "signalTruth": 0.9,
+        "vsZap": 0.5
+      }
+    }
+  },
+  "twin": {
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "headToHead": {
+      "pairs": 2000,
+      "mean": 0.51,
+      "lo": 0.49,
+      "hi": 0.53
+    },
+    "seedFloor": {
+      "pairs": 2000,
+      "mean": 0.502,
+      "lo": 0.48,
+      "hi": 0.52
+    },
+    "seedFloorCycle": "20261107-2200",
+    "seedNoise": {
+      "floors": 2,
+      "rms": 0.0035
+    }
+  },
+  "ab": {
+    "from": 1763803600000,
+    "until": 1765096000000,
+    "matches": {
+      "candidate": 140,
+      "control": 60
+    },
+    "people": 46,
+    "drop": 0.004,
+    "lo": -0.03,
+    "hi": 0.04,
+    "detectablePoints": 4.5,
+    "rolledBack": false
+  },
+  "explorer": {
+    "network": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "pass": true,
+    "limit": 0.01,
+    "source": "measured",
+    "reusedFrom": null,
+    "verdicts": [
+      {
+        "explorer": "neverRaises>bluffer@3/same",
+        "kind": "scripted",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mean": 0.00488,
+        "upper95": 0.00773,
+        "pairs": 8000,
+        "pass": true
+      },
+      {
+        "explorer": "trapper>bluffer@3/v1",
+        "kind": "scripted",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mean": 0.00256,
+        "upper95": 0.00501,
+        "pairs": 8000,
+        "pass": true
+      },
+      {
+        "explorer": "training/cycle/data/prod/explorer/20261128-2200/1/explorer-run/explorer.zapw",
+        "kind": "trained",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "mean": -0.01,
+        "upper95": -0.00569,
+        "pairs": 8000,
+        "pass": true
+      }
+    ],
+    "failuresOnRecord": [
+      "trapper>bluffer@3/v1"
+    ],
+    "pending": [],
+    "reasons": [],
+    "measuredOnRecord": [
+      "neverRaises>bluffer@3/same"
+    ],
+    "settings": {
+      "check_pairs": 200,
+      "fresh_pairs": 2000,
+      "grid_limit": 0,
+      "limit": 0.01,
+      "measure_pairs": 2000,
+      "on": true,
+      "pool": "all",
+      "reserve_hours": 6,
+      "round_pairs": 64,
+      "seeds": "cycle",
+      "style_matches": 500,
+      "threads": 4,
+      "trained_critic_warmup": 5,
+      "trained_decisions": 120000,
+      "trained_eval_every": 10,
+      "trained_eval_pairs": 200,
+      "trained_hours": 3,
+      "trained_iters": 103,
+      "trained_threads": 3,
+      "trained_workers": 3,
+      "twin": "ai/models/bootstrap/zap-v2.zapw",
+      "twin2": "ai/models/bootstrap/zap-v2.zapw"
+    },
+    "ppo": {
+      "iterations": 103,
+      "wanted": 103
+    },
+    "lifted": null
+  }
+}

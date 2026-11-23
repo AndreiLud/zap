@@ -1,0 +1,97 @@
+{
+  "schema": "zap-reading/1",
+  "generatedAt": 1763800000000,
+  "noAdapt": true,
+  "matches": 3,
+  "decisions": 0,
+  "priors": "selfplay",
+  "numbers": [
+    {
+      "key": "raise",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "run",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "accept",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "reraise",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "shown",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "cover",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "bluff",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    },
+    {
+      "key": "signalTruth",
+      "n": 0,
+      "shown": false,
+      "value": null,
+      "low": null,
+      "high": null,
+      "population": 0.4,
+      "source": "selfplay"
+    }
+  ],
+  "time": {
+    "n": 0,
+    "shown": false,
+    "medianMs": null,
+    "lowMs": null,
+    "highMs": null
+  }
+}

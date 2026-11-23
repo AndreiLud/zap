@@ -1,0 +1,60 @@
+{
+  "schema": "zap-receipt/1",
+  "date": "2026-11-21",
+  "createdAt": 1795233609000,
+  "jobs": {
+    "retention": {
+      "status": "ok",
+      "error": null,
+      "counts": {
+        "devices": 0,
+        "reports": 0,
+        "flags": 0,
+        "rooms": 3,
+        "members": 4,
+        "calls": 0,
+        "exportGroups": 0,
+        "profiles": 0
+      }
+    },
+    "calls": {
+      "status": "ok",
+      "error": null,
+      "delivered": 2
+    },
+    "flags": {
+      "status": "ok",
+      "error": null,
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "applied": [
+        "2026-11-20:aaaaaaaaaaaaaaaa"
+      ],
+      "ignored": [],
+      "unresolved": [
+        "2026-11-19:bbbbbbbbbbbbbbbb"
+      ],
+      "reviewed": []
+    },
+    "priors": {
+      "status": "skipped",
+      "error": null,
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "imported": false
+    },
+    "export": {
+      "status": "ok",
+      "error": null,
+      "key": "exports/2026-11-20.json",
+      "rows": 4,
+      "reports": 2,
+      "partial": false,
+      "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+    },
+    "alert": {
+      "status": "ok",
+      "error": null,
+      "sent": true,
+      "reason": "failed"
+    }
+  }
+}

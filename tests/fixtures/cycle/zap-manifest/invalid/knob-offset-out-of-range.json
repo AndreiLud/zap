@@ -1,0 +1,310 @@
+{
+  "schema": "zap-manifest/1",
+  "current": "v1",
+  "control": null,
+  "controlShare": 0.3,
+  "controlUntil": null,
+  "updatedAt": 1762936000000,
+  "models": {
+    "v1": {
+      "sha256": "d6fd4924ab4a7ea0ab311f94907ae1106639c58412dde602df586217ca53c62d",
+      "bytes": 184976,
+      "arch": "mlp-v1",
+      "features": "v1",
+      "inputs": 431,
+      "hidden": [
+        256,
+        256
+      ],
+      "adapt": null,
+      "personas": {
+        "zap": {
+          "temperature": 0.6,
+          "raise": 1000000,
+          "accept": 0,
+          "run": 0,
+          "cover": 0,
+          "bluff": 0,
+          "signalLie": 0,
+          "style": null,
+          "styleShare": 0,
+          "switchStyles": null,
+          "persona": []
+        },
+        "ravi": {
+          "temperature": 1,
+          "raise": 0,
+          "accept": 0,
+          "run": 0,
+          "cover": 0,
+          "bluff": 0,
+          "signalLie": 0,
+          "style": null,
+          "styleShare": 1,
+          "switchStyles": [
+            {
+              "w": [
+                -0.3,
+                3,
+                2,
+                1,
+                1.6,
+                1.4,
+                0.6
+              ],
+              "raise": [
+                0.9,
+                0.93,
+                0.95,
+                0.97
+              ],
+              "accept": [
+                0.68,
+                0.72,
+                0.76,
+                0.8
+              ],
+              "reraise": [
+                0.95,
+                0.97,
+                0.99
+              ],
+              "onze": 0.62,
+              "bluff": 0,
+              "bluffBelow": 0.3,
+              "lead1": 2,
+              "leadLater": 2,
+              "signalTruth": 1,
+              "behind": 0
+            },
+            {
+              "w": [
+                -0.3,
+                3,
+                2,
+                1,
+                1.6,
+                1.4,
+                0.6
+              ],
+              "raise": [
+                0.35,
+                0.4,
+                0.45,
+                0.5
+              ],
+              "accept": [
+                0.12,
+                0.15,
+                0.2,
+                0.25
+              ],
+              "reraise": [
+                0.5,
+                0.55,
+                0.6
+              ],
+              "onze": 0.3,
+              "bluff": 0.25,
+              "bluffBelow": 0.3,
+              "lead1": 2,
+              "leadLater": 2,
+              "signalTruth": 1,
+              "behind": 0
+            }
+          ],
+          "persona": []
+        },
+        "iara": {
+          "temperature": 0.6,
+          "raise": 0,
+          "accept": 0,
+          "run": 0,
+          "cover": 0,
+          "bluff": 0,
+          "signalLie": 0,
+          "style": {
+            "w": [
+              -0.3,
+              3,
+              2,
+              1,
+              1.6,
+              1.4,
+              0.6
+            ],
+            "raise": [
+              0.76,
+              0.8,
+              0.86,
+              0.92
+            ],
+            "accept": [
+              0.5,
+              0.52,
+              0.55,
+              0.6
+            ],
+            "reraise": [
+              0.84,
+              0.9,
+              0.95
+            ],
+            "onze": 0.5,
+            "bluff": 0,
+            "bluffBelow": 0.3,
+            "lead1": 2,
+            "leadLater": 2,
+            "signalTruth": 1,
+            "behind": 0
+          },
+          "styleShare": 0.35,
+          "switchStyles": null,
+          "persona": []
+        },
+        "otavio": {
+          "temperature": 1.8,
+          "raise": 0,
+          "accept": 0,
+          "run": 0,
+          "cover": 0,
+          "bluff": 0,
+          "signalLie": 0,
+          "style": {
+            "w": [
+              -0.3,
+              3,
+              2,
+              1,
+              1.6,
+              1.4,
+              0.6
+            ],
+            "raise": [
+              0.9,
+              0.93,
+              0.95,
+              0.97
+            ],
+            "accept": [
+              0.68,
+              0.72,
+              0.76,
+              0.8
+            ],
+            "reraise": [
+              0.95,
+              0.97,
+              0.99
+            ],
+            "onze": 0.62,
+            "bluff": 0,
+            "bluffBelow": 0.3,
+            "lead1": 2,
+            "leadLater": 2,
+            "signalTruth": 1,
+            "behind": 0
+          },
+          "styleShare": 0.68359375,
+          "switchStyles": null,
+          "persona": []
+        },
+        "bento": {
+          "temperature": 1,
+          "raise": 0,
+          "accept": 0,
+          "run": 0,
+          "cover": 0,
+          "bluff": 0,
+          "signalLie": 0.2,
+          "style": {
+            "w": [
+              -0.3,
+              3,
+              2,
+              1,
+              1.6,
+              1.4,
+              0.6
+            ],
+            "raise": [
+              0.72,
+              0.78,
+              0.84,
+              0.9
+            ],
+            "accept": [
+              0.36,
+              0.4,
+              0.45,
+              0.5
+            ],
+            "reraise": [
+              0.82,
+              0.88,
+              0.94
+            ],
+            "onze": 0.5,
+            "bluff": 0.6,
+            "bluffBelow": 0.4,
+            "lead1": 2,
+            "leadLater": 2,
+            "signalTruth": 0.75,
+            "behind": 0
+          },
+          "styleShare": 0.73046875,
+          "switchStyles": null,
+          "persona": []
+        },
+        "lia": {
+          "temperature": 1,
+          "raise": 0,
+          "accept": 0,
+          "run": 0,
+          "cover": 0,
+          "bluff": 0,
+          "signalLie": 0,
+          "style": {
+            "w": [
+              -0.3,
+              3,
+              2,
+              1,
+              1.6,
+              1.4,
+              0.6
+            ],
+            "raise": [
+              0.35,
+              0.4,
+              0.45,
+              0.5
+            ],
+            "accept": [
+              0.12,
+              0.15,
+              0.2,
+              0.25
+            ],
+            "reraise": [
+              0.5,
+              0.55,
+              0.6
+            ],
+            "onze": 0.3,
+            "bluff": 0.25,
+            "bluffBelow": 0.3,
+            "lead1": 2,
+            "leadLater": 2,
+            "signalTruth": 1,
+            "behind": 0
+          },
+          "styleShare": 0.99609375,
+          "switchStyles": null,
+          "persona": []
+        }
+      },
+      "createdAt": 1762936000000
+    }
+  }
+}

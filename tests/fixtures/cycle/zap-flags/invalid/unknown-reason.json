@@ -1,0 +1,23 @@
+{
+  "schema": "zap-flags/1",
+  "createdAt": 1763800000000,
+  "ops": [
+    {
+      "ref": "2026-11-20:aaaaaaaaaaaaaaaa",
+      "op": "flag",
+      "reason": "bot",
+      "evidence": "cv 0.04 over 260 decisions",
+      "at": 1763713600000
+    },
+    {
+      "ref": "2026-11-20:aaaaaaaaaaaaaaaa",
+      "op": "confirm",
+      "at": 1763756800000
+    },
+    {
+      "ref": "2026-11-19:bbbbbbbbbbbbbbbb",
+      "op": "clear",
+      "at": 1763800000000
+    }
+  ]
+}

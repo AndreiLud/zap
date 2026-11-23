@@ -1,0 +1,171 @@
+{
+  "schema": "zap-gate/1",
+  "candidate": {
+    "version": "v3",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "current": {
+    "version": "v2",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "seed": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "stats": "empty",
+  "sprt": {
+    "decision": "inconclusive",
+    "llr": 0.4,
+    "lower": -2.944,
+    "upper": 2.944,
+    "pairs": 2400,
+    "mean": 0.531,
+    "perSegment": {
+      "paulista-2": {
+        "pairs": 600,
+        "mean": 0.52
+      },
+      "paulista-4": {
+        "pairs": 600,
+        "mean": 0.53
+      },
+      "mineiro-2": {
+        "pairs": 600,
+        "mean": 0.54
+      },
+      "mineiro-4": {
+        "pairs": 600,
+        "mean": 0.55
+      }
+    }
+  },
+  "segments": {
+    "paulista-2": {
+      "pairs": 2500,
+      "mean": 0.53,
+      "lo95": 0.012,
+      "pass": true
+    },
+    "paulista-4": {
+      "pairs": 2500,
+      "mean": 0.53,
+      "lo95": 0.012,
+      "pass": true
+    },
+    "mineiro-2": {
+      "pairs": 2500,
+      "mean": 0.53,
+      "lo95": 0.012,
+      "pass": true
+    },
+    "mineiro-4": {
+      "pairs": 2500,
+      "mean": 0.53,
+      "lo95": 0.012,
+      "pass": true
+    }
+  },
+  "panel": [
+    {
+      "member": "random",
+      "pairs": 4000,
+      "candidate": {
+        "mean": 0.7,
+        "lo": 0.68,
+        "hi": 0.72
+      },
+      "current": {
+        "mean": 0.69,
+        "lo": 0.67,
+        "hi": 0.71
+      },
+      "diff": {
+        "mean": 0.01,
+        "lo95": -0.004
+      },
+      "pass": true
+    },
+    {
+      "member": "base",
+      "pairs": 4000,
+      "candidate": {
+        "mean": 0.7,
+        "lo": 0.68,
+        "hi": 0.72
+      },
+      "current": {
+        "mean": 0.69,
+        "lo": 0.67,
+        "hi": 0.71
+      },
+      "diff": {
+        "mean": 0.01,
+        "lo95": -0.004
+      },
+      "pass": true
+    },
+    {
+      "member": "tuned",
+      "pairs": 4000,
+      "candidate": {
+        "mean": 0.7,
+        "lo": 0.68,
+        "hi": 0.72
+      },
+      "current": {
+        "mean": 0.69,
+        "lo": 0.67,
+        "hi": 0.71
+      },
+      "diff": {
+        "mean": 0.01,
+        "lo95": -0.004
+      },
+      "pass": true
+    },
+    {
+      "member": "v1",
+      "pairs": 4000,
+      "candidate": {
+        "mean": 0.7,
+        "lo": 0.68,
+        "hi": 0.72
+      },
+      "current": {
+        "mean": 0.69,
+        "lo": 0.67,
+        "hi": 0.71
+      },
+      "diff": {
+        "mean": 0.01,
+        "lo95": -0.004
+      },
+      "pass": true
+    },
+    {
+      "member": "v2",
+      "pairs": 4000,
+      "candidate": {
+        "mean": 0.7,
+        "lo": 0.68,
+        "hi": 0.72
+      },
+      "current": {
+        "mean": 0.69,
+        "lo": 0.67,
+        "hi": 0.71
+      },
+      "diff": {
+        "mean": 0.01,
+        "lo95": -0.004
+      },
+      "pass": true
+    }
+  ],
+  "personas": {
+    "orderHolds": true,
+    "source": "work/20261121-0100/gate/personas.json"
+  },
+  "pass": false,
+  "reasons": [
+    "The sequential test reached its cap without a decision."
+  ],
+  "seconds": 3605.2
+}

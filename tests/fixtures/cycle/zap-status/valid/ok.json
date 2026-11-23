@@ -1,0 +1,14 @@
+{
+  "schema": "zap-status/1",
+  "state": "ok",
+  "startedAt": 1763800000000,
+  "finishedAt": 1763803600000,
+  "updatedAt": 1763803600000,
+  "cycleId": "20261121-0100",
+  "step": "idle",
+  "lastPromotion": {
+    "version": "v3",
+    "at": 1763803600000
+  },
+  "message": "Cycle 20261121-0100 done: v3 promoted."
+}
