@@ -1,0 +1,112 @@
+// Worker "zap": the site (static assets), the API and one Durable Object per room.
+// Local development: docker compose up dev (wrangler dev with local D1, R2 and Durable Objects).
+// Deploy: see DEPLOY.md (Workers Builds runs the D1 migrations, then wrangler deploy, on every push
+// to main). Vars live here: a var changed in the dashboard is overwritten by the next deploy.
+// Secrets (TURNSTILE_SECRET_KEY, SESSION_SECRET, ALERT_EMAIL) are set in the dashboard or with
+// `wrangler secret put` (DEPLOY.md, section 3), never written here: a var named like a secret
+// would delete that secret. No binding here is "remote": wrangler dev only ever touches local
+// files (worker/test/no-remote.test.ts checks it).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zap",
+  "main": "worker/src/cf/index.ts",
+  "compatibility_date": "2026-11-04",
+  "assets": {
+    "directory": "./web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/s/*", "/en/s/*", "/ads.txt"]
+  },
+  "exports": {
+    "Room": { "type": "durable-object", "storage": "sqlite" }
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "ROOM", "class_name": "Room" }],
+    // Rooms keep the old code for up to 24 h after a deploy, so matches are not cut.
+    "code_update_strategy": { "mode": "deferred", "max_delay": 86400 }
+  },
+  // database_id: a placeholder of zeros until the remote database exists; DEPLOY.md, section 1.6,
+  // puts its id here (the first build fails with the placeholder).
+  "d1_databases": [
+    { "binding": "DB", "database_name": "zap", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "worker/migrations" }
+  ],
+  "r2_buckets": [
+    // Match records, written by the rooms when a match ends (no person in them); the daily receipts.
+    { "binding": "EVENTS", "bucket_name": "zap-events" },
+    // Models, model cards, the manifest and the training status, written by the training cycle on
+    // the owner's server. The Worker only reads it (rooms: models; daily cron: status).
+    { "binding": "MODELS", "bucket_name": "zap-models" },
+    // Read only by the Worker: summary.json for the data page (GET /api/summary and /api/live),
+    // written by the training cycle.
+    { "binding": "PUBLIC", "bucket_name": "zap-public" }
+  ],
+  // The training alert (worker/src/cron.ts). No destination here: the owner's address is the
+  // ALERT_EMAIL secret, and Email Routing delivers only to verified addresses (DEPLOY.md).
+  "send_email": [{ "name": "EMAIL" }],
+  "ratelimits": [
+    // Per device credential, for the HTTP API.
+    { "name": "RL_API", "namespace_id": "4101", "simple": { "limit": 60, "period": 60 } },
+    // Per IP (as a daily salted hash, never stored), only for the human check and recovery.
+    { "name": "RL_VERIFY", "namespace_id": "4102", "simple": { "limit": 10, "period": 60 } },
+    // Per device, for downloading one's own match records in batches.
+    { "name": "RL_DATA", "namespace_id": "4103", "simple": { "limit": 300, "period": 60 } }
+  ],
+  // Daily jobs at 04:00 UTC (worker/src/cron.ts): retention, waiting room calls, the training
+  // cycle's imports and export, the training alert and the receipt. The only cron: Workers Free
+  // allows 5 per account, shared with other projects (DEPLOY.md, section 6). A deploy replaces this
+  // Worker's crons with this list.
+  "triggers": { "crons": ["0 4 * * *"] },
+  "rules": [{ "type": "Data", "globs": ["**/*.zapw"], "fallthrough": true }],
+  "observability": { "enabled": false },
+  "vars": {
+    // Cloudflare's always-pass TEST site key, for local development only: it protects nothing, and
+    // the Worker refuses the human check on https while a test key is set. DEPLOY.md replaces it
+    // with the real Turnstile site key before the first deploy (and turns on Always Use HTTPS for
+    // the zone, which the Strict-Transport-Security header relies on). .dev.vars keeps the test key
+    // for the local sites.
+    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
+    // Hostnames a Turnstile token may come from, comma separated. Never empty in production: the
+    // human check answers 500 misconfigured on https while it is.
+    "TURNSTILE_HOSTNAMES": "zap.andreiludescher.com",
+    "AI_MODE": "net",
+    // In-match adaptation of an adaptive model (features v2): "off" until the conditions of switching
+    // it on hold (project_docs/ai.md, "What ships"). The bundled models ignore it: v2 was trained
+    // without the statistics (features v2-empty) and v1 has none.
+    "AI_ADAPT": "off",
+    // Ads: structure only, switched off (DEPLOY.md, "How to enable ads"). The build reads
+    // ADS_ENABLED too, for the content security policy it writes into _headers.
+    "ADS_ENABLED": "false",
+    "ADS_CLIENT_ID": "",
+    "ADS_TEST_MODE": "false",
+    "ADS_MIN_INTERVAL_S": "120",
+    // The address the privacy pages show (GET /api/config). Empty: the You page (/voce) is the only
+    // channel. DEPLOY.md, section 1.5, sets privacidade@andreiludescher.com through Email Routing.
+    "PRIVACY_CONTACT": "",
+    // Sender of the training alert, an address on the zone (DEPLOY.md). Empty: no email.
+    "ALERT_FROM": "",
+    "PUBLIC_ORIGIN": "https://zap.andreiludescher.com",
+    // The brake (worker/src/brake.ts; DEPLOY.md, "The brake and when to move to Workers Paid").
+    // "free": no match starts once it would take the Zap past 80% of a Workers Free daily limit
+    // minus the other projects' reserve. "paid": the same for a monthly bill ceiling on Workers
+    // Paid. "off": no brake.
+    "BRAKE_MODE": "free",
+    // The other projects' share of each limit (0 or more; at 0.8 or above the Zap gets nothing of
+    // that line on Workers Free), their highest day of the last 14 days in the Cloudflare
+    // dashboard. 0.5 until the owner sends those numbers.
+    "BRAKE_RESERVE": { "workerRequests": 0.5, "doRequests": 0.5, "doRowsWritten": 0.5, "doGbSeconds": 0.5, "d1RowsWritten": 0.5, "d1RowsRead": 0.5 },
+    // Paid mode only: the whole Workers Paid bill of a month in US dollars, the $5 base included.
+    // Below the other projects' own bill every match is refused (worker/dev/brake-table.ts prints
+    // that minimum).
+    "BRAKE_MONTHLY_USD": "10",
+    // The typical cost of a match with its room until the room expires: one person (quick play,
+    // 2 against 2, paulista), and what each further person at the table adds, the local site's
+    // measured means rounded up (project_docs/brake.md). doGbSeconds is the time the room's
+    // handlers run: 269 ms for each request and message (19 ms measured plus a 250 ms margin for
+    // production), in GB-s rounded up. The ledger's real spend replaces them as matches end and
+    // rooms expire; they only hold room for the matches being played. Each match also updates the
+    // public counters' row once (GET /api/live): one D1 row written and one read on top of the
+    // measured 26 and 16.
+    "BRAKE_COST_SOLO": { "workerRequests": 2, "doRequests": 4, "doWsMessages": 13, "doRowsWritten": 26, "doGbSeconds": 0.6, "d1RowsWritten": 27, "d1RowsRead": 17 },
+    "BRAKE_COST_PER_PERSON": { "workerRequests": 1, "doRequests": 5, "doWsMessages": 15, "doRowsWritten": 22, "doGbSeconds": 0.7, "d1RowsWritten": 15, "d1RowsRead": 9 }
+  }
+}

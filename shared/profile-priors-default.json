@@ -1,0 +1,102 @@
+{
+  "schema": "zap-priors/1",
+  "createdAt": 1795338912451,
+  "source": "selfplay",
+  "people": null,
+  "numbers": {
+    "raise": {
+      "mean": 0.435009,
+      "strength": 2,
+      "people": null
+    },
+    "run": {
+      "mean": 0.430203,
+      "strength": 2,
+      "people": null
+    },
+    "accept": {
+      "mean": 0.568775,
+      "strength": 2,
+      "people": null
+    },
+    "reraise": {
+      "mean": 0.001023,
+      "strength": 2,
+      "people": null
+    },
+    "shown": {
+      "mean": 0.494135,
+      "strength": 2,
+      "people": null
+    },
+    "cover": {
+      "mean": 0.14758,
+      "strength": 2,
+      "people": null
+    },
+    "bluff": {
+      "mean": 0.171708,
+      "strength": 2,
+      "people": null
+    },
+    "signalTruth": {
+      "mean": 0.920415,
+      "strength": 2,
+      "people": null
+    }
+  },
+  "time": {
+    "mu": 8.006367567650246,
+    "tau": 1,
+    "sigma": 1
+  },
+  "alpha": 2,
+  "segments": {
+    "paulista-2": {
+      "raise": 0.6557965451055662,
+      "run": 0.3898671096345515,
+      "accept": 0.587375415282392,
+      "reraise": 0.022757475083056478,
+      "shown": 0.46337018572055605,
+      "cover": 0.16180449358898952
+    },
+    "paulista-4": {
+      "raise": 0.3029567391557158,
+      "run": 0.5797395145498428,
+      "accept": 0.39630675349515004,
+      "reraise": 0.02395373195500706,
+      "shown": 0.5327438257270017,
+      "cover": 0.19953823810528667
+    },
+    "mineiro-2": {
+      "raise": 0.7016150124231725,
+      "run": 0.3079247237569061,
+      "accept": 0.6638898480662984,
+      "reraise": 0.02818542817679558,
+      "shown": 0.46617427318341886,
+      "cover": 0.13609727512452388
+    },
+    "mineiro-4": {
+      "raise": 0.31810082123857236,
+      "run": 0.5145355439473086,
+      "accept": 0.45397077750018927,
+      "reraise": 0.03149367855250208,
+      "shown": 0.5230803276137116,
+      "cover": 0.17037436216971757
+    }
+  },
+  "readingSegments": {
+    "paulista-2": {
+      "bluff": 0.342303
+    },
+    "paulista-4": {
+      "bluff": 0.092929
+    },
+    "mineiro-2": {
+      "bluff": 0.373978
+    },
+    "mineiro-4": {
+      "bluff": 0.111966
+    }
+  }
+}
