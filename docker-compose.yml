@@ -1,0 +1,140 @@
+# Every tool runs in a container. Caches stay inside the project folder (.cache/, ignored by Git).
+# One-off commands:  docker compose run --rm node npm test
+name: zap
+
+x-node: &node
+  image: node:24-bookworm-slim@sha256:01d566e8d94d8c619591d78652babfccd3c6992a3dffa9ed5ab39e11cf6c70e9
+  user: node
+  init: true
+  working_dir: /app
+  volumes:
+    - ./:/app
+  environment:
+    HOME: /app/.cache/home
+    npm_config_cache: /app/.cache/npm
+    npm_config_update_notifier: "false"
+    npm_config_fund: "false"
+
+services:
+  # Local site: wrangler dev with local D1, R2 and Durable Objects, on http://127.0.0.1:8787
+  dev:
+    <<: *node
+    build: ./docker/dev
+    image: zap-dev:local
+    ports:
+      - "127.0.0.1:8787:8787"
+    command: ["sh", "-c", "npx wrangler d1 migrations apply zap --local && npx wrangler dev --ip 0.0.0.0 --port 8787 --persist-to .wrangler/state"]
+
+  # Second local site for end-to-end tests, with every waiting time 20 times shorter.
+  dev-e2e:
+    <<: *node
+    build: ./docker/dev
+    image: zap-dev:local
+    profiles: ["e2e"]
+    ports:
+      - "127.0.0.1:8788:8788"
+    command: ["sh", "-c", "npx wrangler d1 migrations apply zap --local --persist-to .wrangler/e2e-state && npx wrangler dev --ip 0.0.0.0 --port 8788 --persist-to .wrangler/e2e-state --var ROOM_TIME_SCALE:0.05"]
+
+  node:
+    <<: *node
+    profiles: ["tools"]
+    command: ["npm", "test"]
+
+  train:
+    build:
+      context: ./training
+      additional_contexts:
+        wheels: ./.cache/wheels
+    image: zap-train:local
+    user: "1000:1000"
+    working_dir: /app
+    init: true
+    volumes:
+      - ./:/app
+    environment:
+      HOME: /app/.cache/home
+    cpus: 4
+    mem_limit: 6g
+    profiles: ["train"]
+    command: ["python", "training/train.py", "--run", "training/runs/main"]
+
+  # Local stand-in for R2 (S3 API) for the cycle's tests. Bound to 127.0.0.1; data in .cache/minio.
+  # The MinIO image is no longer published on Docker Hub, so this runs a small S3 server written for
+  # the tests (training/cycle/devs3/s3server.py, standard library only) on the local Python image.
+  minio:
+    image: python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+    profiles: ["cycle-dev"]
+    user: "1000:1000"
+    command: ["python", "-I", "/srv/s3server.py", "--data", "/data", "--port", "9000"]
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - ./.cache/minio:/data
+      - ./training/cycle/devs3:/srv:ro
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-}
+    cpus: 0.5
+    mem_limit: 512m
+
+  # Training cycle, one-off commands (tests, status, rollback, flags, bridge). One core.
+  cycle:
+    build:
+      context: ./training/cycle
+      additional_contexts:
+        wheels: ./.cache/wheels-cycle
+    image: zap-cycle:local
+    profiles: ["cycle"]
+    user: "1000:1000"
+    working_dir: /app
+    init: true
+    volumes:
+      - ./:/app
+    environment:
+      HOME: /app/.cache/home
+    env_file:
+      - path: .env
+        required: false
+    cpus: 1
+    mem_limit: 2g
+    command: ["python", "training/cycle/cycle.py", "--config", "training/cycle/config/local.toml", "status"]
+
+  # Training cycle on the owner's server: weekly, or after 1,000 new human matches (training/cycle/SERVER.md).
+  scheduler:
+    build:
+      context: ./training/cycle
+      additional_contexts:
+        wheels: ./.cache/wheels-cycle
+    image: zap-cycle:local
+    profiles: ["scheduler"]
+    restart: unless-stopped
+    user: "1000:1000"
+    working_dir: /app
+    init: true
+    volumes:
+      - ./:/app
+    environment:
+      HOME: /app/.cache/home
+    env_file:
+      - path: .env
+        required: false
+    cpus: 4
+    mem_limit: 6g
+    command: ["python", "training/cycle/cycle.py", "--config", "training/cycle/config/prod.toml", "scheduler"]
+
+  # One-off: makes the nine shouts into web/src/sfx/. Needs no network while it runs.
+  audio:
+    build: ./docker/audio
+    image: zap-audio:local
+    profiles: ["audio"]
+    user: "1000:1000"
+    working_dir: /app
+    init: true
+    network_mode: none
+    volumes:
+      - ./:/app
+    environment:
+      HOME: /app/.cache/home
+    cpus: 1
+    mem_limit: 512m
+    command: ["sh", "tools/audio/make-shouts.sh"]

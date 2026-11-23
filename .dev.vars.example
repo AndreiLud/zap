@@ -1,0 +1,28 @@
+# Local development secrets and vars for wrangler dev. Copy to .dev.vars (ignored by Git). None of
+# these values ever goes to production (DEPLOY.md, "Only for the local sites, never in production").
+# These are Cloudflare's public Turnstile TEST keys: they never protect anything real.
+# Test sitekeys: 1x00000000000000000000AA always passes, 2x00000000000000000000AB always fails,
+# 3x00000000000000000000FF forces an interactive challenge.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+# The test site key. wrangler.jsonc holds the real site key once the site is deployed (DEPLOY.md,
+# section 1.6); this line keeps the local sites on the test key, since .dev.vars overrides it.
+TURNSTILE_SITE_KEY=1x00000000000000000000AA
+# Signs the short-lived game credential and the daily salt for rate-limit keys. Any long random string locally.
+SESSION_SECRET=dev-only-change-me-0123456789abcdef0123456789abcdef
+# Local development accepts any hostname (the Turnstile test keys).
+TURNSTILE_HOSTNAMES=
+# A local test site: match records carry "test": true, and the rooms read the model manifest every
+# MANIFEST_TTL_S seconds instead of every 5 minutes. Never set in wrangler.jsonc or in production.
+TEST_RECORDS=true
+MANIFEST_TTL_S=5
+# The training alert of the daily cron (worker/src/cron.ts). On a local site the send_email binding
+# only logs the message and writes it to a file inside wrangler dev: nothing leaves the machine.
+# In production ALERT_FROM is a var set at deploy and ALERT_EMAIL a secret (DEPLOY.md).
+ALERT_FROM=alerts@zap.localhost
+ALERT_EMAIL=owner@zap.localhost
+# The brake (worker/src/brake.ts). A local site runs the paid mode's arithmetic with a ceiling no
+# day of tests reaches, so the brake reserves and swaps on every match without ever stopping one.
+# The brake's own tests use test ledgers with room for a few matches (x-zap-test-ledger, honoured
+# only with TEST_RECORDS on a local host). Never set in production: DEPLOY.md sets the real mode.
+BRAKE_MODE=paid
+BRAKE_MONTHLY_USD=1000
