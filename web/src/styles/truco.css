@@ -1,0 +1,434 @@
+/* The TRUCO moment (CLIENT-SPEC 11.4; prototype azulejo-v2/mesa.css .truco*): the one place where
+   the tile wall takes the whole stage. The wall and its grout live only in the top area (on desktop
+   the left column), clip-path keeps the turning tiles inside the radius, and the answer area is the
+   one layer at the bottom corners. Buttons work from the first frame; the flip is decoration. */
+
+/* The panel covers the play area and grows down over the hand when the answers need more room (with
+   large text): cards cannot be played while answering, and the top area always keeps at least 6rem
+   for who called and the word. */
+.truco {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: minmax(6rem, 1fr) auto;
+  min-height: 100%;
+  overflow: clip;
+  border-radius: var(--radius-l);
+  clip-path: inset(0 round var(--radius-l));
+}
+
+/* Size contained: the measured tiles never make the panel taller than its area. */
+.truco__wall {
+  contain: size;
+  display: grid;
+  grid-area: 1 / 1;
+  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(var(--cols, 5), 1fr);
+  align-content: start;
+  gap: 3px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 3px;
+  background: var(--line);
+  perspective: 900px;
+}
+
+.truco__tile {
+  position: relative;
+}
+
+.truco__tile-in {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
+}
+
+.truco__tile-a,
+.truco__tile-b {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 3px;
+  backface-visibility: hidden;
+}
+
+.truco__tile-b {
+  transform: rotateY(180deg);
+}
+
+.truco__tile-b svg {
+  width: 100%;
+  height: 100%;
+  rotate: var(--turn, 0deg);
+}
+
+.truco__stage {
+  position: relative;
+  z-index: 1;
+  container: truco-stage / size;
+  display: grid;
+  grid-area: 1 / 1;
+  place-items: center;
+  min-height: 0;
+}
+
+.truco__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 24px);
+}
+
+.truco__who {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 6px 12px 6px 6px;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.truco__who .avatar {
+  width: 28px;
+  height: 28px;
+}
+
+.truco__word {
+  --lt: min(96px, calc((100cqw - 48px) / var(--word-cols, 3)), calc((100cqh - 100px) / 2));
+
+  display: grid;
+  grid-template-columns: repeat(var(--word-cols, 3), var(--lt));
+  gap: 6px;
+  margin: 0;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--line);
+  box-shadow: var(--shadow);
+  perspective: 700px;
+}
+
+@container truco-stage (height < 12rem) {
+  .truco__word {
+    --lt: min(124px, calc((100cqw - 72px) / var(--word-len, 6)), calc(100cqh - 76px));
+
+    grid-template-columns: repeat(var(--word-len, 6), var(--lt));
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .truco__who {
+    padding-block: 4px;
+  }
+}
+
+.truco__letter {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--lt);
+  height: var(--lt);
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--l-bg);
+  color: var(--l-fg);
+  font-family: var(--font-display);
+  font-size: calc(var(--lt) * 0.84);
+  font-weight: 800;
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.truco__letter::before {
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: var(--l-mod);
+  opacity: 0.5;
+  content: "";
+  translate: var(--mx) var(--my);
+}
+
+.truco__letter > span {
+  position: relative;
+  translate: 0 2%;
+}
+
+/* Our team's color, theirs, ochre with ink, ink with the page color, then again. */
+.truco__letter:nth-child(4n + 1) {
+  --l-bg: var(--nos);
+  --l-fg: var(--nos-fg);
+  --l-mod: color-mix(in srgb, var(--nos) 70%, white);
+  --mx: -55%;
+  --my: -55%;
+}
+
+.truco__letter:nth-child(4n + 2) {
+  --l-bg: var(--eles);
+  --l-fg: var(--eles-fg);
+  --l-mod: color-mix(in srgb, var(--eles) 70%, white);
+  --mx: 55%;
+  --my: -55%;
+}
+
+.truco__letter:nth-child(4n + 3) {
+  --l-bg: var(--ocre-fill);
+  --l-fg: var(--ocre-fg);
+  --l-mod: color-mix(in srgb, var(--ocre-fill) 60%, white);
+  --mx: 55%;
+  --my: 55%;
+}
+
+.truco__letter:nth-child(4n + 4) {
+  --l-bg: var(--text);
+  --l-fg: var(--bg);
+  --l-mod: color-mix(in srgb, var(--text) 75%, var(--bg));
+  --mx: -55%;
+  --my: 55%;
+}
+
+.truco__answers {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 3px solid var(--line);
+  background: var(--surface);
+}
+
+.truco__time {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* The time to answer: it shrinks with reduced motion too (it carries information), linearly. */
+.truco__time span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--ocre-line);
+  transform-origin: left;
+  animation-name: truco-time;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@keyframes truco-time {
+  from {
+    scale: 1 1;
+  }
+
+  to {
+    scale: 0 1;
+  }
+}
+
+.truco__value {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.truco__context {
+  margin: -4px 0 0;
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.truco__buttons {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 8px;
+}
+
+.truco__buttons .btn {
+  min-height: 52px;
+  padding: 0 8px;
+  font-size: 1.05rem;
+}
+
+.truco__buttons .btn--outline {
+  border-color: var(--text-2);
+}
+
+.truco__raise {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.truco.is-closing {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .truco__wall.is-entering .truco__tile-in {
+    animation: tile-turn 0.4s cubic-bezier(0.3, 0.7, 0.2, 1) var(--d, 0ms) both;
+  }
+
+  .truco__wall.is-entering .truco__tile-b svg {
+    animation: tile-spin 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--d, 0ms) + 0.2s) both;
+  }
+
+  .truco__wall.is-entering {
+    animation: wall-ground 0.4s ease-out 0.1s both;
+  }
+
+  .truco .truco__content {
+    animation: content-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.15) 0.15s both;
+  }
+
+  .truco .truco__letter {
+    animation: letter-drop 0.36s cubic-bezier(0.2, 0.9, 0.25, 1.25) calc(0.24s + var(--i, 0) * 50ms) both;
+  }
+
+  .truco .truco__answers {
+    animation: answers-in 0.2s ease-out both;
+  }
+
+  .truco.is-closing {
+    animation: truco-out 0.24s ease-in both;
+  }
+
+  @keyframes tile-turn {
+    from {
+      transform: rotateY(0deg);
+    }
+
+    to {
+      transform: rotateY(180deg);
+    }
+  }
+
+  @keyframes tile-spin {
+    from {
+      rotate: calc(var(--turn, 0deg) - 90deg);
+    }
+  }
+
+  @keyframes wall-ground {
+    from {
+      background-color: transparent;
+    }
+  }
+
+  @keyframes content-in {
+    from {
+      opacity: 0;
+      scale: 0.8;
+    }
+  }
+
+  @keyframes letter-drop {
+    from {
+      opacity: 0;
+      transform: rotateX(-95deg) scale(1.25);
+    }
+  }
+
+  @keyframes answers-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes truco-out {
+    to {
+      opacity: 0;
+      scale: 1.03;
+    }
+  }
+}
+
+/* Reduced motion: the wall and the word are there at once; a short fade only. */
+@media (prefers-reduced-motion: reduce) {
+  .truco .truco__content,
+  .truco .truco__answers {
+    animation: truco-fade 0.2s ease-out both;
+  }
+
+  .truco.is-closing {
+    animation: truco-fade 0.2s ease-in reverse both;
+  }
+
+  @keyframes truco-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* Large text on a phone: the answers stand in one column. */
+@container stage (width < 19rem) {
+  .truco__buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop: the panel covers the play area and the turn line; the answers stand on the right. */
+@media (width >= 64em) {
+  .truco {
+    grid-template-columns: minmax(0, 1fr) clamp(17.5rem, 36%, 23rem);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .truco__word {
+    --lt: min(120px, calc((100cqw - 48px) / var(--word-cols, 3)), calc((100cqh - 104px) / 2));
+
+    gap: 8px;
+    padding: 8px;
+    border-radius: 16px;
+  }
+
+  .truco__content {
+    gap: 12px;
+  }
+
+  .truco__who {
+    font-size: 1.1rem;
+  }
+
+  .truco__answers {
+    align-content: center;
+    gap: 10px;
+    padding: 16px 18px;
+    border-top: 0;
+    border-left: 3px solid var(--line);
+  }
+
+  .truco__value,
+  .truco__context {
+    text-align: left;
+  }
+
+  .truco__buttons {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .truco__buttons .btn:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .truco__buttons .btn {
+    min-height: 50px;
+  }
+}

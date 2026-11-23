@@ -1,0 +1,44 @@
+{
+  "provenance": {
+    "script": "tools/data/cycle-rules.ts",
+    "command": "docker compose run --rm -T node node tools/data/cycle-rules.ts",
+    "measuredAt": "2026-11-23T03:29:39.240Z",
+    "node": "v24.22.2",
+    "cpu": "QEMU Virtual CPU version 2.5+",
+    "commit": "9f20bbe4cf238a6d68572db4c37418a4ab6dd47e",
+    "inputs": [
+      {"path":"tools/data/cycle-rules.ts","sha256":"c352d6d401f00c348c04eb4c9cbd0cb8c1a63321f78f93c5db557a807fd7d684"},
+      {"path":"tools/data/lib/toml-lite.ts","sha256":"e14cfbae5f1e0e3bb619eb9e37b32546f46cdf0f9779f7beb173fba78c44723c"},
+      {"path":"training/cycle/config/prod.toml","sha256":"6292590afc7cc8b72e2236a3cceed3e4c239d69e38536456a5f83bd4485fe146"},
+      {"path":"training/cycle/zapcycle/summary.py","sha256":"e4bf94d189484980a77916a6b5681b1e0c1fd648ea75f704f479d5af97a424bc"}
+    ]
+  },
+  "gate": {
+    "p0": 0.5,
+    "p1": 0.515,
+    "alpha": 0.05,
+    "beta": 0.05,
+    "segment_margin": 0.015,
+    "panel_margin": 0.01,
+    "batch_pairs": 400,
+    "segment_pairs": 2500,
+    "panel_pairs": 2500,
+    "stats": "empty"
+  },
+  "ab": {"share":0.3,"days":14,"rollback_drop":0.02,"min_matches_per_arm":200},
+  "thresholds": {
+    "human_model_matches": 500,
+    "human_model_devices": 50,
+    "priors_people": 100,
+    "adapt_decisions": 150,
+    "player_types_devices": 200,
+    "ranking_people": 50,
+    "ranking_matches_each": 20,
+    "open_data_matches": 1000,
+    "open_data_style_matches": 50,
+    "min_cell_people": 20
+  },
+  "schedule": {"weekday":5,"time":"22:00","timezone":"America/Sao_Paulo","new_matches":1000},
+  "train": {"iters":390,"decisions":120000},
+  "MIN_PEOPLE": 20
+}

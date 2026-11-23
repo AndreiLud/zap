@@ -1,0 +1,49 @@
+/* The two charts of shares, the 100% stacked bars and the waffle (chapter 1 of the data page):
+   imported by Stacked100.tsx and Waffle.tsx, so they load with the chapters that use them. */
+
+.chart .seg-s1 { fill: var(--series-1); }
+.chart .seg-neutral { fill: var(--chart-neutral); }
+.chart .seg-s2 { fill: var(--series-2); }
+
+.chart .seg-s1.is-active,
+.chart .seg-neutral.is-active,
+.chart .seg-s2.is-active {
+  stroke: var(--chart-ink);
+  stroke-width: 2;
+}
+
+.chart .wf-on { fill: var(--series-1); }
+.chart .wf-ring { fill: var(--chart-surface); stroke: var(--series-1); stroke-width: 2; }
+.chart .wf-off { fill: var(--chart-axis); }
+.chart .wf-on.is-active,
+.chart .wf-ring.is-active {
+  stroke: var(--chart-ink);
+  stroke-width: 1;
+}
+
+/* Forced colors: filled shares in CanvasText, empty ones as outlines, the active one in Highlight
+   (these come after the rules above at the same specificity, so they win). */
+@media (forced-colors: active) {
+  .chart .seg-s1,
+  .chart .seg-s2,
+  .chart .wf-on {
+    fill: CanvasText;
+    stroke: Canvas;
+  }
+
+  .chart .seg-neutral,
+  .chart .wf-ring,
+  .chart .wf-off {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+
+  .chart .seg-s1.is-active,
+  .chart .seg-neutral.is-active,
+  .chart .seg-s2.is-active,
+  .chart .wf-on.is-active,
+  .chart .wf-ring.is-active {
+    fill: Highlight;
+    stroke: Highlight;
+  }
+}

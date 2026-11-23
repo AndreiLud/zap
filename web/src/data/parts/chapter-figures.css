@@ -1,0 +1,353 @@
+/* The pieces inside the four chapters that are not charts (DATA-SPEC 4.6 to 4.9): the card glyphs
+   of F11, the version timeline of F19, the character cards of F22 and the meters list of F24. They
+   load with the chapters (parts/chapters-lazy.ts), after the first screen. */
+
+/* F11: a small card before each row name; manilhas wear the ochre accent. */
+.chap-glyph {
+  fill: var(--chart-surface);
+  stroke: var(--chart-ink-2);
+  stroke-width: 1.2;
+}
+
+.chap-glyph--manilha {
+  fill: var(--ocre-fill);
+  stroke: var(--ocre-line);
+}
+
+/* ===================================================================== */
+/* F19 version history                                                    */
+/* ===================================================================== */
+
+.hist {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hist__item {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 0 0 18px 26px;
+  border-left: 2px solid var(--line);
+  margin-left: 7px;
+}
+
+.hist__item:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+
+.hist__item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--chart-ink-2);
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.hist__item.is-current::before {
+  border-color: var(--series-1);
+  background: var(--series-1);
+}
+
+.hist__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.hist__version {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hist__result {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.hist__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  align-self: center;
+}
+
+.hist__tag {
+  padding: 1px 8px;
+  border: 1px solid var(--series-1);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.hist__date,
+.hist__line {
+  color: var(--text-2);
+  font-size: 0.92rem;
+}
+
+.hist__line {
+  margin: 0;
+  max-width: 60ch;
+  line-height: 1.4;
+}
+
+/* ===================================================================== */
+/* F22 the characters                                                     */
+/* ===================================================================== */
+
+.cast-block {
+  display: grid;
+  gap: 20px;
+}
+
+.cast {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cast__card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--chart-surface);
+}
+
+.cast__card--zap {
+  border-color: var(--series-1);
+}
+
+.cast__who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cast__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.cast__style {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.88rem;
+}
+
+.cast__rates {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Name and bar on one row; with large text the bar wraps under its name instead of pushing out. */
+.cast__rate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.cast__rate dt {
+  flex: 0 0 min(7.5rem, 100%);
+  color: var(--text-2);
+  font-size: 0.86rem;
+}
+
+.cast__rate dd {
+  display: grid;
+  flex: 1 1 7rem;
+  grid-template-columns: minmax(0, 1fr) minmax(3.2em, auto);
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+.cast__bar {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--chart-grid);
+}
+
+.cast__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+}
+
+.cast__fill--s1 {
+  background: var(--series-1);
+}
+
+.cast__fill--s2 {
+  background: var(--series-2);
+}
+
+.cast__fill--s3 {
+  background: var(--series-3);
+}
+
+/* Zap's value on the same row, as a thin dark tick (shape, not color, tells it apart). */
+.cast__tick {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--chart-ink);
+}
+
+.cast__value {
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.cast__vs {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+/* F25: one card per player type, the same bar rows as the characters. */
+.types {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.types__card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--chart-surface);
+}
+
+.types__head {
+  margin: 0;
+  font-weight: 800;
+}
+
+.types .cast__rate dt {
+  flex-basis: min(10rem, 100%);
+}
+
+/* ===================================================================== */
+/* F24 the meters list                                                    */
+/* ===================================================================== */
+
+.marks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 0 36px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.marks__item {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.marks__more {
+  display: grid;
+  gap: 5px;
+  margin-left: 30px;
+}
+
+.marks__you-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.marks__you-link {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--text);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* The way to take part under the people figures that are still empty (F17, F24). */
+.chap__play {
+  justify-self: start;
+}
+
+.chart__extra > .chap__play {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.chart__extra .meter {
+  max-width: 28rem;
+}
+
+@media (forced-colors: active) {
+  .cast__fill,
+  .cast__tick,
+  .hist__item.is-current::before {
+    background: CanvasText;
+  }
+
+  .cast__bar {
+    border: 1px solid CanvasText;
+  }
+
+  .chap-glyph,
+  .chap-glyph--manilha {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+}

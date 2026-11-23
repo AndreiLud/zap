@@ -1,0 +1,969 @@
+/* The data page itself (DATA-SPEC 4): the cover and its live counters, the chapter nav, part 1
+   (the cycle, the four learning steps, the duplicate format) and the reading section's status and
+   explainer. The chart kit (figure, marks, meters) is styles/data.css. Imported by
+   data/DataPage.tsx, so it rides in the page's chunk. Whitespace and thin rules make the
+   structure; tiles stay an accent (the cycle icons, the strip, the avatars). */
+
+.dp {
+  width: 100%;
+  min-width: 0;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 8px var(--gutter) 56px;
+}
+
+.dp h1 {
+  max-width: 15ch;
+  font-size: var(--fs-h1-page);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.dp-kicker {
+  color: var(--accent);
+  font-size: var(--fs-label);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dp-lead,
+.dp-sub {
+  max-width: 52ch;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.dp-lead { font-size: var(--fs-lead); }
+.dp-sub { font-size: 0.95rem; }
+
+.dp-note {
+  max-width: 62ch;
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.dp-link {
+  color: var(--accent);
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ Cover and live counters */
+
+.dp-cover {
+  display: grid;
+  gap: 22px;
+  padding: 14px 0 22px;
+}
+
+.dp-cover__text {
+  display: grid;
+  gap: 14px;
+}
+
+.dp-live {
+  display: grid;
+  gap: 10px;
+}
+
+.dp-live__h {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-text);
+  font-size: var(--fs-label);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dp-live__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--eles);
+}
+
+.dp-live__dot.is-stale {
+  background: var(--outline-quiet);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dp-live__dot.is-polling {
+    animation: dp-pulse 2.4s ease-out infinite;
+  }
+
+  @keyframes dp-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--eles) 45%, transparent); }
+    70%, 100% { box-shadow: 0 0 0 7px transparent; }
+  }
+}
+
+.dp-live__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--line-soft);
+}
+
+.dp-live__list > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px 10px 12px 0;
+}
+
+.dp-live__list > div:nth-child(even) {
+  padding-left: 12px;
+  border-left: 1px solid var(--line-soft);
+}
+
+.dp-live__list > div:nth-child(n + 3) {
+  border-top: 1px solid var(--line-soft);
+}
+
+.dp-live__list dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.dp-live__list dd.is-words {
+  font-size: clamp(1.1rem, 4vw, 1.35rem);
+  line-height: 1.15;
+}
+
+.dp-live__list dt,
+.dp-live__note {
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 600;
+}
+
+.dp-live__resume {
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 800;
+}
+
+@media (min-width: 37.5em) {
+  .dp-live__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dp-live__list > div:nth-child(n + 2) { padding-left: 12px; border-left: 1px solid var(--line-soft); }
+  .dp-live__list > div:nth-child(n + 3) { border-top: 0; }
+}
+
+/* ------------------------------------------------------------------ Chapter nav */
+
+.dp-nav {
+  z-index: 5;
+  margin: 0 calc(-1 * var(--gutter)) 8px;
+  padding: 8px var(--gutter);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line-soft);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.dp-nav__list {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.dp-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: var(--fs-note);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dp-nav__link[aria-current='true'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+}
+
+@media (min-width: 56.25em) {
+  .dp-nav {
+    position: sticky;
+    top: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ Parts and blocks */
+
+.dp-part {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 44px;
+  padding: 34px 0 10px;
+  scroll-margin-top: 64px;
+}
+
+.dp-part + .dp-part {
+  border-top: 1px solid var(--line-soft);
+}
+
+.dp-part__h {
+  font-size: var(--fs-h2);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.dp-part__h + .dp-part__lead,
+.dp-part__lead + .dp-status {
+  margin-top: -30px;
+}
+
+.dp-block,
+.dp .figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  scroll-margin-top: 64px;
+}
+
+/* ------------------------------------------------------------------ F1 the cycle */
+
+.dp-cycle__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dp-cycle__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 14px;
+}
+
+.dp-cycle__step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 50px;
+  bottom: -14px;
+  width: 1.5px;
+  background: var(--text-2);
+}
+
+.dp-cycle__ic {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+
+.dp-cycle__step.is-duel .dp-cycle__ic {
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+}
+
+.dp-cycle__ic .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.dp-cycle__txt {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-width: 0;
+  min-height: 44px;
+}
+
+.dp-cycle__txt b {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.dp-cycle__fork,
+.dp-cycle__loop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--eles);
+  font-size: var(--fs-note);
+  font-weight: 700;
+}
+
+.dp-cycle__loop {
+  margin-top: 10px;
+  color: var(--text-2);
+}
+
+.dp-cycle__fork .icon,
+.dp-cycle__loop .icon {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+.dp-record {
+  margin: 0;
+  padding: 2px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.dp-record > div {
+  display: grid;
+  grid-template-columns: fit-content(40%) minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: center;
+  padding: 9px 0;
+}
+
+.dp-record > div + div {
+  border-top: 1px solid var(--line-soft);
+}
+
+.dp-record dt {
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.dp-record dd {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.dp-record__et,
+.dp-record__no dd {
+  color: var(--text-2);
+  font-weight: 650;
+}
+
+.dp-record__no .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* A manilha carries the ochre corner of the deck's seal. */
+.dp-card--m {
+  position: relative;
+}
+
+.dp-card--m::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  border-bottom-left-radius: 9px;
+  background: var(--card-accent);
+}
+
+.dp-duel {
+  max-width: 62ch;
+  border-block: 1px solid var(--line-soft);
+}
+
+.dp-duel summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.dp-duel ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding-left: 1.2rem;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+
+@media (min-width: 64em) {
+  .dp-cycle {
+    position: relative;
+    padding-top: 30px;
+  }
+
+  /* The way back runs over the row, from the last step to the first. */
+  .dp-cycle::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 22px;
+    right: 22px;
+    height: 16px;
+    border: 1.5px solid var(--text-2);
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .dp-cycle::after {
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: 17.5px;
+    border: 5px solid transparent;
+    border-bottom: 0;
+    border-top: 6px solid var(--text-2);
+  }
+
+  .dp-cycle__loop {
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    margin: 0;
+    padding: 0 10px;
+    translate: -50% 0;
+    background: var(--bg);
+  }
+
+  .dp-cycle__loop .icon { display: none; }
+
+  .dp-cycle__list {
+    grid-template-columns: 1fr 2.3fr repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .dp-cycle__step {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px;
+    align-content: start;
+  }
+
+  .dp-cycle__step:not(:last-child)::before {
+    left: 52px;
+    right: -6px;
+    top: 21px;
+    bottom: auto;
+    width: auto;
+    height: 1.5px;
+  }
+
+  .dp-cycle__txt { align-content: start; }
+}
+
+/* ------------------------------------------------------------------ F2 the learning steps */
+
+.dp-steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: dp-step;
+}
+
+.dp-step {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: center;
+  padding: 16px 0;
+  counter-increment: dp-step;
+}
+
+.dp-step + .dp-step {
+  border-top: 1px solid var(--line-soft);
+}
+
+.dp-step__fig {
+  display: grid;
+  place-items: center;
+  min-height: 86px;
+}
+
+.dp-step__txt {
+  display: grid;
+  gap: 5px;
+  align-content: center;
+}
+
+.dp-step h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.25;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.dp-step__n::before {
+  content: counter(dp-step);
+  display: inline-grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--text);
+  font-family: var(--font-text);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.dp-step p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.dp-step--wide {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 14px;
+}
+
+.dp-ill { display: grid; place-items: center; }
+.dp-ill .avatar { width: 30px; height: 30px; }
+
+.dp-ill--rules {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dp-ill__note {
+  display: grid;
+  gap: 5px;
+  align-content: center;
+  width: 40px;
+  height: 54px;
+  padding: 8px 7px;
+  border-radius: 4px;
+  background: var(--card-face);
+  box-shadow: 0 0 0 1px var(--card-edge), var(--shadow-card);
+  rotate: -5deg;
+}
+
+.dp-ill__note i {
+  height: 2.5px;
+  border-radius: 2px;
+  background: #8F8B82;
+}
+
+.dp-ill__note i:nth-child(2) { width: 70%; }
+.dp-ill__note i:nth-child(4) { width: 55%; }
+
+.dp-ill__arrow {
+  width: 22px;
+  height: 11px;
+  color: var(--text-2);
+}
+
+.dp-ill--self {
+  grid-template-columns: repeat(3, 28px);
+  grid-template-rows: repeat(3, 28px);
+  gap: 2px;
+}
+
+.dp-ill--self .avatar { width: 26px; height: 26px; }
+.dp-ill__seat--n { grid-area: 1 / 2; }
+.dp-ill__seat--w { grid-area: 2 / 1; opacity: 0.45; filter: grayscale(0.6); }
+.dp-ill__seat--e { grid-area: 2 / 3; opacity: 0.45; filter: grayscale(0.6); }
+.dp-ill__seat--s { grid-area: 3 / 2; }
+.dp-ill__turn { grid-area: 2 / 2; width: 20px; height: 20px; color: var(--text-2); }
+
+.dp-ill--reward {
+  gap: 7px;
+  width: 100%;
+  justify-items: stretch;
+}
+
+.dp-ill__cap {
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.dp-ill__row {
+  display: grid;
+  grid-template-columns: 3.9em minmax(0, 1fr) 1em;
+  gap: 5px;
+  align-items: center;
+  color: var(--text-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.dp-ill__row i {
+  display: flex;
+  height: 9px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+
+.dp-ill__row b { width: 44%; background: var(--text-2); }
+.dp-ill__row b.is-gain { width: 26%; background: var(--ocre-fill); }
+.dp-ill__row em { font-style: normal; font-weight: 800; color: var(--text); }
+
+.dp-contrast {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dp-mini {
+  display: grid;
+  gap: 9px;
+  justify-items: center;
+  align-content: start;
+  margin: 0;
+  text-align: center;
+}
+
+.dp-mini figcaption {
+  display: grid;
+  gap: 1px;
+}
+
+.dp-mini figcaption span {
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 600;
+}
+
+/* A small table seen from above: four hands in a cross. */
+.dp-table {
+  display: grid;
+  grid-template: "a n b" auto "w c e" minmax(20px, 1fr) "d s f" auto / auto minmax(16px, 1fr) auto;
+  place-items: center;
+  width: 100%;
+  max-width: 13.5rem;
+  aspect-ratio: 1;
+  padding: 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.dp-table__hand { display: inline-flex; align-items: center; }
+.dp-table__hand--n { grid-area: n; align-self: start; }
+.dp-table__hand--s { grid-area: s; align-self: end; }
+.dp-table__hand--w { grid-area: w; flex-direction: column; }
+.dp-table__hand--e { grid-area: e; flex-direction: column; }
+
+.dp-table .dp-table__card {
+  width: 20px;
+  height: 28px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgb(10 20 60 / 0.2);
+  font-size: 11px;
+}
+
+.dp-table .dp-table__card .mini-card__suit { width: 8px; height: 8px; }
+.dp-table__hand--n .dp-table__card + .dp-table__card,
+.dp-table__hand--s .dp-table__card + .dp-table__card { margin-left: -5px; }
+.dp-table__hand--w .dp-table__card + .dp-table__card,
+.dp-table__hand--e .dp-table__card + .dp-table__card { margin-top: -8px; }
+
+.dp-table__hand.is-us,
+.dp-table__hand.is-them {
+  gap: 3px;
+  padding: 3px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--nos) 14%, transparent);
+}
+
+.dp-table__hand.is-them { background: color-mix(in srgb, var(--eles) 14%, transparent); }
+.dp-table .team-chip,
+.dp-dup__key .team-chip { width: 11px; height: 11px; flex: none; }
+.dp-table__av { width: 16px; height: 16px; margin-right: 4px; }
+
+.dp-table__eye {
+  grid-area: c;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+}
+
+.dp-table__eye svg { width: 18px; height: 18px; }
+
+.dp-net {
+  display: grid;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.dp-net__h { font-weight: 750; }
+
+.dp-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--line-soft);
+}
+
+.dp-facts > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 12px 10px 12px 0;
+}
+
+.dp-facts dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.dp-facts dt {
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 600;
+}
+
+@media (min-width: 37.5em) {
+  .dp-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@container (width < 20em) {
+  .dp-step { grid-template-columns: minmax(0, 1fr); row-gap: 12px; }
+  .dp-step__fig { place-items: center start; }
+}
+
+.dp-steps { container-type: inline-size; }
+
+/* ------------------------------------------------------------------ F4 same cards twice */
+
+.dp-dup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.dp-dup__swap svg {
+  width: 24px;
+  height: 24px;
+  color: var(--text-2);
+}
+
+.dp-dup__key {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-note);
+  font-weight: 650;
+}
+
+.dp-dup__key li { display: flex; align-items: center; gap: 6px; }
+.dp-dup__sum { max-width: 52ch; justify-self: center; text-align: center; font-weight: 650; }
+
+/* ------------------------------------------------------------------ The reading: status and F5 */
+
+.dp-status {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+.dp-status__now {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.dp-status__opt {
+  padding-left: 30px;
+  color: var(--text-2);
+  font-size: var(--fs-note);
+}
+
+.dp-lamp {
+  flex: none;
+  margin-top: 1px;
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.dp-lamp.is-on { stroke: var(--series-3); }
+
+.dp-sim {
+  display: grid;
+  gap: 16px;
+}
+
+.dp-sim__hands,
+.dp-sim__add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dp-sim__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 44px;
+  min-height: var(--tap);
+  justify-content: center;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-s);
+  background: var(--chart-surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.dp-sim__chip svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.dp-sim__chip[aria-pressed='true'] {
+  border-color: var(--series-1);
+  background: var(--series-1);
+  color: #FFFFFF;
+}
+
+/* In dark, --series-1 is a light cobalt: white on it is 3.54:1, the page's ink is 5.26:1. */
+@media (prefers-color-scheme: dark) {
+  .dp-sim__chip[aria-pressed='true'] {
+    color: var(--bg);
+  }
+}
+
+.dp-sim__bars,
+.dp-sim__room {
+  display: grid;
+  gap: 8px;
+}
+
+.dp-sim__bar {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr) minmax(4.2rem, auto);
+  gap: 10px;
+  align-items: center;
+  font-size: var(--fs-note);
+  font-weight: 650;
+}
+
+.dp-sim__track {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--chart-grid);
+}
+
+.dp-sim__track b {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  background: var(--series-2);
+}
+
+.dp-sim__bar.is-read b { background: var(--series-1); }
+.dp-sim__bar.is-room b { background: var(--series-3); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .dp-sim__track b { transition: width 0.35s var(--ease-out); }
+}
+
+.dp-sim__tick,
+.dp-sim__pop i {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: repeating-linear-gradient(var(--chart-ink) 0 3px, transparent 3px 6px);
+}
+
+.dp-sim__val {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dp-sim__pop {
+  position: relative;
+  padding-left: 14px;
+  color: var(--text-2);
+  font-size: var(--fs-note);
+}
+
+.dp-sim__pop i { left: 2px; top: 1px; bottom: 1px; }
+
+.dp-sim__n {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: var(--fs-note);
+  font-weight: 650;
+}
+
+.dp-sim__n b {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+}
+
+@media (max-width: 30em) {
+  .dp-sim__bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .dp-sim__label { grid-column: 1 / -1; }
+}
+
+@media (forced-colors: active) {
+  .dp-sim__track b,
+  .dp-live__dot { background: CanvasText; }
+  /* No backplate under the digits: Highlight and HighlightText are a pair the system keeps readable. */
+  .dp-sim__chip[aria-pressed='true'] { forced-color-adjust: none; background: Highlight; color: HighlightText; border-color: Highlight; }
+}

@@ -1,0 +1,482 @@
+/* The deck and the shared pieces (CLIENT-SPEC 7 and 8; prototype deck.js, pecas.js, style.css).
+   Cards take every color from these classes, so the four-color option is one attribute on <html>
+   (data-deck="four") and no card re-renders. */
+
+/* ------------------------------------------------------------------ Cards */
+
+/* svg.card: the old text cards (span.card, legacy/cards.css) share the name until WP2 removes them. */
+svg.card {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 200 / 280;
+  overflow: visible;
+}
+
+/* Two colors: hearts and diamonds terracotta, clubs and spades cobalt. Shapes differ per suit too. */
+.suit-h,
+.suit-d {
+  --suit: var(--suit-red);
+}
+
+.suit-c,
+.suit-s {
+  --suit: var(--suit-black);
+}
+
+/* Four colors: clubs cobalt, hearts terracotta, spades ink, diamonds ochre. */
+html[data-deck='four'] .suit-c {
+  --suit: var(--suit-four-c);
+}
+
+html[data-deck='four'] .suit-h {
+  --suit: var(--suit-four-h);
+}
+
+html[data-deck='four'] .suit-s {
+  --suit: var(--suit-four-s);
+}
+
+html[data-deck='four'] .suit-d {
+  --suit: var(--suit-four-d);
+  /* In court panels the accent becomes cobalt on diamonds. */
+  --card-accent: var(--suit-four-c);
+}
+
+.card__face {
+  fill: var(--card-face);
+  stroke: var(--card-edge);
+  stroke-width: 2;
+}
+
+.card__frame {
+  fill: none;
+  stroke: var(--card-line);
+  stroke-width: 2.5;
+}
+
+.card__motif {
+  fill: var(--card-motif);
+}
+
+.card__seal {
+  /* The deck's ochre, the same in both themes (cards are physical objects). */
+  fill: var(--suit-four-d);
+}
+
+.card__seal-star {
+  fill: var(--suit-ink);
+}
+
+.card__rank {
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 800;
+  font-stretch: 78%;
+  font-variation-settings: "opsz" 96;
+}
+
+/* Index text and pip: the suit color; in four-color mode white (ink on ochre) on a filled tile. */
+.card__index {
+  fill: var(--index-ink, var(--suit));
+}
+
+.card__index-tile {
+  display: none;
+  fill: var(--suit);
+}
+
+html[data-deck='four'] .card__index-tile {
+  display: inline;
+}
+
+html[data-deck='four'] .card {
+  --index-ink: #FFFFFF;
+}
+
+html[data-deck='four'] .card.suit-d {
+  --index-ink: var(--suit-ink);
+}
+
+.card__pip {
+  fill: var(--suit);
+}
+
+/* Ochre alone on a card face measures 2.10:1: ochre pips get an ink stroke (5 glyph units). */
+html[data-deck='four'] .suit-d .card__pip {
+  stroke: var(--suit-ink);
+  stroke-width: 5;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.card__ace-ring {
+  fill: none;
+  stroke: var(--card-line);
+  stroke-width: 2.5;
+}
+
+.card__court-frame {
+  fill: var(--card-line);
+}
+
+.card__role-s {
+  fill: var(--suit);
+}
+
+.card__role-a {
+  fill: var(--card-accent);
+}
+
+.card__role-w {
+  fill: var(--card-face);
+}
+
+.card__glyph-on {
+  fill: #FFFFFF;
+}
+
+html[data-deck='four'] .suit-d .card__glyph-on {
+  fill: var(--suit-ink);
+}
+
+.card__back-field {
+  fill: var(--card-back);
+}
+
+.card__back-motif {
+  fill: var(--card-back-motif);
+}
+
+.card__back-accent {
+  fill: var(--card-back-accent);
+}
+
+.card__back-rim {
+  fill: none;
+  stroke: var(--card-face);
+  stroke-width: 2;
+  stroke-opacity: 0.5;
+}
+
+/* A suit glyph in running text. */
+.suit-glyph {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.12em;
+  fill: var(--suit, currentColor);
+}
+
+/* The mini card of the hand info row: rank as real text, an 11 px glyph. */
+.mini-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 1.9rem;
+  height: 2.6rem;
+  border: 1px solid var(--card-edge);
+  border-radius: 4px;
+  background: var(--card-face);
+  box-shadow: var(--shadow-card);
+  color: var(--suit, var(--text));
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-stretch: 78%;
+  line-height: 1;
+}
+
+.mini-card__suit {
+  width: 11px;
+  height: 11px;
+}
+
+.mini-card--back {
+  border-color: var(--card-face);
+  background: var(--card-back);
+}
+
+html[data-deck='four'] .mini-card:not(.mini-card--back) {
+  background: var(--suit);
+  color: #FFFFFF;
+}
+
+html[data-deck='four'] .mini-card.suit-d {
+  color: var(--suit-ink);
+}
+
+html[data-deck='four'] .mini-card .suit-glyph {
+  fill: currentColor;
+}
+
+/* Rank Q as HTML text: the face's O plus a tail across the bowl, so it never reads as O or zero. */
+.rank-q {
+  position: relative;
+  display: inline-block;
+}
+
+.rank-q::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  width: 0.15em;
+  height: 0.44em;
+  border-radius: 0.02em;
+  background: currentColor;
+  rotate: -42deg;
+  transform-origin: 50% 0;
+}
+
+/* ------------------------------------------------------------------ Seats */
+
+/* Character avatar: a small tile composition, never a face. Optional timer ring around it. */
+.avatar {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 30px;
+  height: 30px;
+}
+
+.avatar__art {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.avatar__initial {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.timer-ring {
+  position: absolute;
+  inset: -7px;
+  width: calc(100% + 14px);
+  height: calc(100% + 14px);
+  rotate: -90deg;
+}
+
+.timer-ring circle {
+  fill: none;
+}
+
+.timer-ring__track {
+  stroke: var(--line);
+  stroke-width: 1.2;
+}
+
+.timer-ring__live {
+  stroke: var(--ocre-line);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 0;
+}
+
+/* The ring carries information, so it shrinks with reduced motion too (linear, no easing). */
+.timer-ring:not(.timer-ring--static) .timer-ring__live {
+  animation: timer-ring var(--ring-dur, 30s) linear forwards;
+  animation-delay: var(--ring-delay, 0s);
+}
+
+@keyframes timer-ring {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* The AI mark: set in type, a thin outline, never a filled badge. */
+.ai-mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  height: 1.55em;
+  padding: 0 0.38em;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-decoration: none;
+}
+
+/* Verified human: only on other people's seats in rooms with humans. */
+.human-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-2);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.human-seal svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: var(--nos);
+}
+
+.human-seal__check {
+  stroke: var(--surface);
+}
+
+/* Team marker: us a quarter disc, them a triangle, at 12 px or more. */
+.team-chip {
+  flex: none;
+  width: 0.78rem;
+  height: 0.78rem;
+  border-radius: 2px;
+}
+
+.team-chip--us .team-chip__ground {
+  fill: var(--nos);
+}
+
+.team-chip--them .team-chip__ground {
+  fill: var(--eles);
+}
+
+.team-chip__mark {
+  fill: rgb(255 255 255 / 0.42);
+}
+
+/* Seat label: avatar, name with the AI mark and the team chip, then one quiet line. */
+.seat-label {
+  display: grid;
+  grid-template-columns: var(--seat-cols, auto auto);
+  grid-template-areas: var(--seat-areas, "av name" "av line");
+  align-items: center;
+  justify-content: var(--seat-just, start);
+  column-gap: 13px;
+  row-gap: 1px;
+  text-align: var(--seat-align, left);
+}
+
+.seat-label--right {
+  --seat-areas: "name av" "line av";
+  --seat-just: end;
+  --seat-align: right;
+}
+
+.seat-label .avatar {
+  grid-area: av;
+}
+
+.seat-label__name {
+  display: flex;
+  grid-area: name;
+  align-items: center;
+  justify-content: var(--seat-just, start);
+  gap: 5px;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.seat-label[data-team='us'] .seat-label__name > span:first-child {
+  color: var(--nos);
+}
+
+.seat-label__line {
+  grid-area: line;
+  color: var(--text-2);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ------------------------------------------------------------------ Medallion */
+
+.medallion__ground {
+  fill: var(--medallion-ground, var(--medallion-0));
+}
+
+.medallion__ring {
+  fill: var(--medallion-ring, var(--medallion));
+}
+
+.medallion__point {
+  fill: var(--medallion-point, var(--medallion-2));
+}
+
+.medallion-line__line {
+  fill: none;
+  stroke: var(--medallion);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.medallion-line__disc {
+  fill: var(--medallion);
+}
+
+.medallion-line__point {
+  fill: var(--medallion-2);
+}
+
+/* ------------------------------------------------------------------ Glossary term (WP4 owns the look) */
+
+.term {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-bottom: 1.5px dotted currentColor;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: help;
+}
+
+.tip {
+  position: fixed;
+  inset: auto 16px 16px;
+  width: auto;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: 0.95rem;
+}
+
+.tip:popover-open {
+  display: grid;
+  gap: 8px;
+}
+
+.tip__more {
+  font-weight: 650;
+}
+
+@media (forced-colors: active) {
+  .ai-mark {
+    border: 1px solid CanvasText;
+  }
+}

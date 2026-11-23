@@ -1,0 +1,22 @@
+/* The ads consent dialog (ads/AdsConsent.tsx). Loaded with its chunk, only when ads are on. */
+
+.ads-consent__text {
+  margin: 12px 0 18px;
+  line-height: 1.5;
+}
+
+.ads-consent__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.ads-consent__actions .btn {
+  min-height: var(--tap);
+}
+
+@media (min-width: 37.5em) {
+  .ads-consent__actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}

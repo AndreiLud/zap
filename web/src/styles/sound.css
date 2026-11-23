@@ -1,0 +1,57 @@
+/* Desktop sound switch (sound/SoundToggle.tsx): a round 44 px button next to the four-color pill,
+   in the same outline style. Pressed means sound on; off shows a slash over the speaker. */
+
+.sound-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  margin-right: 6px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.sound-toggle .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sound-toggle[aria-pressed='true'] {
+  border-color: var(--text);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sound-toggle:hover {
+  border-color: var(--text-2);
+}
+
+.sound-toggle[aria-pressed='false'] .icon path:last-child {
+  opacity: 0;
+}
+
+.sound-toggle[aria-pressed='false']::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: rotate(-45deg);
+}
+
+@media (forced-colors: active) {
+  .sound-toggle {
+    border: 1px solid CanvasText;
+  }
+
+  .sound-toggle[aria-pressed='false']::after {
+    background: CanvasText;
+  }
+}

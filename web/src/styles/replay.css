@@ -1,0 +1,254 @@
+/* The replay viewer (DATA-SPEC F23 and the personal page's "Rever"): imported by
+   data/ReplayViewer.tsx, so it loads with the viewer, near F23 or when a replay opens. */
+
+.replay {
+  display: grid;
+  gap: 12px;
+}
+
+.replay__stage {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--chart-surface);
+}
+
+.replay__stage:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.replay__table {
+  display: grid;
+  gap: 8px;
+  align-items: center;
+  justify-items: center;
+  min-width: 0;
+}
+
+.replay__table--2 {
+  grid-template-areas: 'top' 'middle' 'bottom';
+}
+
+.replay__table--4 {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr) minmax(0, 1fr);
+  grid-template-areas: '. top .' 'left middle right' '. bottom .';
+}
+
+.replay__seat {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-width: 0;
+}
+
+.replay__seat--top { grid-area: top; }
+.replay__seat--bottom { grid-area: bottom; }
+.replay__seat--left { grid-area: left; }
+.replay__seat--right { grid-area: right; }
+
+.replay__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.84rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.replay__seat--t0 .replay__name {
+  color: var(--nos);
+}
+
+.replay__seat--t1 .replay__name {
+  color: var(--eles);
+}
+
+.replay__hand {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  min-height: 46px;
+}
+
+.replay svg.card.replay__card {
+  flex: none;
+  width: 32px;
+  height: auto;
+}
+
+.replay__middle {
+  grid-area: middle;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  min-height: 80px;
+  padding: 8px;
+  border: 1px solid var(--chart-grid);
+  border-radius: var(--radius-s);
+}
+
+.replay__vira {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--chart-ink-2);
+}
+
+.replay__rounds {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.replay__round {
+  display: grid;
+  gap: 2px;
+}
+
+.replay__round-name {
+  color: var(--chart-ink-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.replay__round-name::first-letter {
+  text-transform: uppercase;
+}
+
+.replay__plays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.replay__play {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.replay__play.is-winner {
+  box-shadow: inset 0 0 0 2px var(--ocre-line);
+}
+
+.replay__play.is-covered .replay__card {
+  opacity: 0.6;
+}
+
+.replay__who,
+.replay__tag {
+  max-width: 5.5rem;
+  overflow: hidden;
+  font-size: 0.7rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.replay__tag {
+  color: var(--chart-ink-2);
+}
+
+.replay__tag--win {
+  color: var(--chart-ink);
+  font-weight: 800;
+}
+
+.replay__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.replay__move {
+  min-height: 2.9em;
+  margin: 0;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.replay__count {
+  color: var(--text-2);
+  font-size: 0.86rem;
+}
+
+.replay__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.replay__chance {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.replay__chance-title {
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.replay__chance-plot {
+  position: relative;
+  min-height: 1px;
+}
+
+.replay__chance-plot text {
+  fill: var(--chart-ink-2);
+  font-family: var(--font-text);
+  font-size: calc(12px * var(--fs, 1));
+  font-weight: 600;
+}
+
+.replay__chance-plot .note--strong { fill: var(--chart-ink); font-weight: 800; }
+.replay__chance-plot .grid { stroke: var(--chart-grid); stroke-width: 1; }
+.replay__chance-plot .ref,
+.replay__chance-plot .vmark { stroke: var(--chart-ink-2); stroke-width: 1; stroke-dasharray: 4 3; }
+.replay__chance-plot .vmark--strong { stroke: var(--chart-ink); }
+.replay__chance-plot .ln { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; }
+.replay__chance-plot .mk { fill: var(--series-1); stroke: var(--chart-surface); stroke-width: 2; }
+.replay__chance-plot .mk.is-active { stroke: var(--chart-ink); stroke-width: 2.5; }
+
+@media (min-width: 37.5em) {
+  .replay svg.card.replay__card {
+    width: 40px;
+  }
+}
+
+/* Forced colors: the stage framed, the chance line in CanvasText. */
+@media (forced-colors: active) {
+  .replay__stage {
+    border: 1px solid CanvasText;
+  }
+
+  .replay__chance-plot text {
+    fill: CanvasText;
+  }
+
+  .replay__chance-plot .mk {
+    fill: CanvasText;
+    stroke: Canvas;
+  }
+
+  .replay__chance-plot .ln {
+    stroke: CanvasText;
+  }
+}

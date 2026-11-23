@@ -1,0 +1,19 @@
+{
+  "truco.who": "{name} called",
+  "truco.aria": "{name} called {call}",
+  "truco.value.accept": "Accept and the hand is worth {value} points.",
+  "truco.value.run.4": "Run and they take {points}.",
+  "truco.value.run.2": "Run and {name} takes {points}.",
+  "truco.ctx.us": "Your team took round {n}.",
+  "truco.ctx.you": "You took round {n}.",
+  "truco.ctx.them": "They took round {n}.",
+  "truco.ctx.other": "{name} took round {n}.",
+  "truco.ctx.tie": "Round {n} was a tie.",
+  "truco.ctx.first": "First round.",
+  "truco.ctx.table": "On the table: {list}.",
+  "truco.ctx.mine": "your {card}",
+  "truco.ctx.mine.f": "your {card}",
+  "truco.ctx.theirs": "{of} {card}",
+  "truco.ctx.covered": "{of} face-down card",
+  "truco.ctx.covered.mine": "your face-down card"
+}

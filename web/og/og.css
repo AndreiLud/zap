@@ -1,0 +1,399 @@
+/* The Open Graph images: a fixed 1200 by 630 canvas in the light theme (link previews have no dark
+   mode). Values follow the start, play and table styles of the client; nothing here reaches the site. */
+
+html,
+body {
+  margin: 0;
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.og {
+  position: relative;
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body, "Figtree", system-ui, sans-serif);
+}
+
+.og-brand {
+  position: absolute;
+  left: 72px;
+  top: 60px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 48px;
+  letter-spacing: -0.02em;
+}
+
+.og-brand__mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+}
+
+.og-title {
+  position: absolute;
+  left: 72px;
+  top: 250px;
+  width: 520px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 92px;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-stretch: 85%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+.og-site {
+  position: absolute;
+  left: 72px;
+  bottom: 60px;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.og-art {
+  position: absolute;
+  right: 56px;
+  top: 55px;
+  width: 520px;
+  height: 520px;
+}
+
+/* Start: the medallion with the fan (start.css). */
+.og-start__tile {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  --medallion-ground: var(--surface);
+  --medallion-ring: var(--btn-bg);
+  --medallion-point: var(--ocre-fill);
+}
+
+.og-start__tile .medallion__ring {
+  stroke: var(--btn-bg);
+  stroke-width: 0.006;
+}
+
+.og-fan {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 37%;
+  aspect-ratio: 200 / 280;
+  translate: -50% -42%;
+}
+
+.og-fan__card {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 130%;
+  filter: drop-shadow(0 12px 16px rgb(10 20 60 / 0.3));
+}
+
+.og-fan__card:nth-child(1) {
+  rotate: -17deg;
+}
+
+.og-fan__card:nth-child(2) {
+  translate: 0 -8%;
+}
+
+.og-fan__card:nth-child(3) {
+  rotate: 17deg;
+}
+
+/* Play: three mode tiles over a strip of tiles. */
+.og-play {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+}
+
+.og-modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.og-mode {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 28px 8px 22px;
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.og-mode.is-chosen {
+  border-color: var(--nos);
+  background: var(--chosen);
+}
+
+.og-mode__table {
+  width: 96px;
+  height: 96px;
+}
+
+.og-mode__table .mini-table__table {
+  fill: var(--bg);
+  stroke: var(--text-2);
+  stroke-width: 1.3;
+}
+
+.og-mode__table .mini-table__us {
+  fill: var(--nos);
+}
+
+.og-mode__table .mini-table__them {
+  fill: var(--eles);
+}
+
+.og-mode__table .mini-table__open {
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 1.3;
+  stroke-dasharray: 2.2 1.8;
+}
+
+.og-strip {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  height: 52px;
+}
+
+.og-strip__tile {
+  width: 100%;
+  height: 52px;
+  display: block;
+}
+
+/* Guided: the hand over the line medallion, the coach's tag on the suggested card. */
+.og-guided__table {
+  position: absolute;
+  inset: 40px;
+  width: 440px;
+  height: 440px;
+}
+
+.og-hand {
+  position: absolute;
+  left: 50%;
+  bottom: 70px;
+  display: flex;
+  gap: 18px;
+  translate: -50% 0;
+}
+
+.og-hand__card {
+  position: relative;
+  width: 140px;
+  aspect-ratio: 200 / 280;
+  filter: drop-shadow(0 10px 14px rgb(10 20 60 / 0.28));
+}
+
+.og-hand__card.is-suggested {
+  translate: 0 -34px;
+}
+
+.og-tag {
+  position: absolute;
+  left: 50%;
+  top: -52px;
+  translate: -50% 0;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+  font-weight: 800;
+  font-size: 22px;
+  white-space: nowrap;
+}
+
+/* Rules: a ladder of the ten ranks and the zap above it with its star. */
+.og-ladder {
+  position: absolute;
+  inset: 0;
+}
+
+.og-ladder__card {
+  position: absolute;
+  width: 110px;
+  aspect-ratio: 200 / 280;
+  left: calc(var(--i) * 41px);
+  bottom: calc(20px + var(--i) * 22px);
+  filter: drop-shadow(0 6px 10px rgb(10 20 60 / 0.22));
+}
+
+.og-ladder__zap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 150px;
+  aspect-ratio: 200 / 280;
+  rotate: 8deg;
+  filter: drop-shadow(0 12px 16px rgb(10 20 60 / 0.3));
+}
+
+.og-star {
+  position: absolute;
+  right: -22px;
+  top: -22px;
+  width: 54px;
+  height: 54px;
+  fill: var(--ocre-fill);
+  stroke: var(--ocre-line);
+  stroke-width: 0.6;
+}
+
+/* Data: the training curve of F3 (curve.json), its band, an even score dashed. */
+.og-data svg {
+  width: 100%;
+  height: 100%;
+}
+
+.og-data__grid {
+  stroke: var(--line);
+  stroke-width: 2;
+}
+
+.og-data__even {
+  stroke: var(--outline-quiet);
+  stroke-width: 2;
+  stroke-dasharray: 8 8;
+}
+
+.og-data__band {
+  fill: var(--card-motif);
+}
+
+.og-data__band.is-old {
+  fill: color-mix(in srgb, var(--eles) 14%, var(--bg));
+}
+
+.og-data__line {
+  fill: none;
+  stroke: var(--nos);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.og-data__line.is-old {
+  stroke: var(--eles);
+  stroke-width: 6;
+  stroke-dasharray: 14 12;
+}
+
+.og-data__last {
+  fill: var(--ocre-fill);
+  stroke: var(--nos);
+  stroke-width: 5;
+}
+
+/* You and the legal pages: the medallion bleeds off the top right corner. */
+.og-corner {
+  right: -400px;
+  top: -145px;
+  width: 920px;
+  height: 920px;
+}
+
+.og-corner__tile {
+  width: 100%;
+  height: 100%;
+  --medallion-ground: var(--surface);
+  --medallion-ring: var(--btn-bg);
+  --medallion-point: var(--ocre-fill);
+}
+
+.og-corner__tile .medallion__ring {
+  stroke: var(--medallion-ring);
+  stroke-width: 0.006;
+}
+
+.og-corner--terms .og-corner__tile,
+.og-corner--verify .og-corner__tile {
+  --medallion-ring: var(--eles);
+}
+
+.og-corner--you .og-corner__tile {
+  --medallion-ring: var(--ocre-fill);
+  --medallion-point: var(--btn-bg);
+}
+
+/* Room: a table from above with four seats. */
+.og-room__table {
+  position: absolute;
+  left: 110px;
+  top: 110px;
+  width: 300px;
+  height: 300px;
+}
+
+.og-seat {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-size: 20px;
+}
+
+.og-seat .avatar {
+  width: 84px;
+  height: 84px;
+  font-size: 40px;
+}
+
+.og-seat .avatar__initial {
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.og-seat .human-seal,
+.og-seat .ai-mark {
+  font-size: 18px;
+}
+
+.og-seat--top {
+  left: 50%;
+  top: 0;
+  translate: -50% 0;
+}
+
+.og-seat--bottom {
+  left: 50%;
+  bottom: 14px;
+  translate: -50% 0;
+}
+
+.og-seat--left {
+  left: 0;
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.og-seat--right {
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+}

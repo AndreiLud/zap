@@ -1,0 +1,47 @@
+/* The replay panel of "You against Zap" ("Rever"): imported by MatchReplay.tsx, so it loads
+   with the replay. */
+
+.vs-replay {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 16px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--chart-surface);
+}
+
+.vs-replay__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vs-replay__head h3 {
+  font-size: clamp(1.05rem, 4vw, 1.2rem);
+}
+
+.vs-replay__head h3:focus {
+  outline: none;
+}
+
+.vs-replay__head h3:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.vs-replay__pick {
+  max-width: 16rem;
+}
+
+.vs-replay__pick select {
+  min-height: var(--tap);
+  padding: 0 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}

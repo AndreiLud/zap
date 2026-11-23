@@ -1,0 +1,2333 @@
+/* The table (CLIENT-SPEC 11; prototype azulejo-v2/mesa.css). Phone portrait first, then tablet, then
+   desktop with a side panel. One light play area where the cards land in a cross; seats are quiet
+   labels laid out by a grid around it; the score and the state of the hand are two thin rows above
+   it; your hand is below. Card sizes come from container units, so they follow the space the table
+   gets, and the seat layout changes in steps when the reader enlarges the text. Entrances of pieces
+   that mount run only with main[data-motion="on"] (not on a snapshot) and never with reduced motion. */
+
+.table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100dvh - var(--header-h, 57px));
+  padding: 0 var(--gutter) max(10px, env(safe-area-inset-bottom));
+}
+
+/* The skip link "Skip to your cards" sits under the one of the shell. */
+.table > .skip-link:focus {
+  translate: 0 64px;
+}
+
+.stage {
+  container: stage / inline-size;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+/* The play area and the turn line; the TRUCO panel and the match result cover exactly this box. */
+.stage__game {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ------------------------------------------------------------------ Score */
+
+.score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.score__row {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 2px 0;
+}
+
+.score__side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.score__side[data-team='them'] {
+  flex-direction: row-reverse;
+}
+
+.score__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-2);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.score__num {
+  position: relative;
+  display: inline-flex;
+  font-family: var(--font-display);
+  font-size: var(--fs-score);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.score__side[data-team='us'] .score__num {
+  margin-right: 2px;
+  color: var(--nos);
+}
+
+.score__side[data-team='them'] .score__num {
+  margin-left: 2px;
+  color: var(--eles);
+}
+
+.score__digit {
+  display: inline-block;
+  transform-origin: 50% 60%;
+}
+
+.score__goal {
+  max-width: 4.5rem;
+  color: var(--text-2);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.score__games {
+  flex-basis: 100%;
+  order: 3;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.score-marks {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 2px;
+  min-width: 0;
+  max-width: 9.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Theirs fill from the right, so both bars meet the goal in the middle. */
+.score__side[data-team='them'] .score-marks {
+  direction: rtl;
+}
+
+.score-marks li {
+  height: 11px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.score__side[data-team='us'] .score-marks li.is-full {
+  background: var(--nos);
+  box-shadow: none;
+}
+
+.score__side[data-team='them'] .score-marks li.is-full {
+  background: var(--eles);
+  box-shadow: none;
+}
+
+/* "+3" next to the number while the points are counted. */
+.score__chip {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  min-width: 2.2em;
+  height: 1.55em;
+  padding: 0 0.3em;
+  border-radius: 5px;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+  box-shadow: 0 0 0 2px var(--bg);
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  translate: 0 -50%;
+}
+
+.score__side[data-team='us'] .score__chip {
+  left: calc(100% + 4px);
+}
+
+.score__side[data-team='them'] .score__chip {
+  right: calc(100% + 4px);
+}
+
+.score .conn {
+  flex: none;
+}
+
+/* ------------------------------------------------------------------ This hand */
+
+.hand-info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-top: 7px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.hand-info__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 0 4px;
+}
+
+.hand-info__cell + .hand-info__cell {
+  border-left: 1px solid var(--line-soft);
+}
+
+.hand-info__label {
+  color: var(--text-2);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.hand-info__label .term {
+  min-height: 24px;
+}
+
+.hand-info__value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 2.3rem;
+}
+
+.hand-info__value small {
+  color: var(--text-2);
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+
+.hand-info__num {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hand-info__fixed {
+  font-weight: 800;
+}
+
+/* The value a pending raise asks for: an arrow, then the value in outline, before the unit. */
+.hand-info__value.has-proposed {
+  gap: 4px;
+}
+
+.hand-info__proposed {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--eles);
+}
+
+.hand-info__proposed svg {
+  width: 11px;
+  height: 11px;
+}
+
+.hand-info__proposed b {
+  display: grid;
+  place-items: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  padding: 0 0.2em;
+  border: 1.5px solid var(--eles);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The deck pile and the vira, as small cards. */
+.pile {
+  position: relative;
+  display: inline-block;
+  width: 2.6rem;
+  height: 2.3rem;
+}
+
+.pile .mini-card {
+  position: absolute;
+  top: 0.1rem;
+  width: 1.55rem;
+  height: 2.15rem;
+  font-size: 1rem;
+}
+
+.pile__back {
+  left: 0.2rem;
+  rotate: 4deg;
+}
+
+.pile__vira,
+.pile .mini-card--slot {
+  left: 0.85rem;
+  z-index: 1;
+  rotate: -5deg;
+}
+
+/* Alone (the deck still on the table, or back on it after the hand), the vira spot sits centred. */
+.pile--alone .pile__vira,
+.pile--alone .mini-card--slot {
+  left: 50%;
+  rotate: 0deg;
+  translate: -50% 0;
+}
+
+/* Empty spots that wait for a card: the vira and the manilha here, your three cards below. */
+.band,
+.table-area,
+.hand-area {
+  --slot-line: color-mix(in srgb, var(--text-2) 38%, transparent);
+  --slot-fill: color-mix(in srgb, var(--text-2) 7%, var(--bg));
+}
+
+.mini-card--slot {
+  border: 1.5px dashed var(--slot-line);
+  background: transparent;
+  box-shadow: none;
+}
+
+.manilha-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 5px;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* The one tile gesture in this row: a quarter disc of light in the corner. */
+.manilha-tile::before {
+  position: absolute;
+  top: -30%;
+  right: -30%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.32);
+  content: "";
+}
+
+.manilha-tile > span {
+  position: relative;
+}
+
+.manilha-tile.is-empty {
+  border: 1.5px dashed var(--slot-line);
+  background: transparent;
+}
+
+.manilha-tile.is-empty::before {
+  display: none;
+}
+
+.rounds {
+  display: flex;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rounds li {
+  display: flex;
+}
+
+.rounds i {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--text-2);
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Us: filled cobalt with a quarter disc notch; them: terracotta with a triangle notch; a tie: dashed "=". */
+.rounds li[data-r='us'] i {
+  background: radial-gradient(circle at 100% 0, rgb(255 255 255 / 0.4) 0 32%, transparent 33%), var(--nos);
+  box-shadow: none;
+  color: var(--nos-fg);
+}
+
+.rounds li[data-r='them'] i {
+  background: linear-gradient(225deg, rgb(255 255 255 / 0.4) 0 22%, transparent 23%), var(--eles);
+  box-shadow: none;
+  color: var(--eles-fg);
+}
+
+.rounds li[data-r='tie'] i {
+  border: 1.5px dashed var(--text-2);
+  box-shadow: none;
+  color: var(--text);
+}
+
+.rounds li.is-now i {
+  box-shadow: inset 0 0 0 2px var(--text);
+  color: var(--text);
+}
+
+.first-hint {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 600;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ------------------------------------------------------------------ The play area
+   .play-area is the size container (stretched inside .table-area, so its height is always known).
+   Inside it, .play-area__grid places the top seat's label above the cross and the side seats in the
+   top corners beside the top card. The card width (--cw) is the smallest of a share of the width,
+   what is left between the two corner labels (each gets a fixed budget, --label-w) and what the
+   height allows, so labels and cards never meet. */
+
+.table-area {
+  --pad-b: 10px;
+  --pad-i: 8px;
+  --gap-f: 6px;
+  --row: max(30px, 2.05rem);
+  --rows: var(--row);
+  --label-w: calc(32px + 5.3rem);
+  --side-w: calc(var(--label-w) + 4px);
+  --cross-k: 1;
+  --cw-min: 64px;
+  --cw-max: 112px;
+  --cw-frac: 27cqw;
+  --area-min: calc(2 * var(--pad-b) + var(--rows) + var(--gap-f) + var(--cw-min) * 3.03 + 8px);
+
+  display: flex;
+  flex: 1 1 auto;
+  min-height: var(--area-min);
+}
+
+.play-area {
+  container: play-area / size;
+  position: relative;
+  flex: 1;
+  overflow: clip;
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+
+.play-area__grid {
+  --cw: clamp(var(--cw-min), min(var(--cw-max), var(--cw-frac), (100cqw - 2 * var(--pad-i) - 2 * var(--side-w)) / var(--cross-k), (100cqh - 2 * var(--pad-b) - var(--rows) - var(--gap-f) - 8px) / 3.03), var(--cw-max));
+  --ch: calc(var(--cw) * 1.4);
+  --cross-h: calc(var(--cw) * 3.03 + 8px);
+
+  display: grid;
+  grid-template-areas: "n n" "x x";
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(var(--row), auto) var(--cross-h);
+  align-content: center;
+  row-gap: var(--gap-f);
+  height: 100%;
+  padding: var(--pad-b) var(--pad-i);
+}
+
+.table.players-2 .play-area__grid {
+  grid-template-rows: minmax(var(--row), auto) var(--cross-h);
+}
+
+.trick {
+  position: relative;
+  grid-area: x;
+  min-width: 0;
+}
+
+.trick__medallion {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--cw) * 2.2);
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+  translate: -50% -50%;
+}
+
+/* The inlaid tile as cobalt line work. */
+.trick__medallion .medallion-line__line {
+  stroke: color-mix(in srgb, var(--nos) 30%, transparent);
+  stroke-width: 1.5px;
+}
+
+.trick__medallion .medallion-line__disc {
+  fill: color-mix(in srgb, var(--nos) 20%, transparent);
+}
+
+.trick__medallion .medallion-line__point {
+  fill: var(--ocre-fill);
+}
+
+/* The deck resting on the tile: two packets of backs; their thickness is drawn as card edges. */
+.deck {
+  --deck-face: var(--card-face);
+  --deck-edge: #CBBFA9;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: calc(var(--cw) * 0.9);
+  aspect-ratio: 5 / 7;
+  rotate: -4deg;
+  translate: -50% calc(-50% - 6px);
+}
+
+.deck__packet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 7% / 5%;
+}
+
+.deck__packet[data-m='a'] {
+  top: 4px;
+}
+
+.deck__packet svg.card {
+  width: 100%;
+  height: 100%;
+}
+
+/* The cross: north and south .58 of a card height from the centre, west and east almost a card
+   width, so the cards touch at the corners and every index shows. */
+.trick__cards {
+  position: absolute;
+  inset: 0;
+}
+
+.trick__spot {
+  --tx: -50%;
+  --ty: -50%;
+  --rot: 0deg;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: var(--cw);
+  aspect-ratio: 5 / 7;
+  rotate: var(--rot);
+  translate: var(--tx) var(--ty);
+  transition: opacity 0.25s;
+}
+
+.trick__spot[data-pos='top'] {
+  --ty: calc(-50% - var(--ch) * 0.58);
+  --rot: -2deg;
+}
+
+.trick__spot[data-pos='bottom'] {
+  --ty: calc(-50% + var(--ch) * 0.58);
+  --rot: 1.5deg;
+}
+
+.trick__spot[data-pos='left'] {
+  --tx: calc(-50% - var(--cw) * 0.98);
+  --rot: -4deg;
+}
+
+.trick__spot[data-pos='right'] {
+  --tx: calc(-50% + var(--cw) * 0.98);
+  --rot: 3.5deg;
+}
+
+.trick__spot.is-empty {
+  pointer-events: none;
+}
+
+.trick__card {
+  width: 100%;
+  height: 100%;
+  border-radius: 6.5% / 4.6%;
+  box-shadow: var(--shadow-card);
+}
+
+.trick__card svg.card {
+  width: 100%;
+  height: 100%;
+}
+
+.trick__spot.wins {
+  z-index: 3;
+}
+
+.trick__spot.wins .trick__card {
+  outline: 3px solid var(--ocre-line);
+  outline-offset: 2px;
+}
+
+.trick__cards.is-resolved .trick__spot:not(.wins) {
+  opacity: 0.5;
+}
+
+.win-tag,
+.trick__tag {
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.win-tag {
+  z-index: 1;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+}
+
+.trick__tag {
+  top: 50%;
+  bottom: auto;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line);
+  translate: -50% -50%;
+}
+
+.trick__notice {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+  translate: -50% -50%;
+}
+
+/* ------------------------------------------------------------------ Seats */
+
+.seat {
+  position: relative;
+  z-index: 5;
+  min-width: 0;
+}
+
+.seat[data-pos='top'] {
+  grid-area: n;
+  align-self: end;
+  justify-self: center;
+}
+
+.seat[data-pos='left'] {
+  grid-area: x;
+  grid-column: 1;
+  align-self: start;
+  justify-self: start;
+  max-width: var(--label-w);
+}
+
+.seat[data-pos='right'] {
+  --seat-areas: "name av" "line av";
+  --seat-just: end;
+  --seat-align: right;
+
+  grid-area: x;
+  grid-column: 2;
+  align-self: start;
+  justify-self: end;
+  max-width: var(--label-w);
+}
+
+.seat .seat-label {
+  column-gap: 8px;
+}
+
+.seat .avatar {
+  width: 24px;
+  height: 24px;
+}
+
+.seat .timer-ring {
+  inset: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+}
+
+/* If a name ever runs out of room, the AI mark and the team chip wrap under it instead of overlapping. */
+.seat .seat-label__name {
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: var(--fs-seat);
+  white-space: normal;
+}
+
+.seat .seat-label__name > span:first-child {
+  white-space: nowrap;
+}
+
+.seat .seat-label__line {
+  font-size: var(--fs-seat-line);
+}
+
+.seat .team-chip {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+/* The partner's cards in a mão de onze, small under the label. */
+.seat__cards {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.seat__cards svg.card {
+  width: 26px;
+  border-radius: 3px;
+}
+
+/* Text a little larger: the corner labels move to a row of their own above the cross. */
+@container play-area (width < 19.9rem) {
+  .play-area__grid {
+    --rows: calc(2 * var(--row) + var(--gap-f));
+    --side-w: 0px;
+    --cross-k: 2.96;
+  }
+
+  .play-area__grid {
+    grid-template-areas: "n n" "w e" "x x";
+    grid-template-rows: minmax(var(--row), auto) minmax(var(--row), auto) var(--cross-h);
+  }
+
+  .seat[data-pos='left'] {
+    grid-area: w;
+    align-self: center;
+    max-width: none;
+  }
+
+  .seat[data-pos='right'] {
+    grid-area: e;
+    align-self: center;
+    max-width: none;
+  }
+}
+
+/* Larger: the style line goes (it stays in each seat's accessible name) and the avatars shrink. */
+@container play-area (width < 16.5rem) {
+  .play-area__grid {
+    --row: max(22px, 1.3rem);
+  }
+
+  .seat .seat-label__line {
+    display: none;
+  }
+
+  .seat .avatar {
+    width: 20px;
+    height: 20px;
+  }
+
+  .seat .timer-ring {
+    inset: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+  }
+}
+
+/* Largest: one label per row, centred over the cross. */
+@container play-area (width < 14.75rem) {
+  .play-area__grid {
+    --rows: calc(3 * var(--row) + 2 * var(--gap-f));
+  }
+
+  .play-area__grid {
+    grid-template-areas: "n" "w" "e" "x";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(3, minmax(var(--row), auto)) var(--cross-h);
+  }
+
+  .seat[data-pos] {
+    justify-self: center;
+  }
+}
+
+/* Wide play area (tablet and desktop): the side seats stand beside their card spots. */
+@container play-area (width >= 40rem) {
+  .play-area__grid {
+    --pad-b: 14px;
+    --pad-i: 16px;
+    --gap-f: 10px;
+    --row: max(40px, 2.6rem);
+    --label-w: 9.5rem;
+    --side-w: calc(var(--label-w) + 22px);
+    --cross-k: 2.96;
+    --cw-max: 7.5rem;
+    --cw-frac: 100cqw;
+  }
+
+  .seat[data-pos='left'],
+  .seat[data-pos='right'] {
+    grid-area: x;
+    align-self: center;
+    max-width: var(--label-w);
+  }
+
+  .seat[data-pos='left'] {
+    --seat-areas: "name av" "line av";
+    --seat-just: end;
+    --seat-align: right;
+
+    grid-column: 1;
+    justify-self: end;
+    margin-right: calc(var(--cw) * 1.48 + 18px);
+  }
+
+  .seat[data-pos='right'] {
+    --seat-areas: "av name" "av line";
+    --seat-just: start;
+    --seat-align: left;
+
+    grid-column: 2;
+    justify-self: start;
+    margin-left: calc(var(--cw) * 1.48 + 18px);
+  }
+
+  .seat .seat-label {
+    column-gap: 12px;
+  }
+
+  .seat .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .seat .timer-ring {
+    inset: -7px;
+    width: calc(100% + 14px);
+    height: calc(100% + 14px);
+  }
+
+  .seat .seat-label__name {
+    gap: 5px;
+    font-size: 1.12rem;
+  }
+
+  .seat .seat-label__line {
+    font-size: 0.85rem;
+  }
+
+  .seat .team-chip {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+}
+
+/* The minimum height of the play area follows the same steps (measured on the stage, which holds it). */
+@container stage (width < 19.9rem) {
+  .table-area {
+    --rows: calc(2 * var(--row) + var(--gap-f));
+  }
+}
+
+@container stage (width < 16.5rem) {
+  .table-area {
+    --row: max(22px, 1.3rem);
+  }
+}
+
+@container stage (width < 14.75rem) {
+  .table-area {
+    --rows: calc(3 * var(--row) + 2 * var(--gap-f));
+  }
+}
+
+/* ------------------------------------------------------------------ Bubbles and the dealer's line */
+
+.bubble {
+  position: absolute;
+  z-index: 8;
+  max-width: 13rem;
+  margin: 0;
+  padding: 8px 12px 9px;
+  border: 1px solid var(--text-2);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.bubble small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.bubble small .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.bubble::after {
+  position: absolute;
+  top: -6.5px;
+  left: var(--tail, 18px);
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--text-2);
+  border-width: 1px 0 0 1px;
+  background: var(--surface);
+  content: "";
+  rotate: 45deg;
+}
+
+.bubble--right::after {
+  right: 18px;
+  left: auto;
+}
+
+.bubble[data-place='beside']::after {
+  top: calc(50% - 6px);
+  left: -6.5px;
+  rotate: -45deg;
+}
+
+.bubble--top[data-place='under']::after {
+  left: calc(var(--tail, 50%) - 6px);
+}
+
+/* Docked at the foot of a narrow play area, clear of the trick (Bubbles.tsx dock): the tail still
+   points up toward the seat, and the seat's name shows since the bubble left its side. */
+.bubble[data-place='dock']::after {
+  right: auto;
+  left: calc(var(--tail, 50%) - 6px);
+}
+
+/* No free room yet (Bubbles.tsx): the line waits, unseen, until the trick clears. */
+.bubble[data-place='wait'] {
+  visibility: hidden;
+}
+
+.bubble__who {
+  display: none;
+}
+
+.bubble[data-place='dock'] .bubble__who {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-2);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.bubble[data-place='dock'] small .bubble__who {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.bubble[data-place='dock'] .bubble__private {
+  display: none;
+}
+
+/* Your own phrase sits just above your cards, inside your seat (the hand region). */
+.bubble--own {
+  bottom: calc(100% - 6px);
+  left: 50%;
+  translate: -50% 0;
+}
+
+.bubble--own::after {
+  top: auto;
+  bottom: -6.5px;
+  left: calc(50% - 6px);
+  rotate: 225deg;
+}
+
+.dealer-line {
+  position: absolute;
+  bottom: max(10px, 2.2cqh);
+  left: 50%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.25;
+  translate: -50% 0;
+}
+
+.dealer-line .avatar {
+  width: 20px;
+  height: 20px;
+}
+
+.dealer-line b {
+  margin-right: 2px;
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* No room under the tile (very large text): the line shows in the status line; this copy is for
+   screen readers only. */
+.dealer-line[data-room='none'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ Actions row */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  min-height: 50px;
+  padding: 2px 2px 0;
+}
+
+/* Under the TRUCO panel the status stays in the page (and readable) but out of sight. */
+.actions.is-covered {
+  opacity: 0;
+}
+
+.actions__status {
+  flex: 1 1 9rem;
+  min-width: 0;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.actions__status b {
+  display: block;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-status);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.actions__more,
+.actions__dealer {
+  display: block;
+}
+
+.actions__dealer {
+  margin-top: 4px;
+  color: var(--text);
+}
+
+.clock {
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--fs-status);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions__status b + .clock {
+  margin-left: 0;
+}
+
+.actions__status b:has(+ .clock) {
+  display: inline;
+  margin-right: 8px;
+}
+
+.clock.is-low {
+  color: var(--eles);
+}
+
+.actions__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.actions__buttons:empty {
+  display: none;
+}
+
+.actions__buttons .btn {
+  min-height: 46px;
+}
+
+.actions__cover[aria-pressed='true'] {
+  border-color: var(--text);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.actions--onze .actions__status b {
+  font-size: 1.02rem;
+}
+
+/* Popovers of the actions row (signals, phrases): fixed at the bottom of the screen. */
+.table-pop {
+  position: fixed;
+  inset: auto 16px max(16px, env(safe-area-inset-bottom));
+  width: auto;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.table-pop__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--text-2);
+}
+
+.chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.table-pop__note {
+  margin: 10px 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ Your hand */
+
+.hand-area {
+  position: relative;
+  display: grid;
+  grid-template-columns: min(100%, 26rem);
+  justify-content: center;
+}
+
+.resume {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.resume p {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* The time of your turn: a thin ochre bar that turns terracotta at 5 s. It shrinks with reduced
+   motion too (it carries information), linearly. */
+.turn-bar {
+  width: min(100%, 18rem);
+  height: 3px;
+  margin: 0 auto 7px;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+
+.turn-bar--off {
+  visibility: hidden;
+}
+
+.turn-bar span {
+  display: block;
+  height: 100%;
+  background: var(--ocre-line);
+  transform-origin: left;
+  animation-name: turn-bar;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+.turn-bar span.is-low {
+  background: var(--eles);
+}
+
+@keyframes turn-bar {
+  from {
+    scale: 1 1;
+  }
+
+  to {
+    scale: 0 1;
+  }
+}
+
+.hand {
+  --hand-gap: 5px;
+  --legend: 2.15rem;
+
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  list-style: none;
+}
+
+/* An empty strut as tall as one card and its caption, so the table does not jump as the hand empties. */
+.hand::before {
+  flex: 0 0 0px;
+  padding-top: calc((100% - 2 * var(--hand-gap)) / 3 * 1.4 + 6px + var(--legend));
+  content: "";
+}
+
+.hand:focus {
+  outline: none;
+}
+
+.hand:focus-visible {
+  outline: 2px dashed var(--text-2);
+  outline-offset: 6px;
+  box-shadow: none;
+}
+
+.hand li {
+  display: flex;
+  flex: 0 0 calc((100% - 2 * var(--hand-gap)) / 3);
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hand li + li {
+  margin-left: var(--hand-gap);
+}
+
+/* A gentle fan: the outer cards lower and turned out a little, less so with two cards. */
+.hand li:first-child:nth-last-child(3) {
+  --arc: 7px;
+  --tilt: -3deg;
+}
+
+.hand li:last-child:nth-child(3) {
+  --arc: 7px;
+  --tilt: 3deg;
+}
+
+.hand li:first-child:nth-last-child(2) {
+  --arc: 3px;
+  --tilt: -1.5deg;
+}
+
+.hand li:last-child:nth-child(2) {
+  --arc: 3px;
+  --tilt: 1.5deg;
+}
+
+.hand-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  padding: 0;
+  border: 0;
+  border-radius: 7.5% / 5.4%;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  rotate: var(--tilt, 0deg);
+  transform-origin: 50% 100%;
+  translate: 0 calc(var(--arc, 0px) - var(--lift, 0px));
+  transition: translate 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hand-card svg.card {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  box-shadow: var(--shadow-card);
+}
+
+.hand.is-your-turn .hand-card:not([aria-disabled='true']):hover,
+.hand.is-your-turn .hand-card:not([aria-disabled='true']):focus-visible {
+  --lift: 10px;
+}
+
+.hand-card[data-pressed='true']:not([aria-disabled='true']) {
+  --lift: 4px;
+}
+
+.hand-card[aria-disabled='true'] {
+  cursor: default;
+}
+
+.hand.is-your-turn .hand-card[aria-disabled='true'] svg.card {
+  opacity: 0.6;
+}
+
+.hand.is-covering .hand-card:not([aria-disabled='true']) svg.card {
+  outline: 2px dashed var(--text-2);
+  outline-offset: 3px;
+}
+
+/* Before the deal and after the hand, the places where your cards will land: soft card-shaped
+   hollows, opaque so the overlapping fan on short phones stays one shape. */
+.hand__hollow-card {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: 7.5% / 5.4%;
+  background: var(--slot-fill);
+  rotate: var(--tilt, 0deg);
+  transform-origin: 50% 100%;
+  translate: 0 var(--arc, 0px);
+}
+
+.hand__legend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1px;
+  min-height: var(--legend);
+  line-height: 1.15;
+  text-align: center;
+  translate: 0 var(--arc, 0px);
+}
+
+.hand__legend kbd {
+  color: var(--text-2);
+}
+
+.hand__manilha {
+  display: grid;
+  justify-items: center;
+}
+
+.hand__manilha small {
+  color: var(--text-2);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.hand__manilha b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.hand__manilha .icon {
+  width: 11px;
+  height: 11px;
+  color: var(--ocre-line);
+}
+
+/* ------------------------------------------------------------------ Match result */
+
+.match-result {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-radius: var(--radius-l);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  text-align: center;
+}
+
+.match-result h2 {
+  font-size: var(--fs-h2);
+}
+
+.match-result__score {
+  margin: 0;
+  color: var(--text-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.match-result .button-row {
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------ Tools */
+
+/* The table's tools: one row each, an icon then the words, as the rows of the menu sheet. In the
+   side panel the rows keep a little inner room for the hover tint and line up with the panel's text. */
+.table-tools {
+  display: grid;
+  justify-items: stretch;
+}
+
+.table-tools :is(.btn, .switch) {
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--tap);
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-s);
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.table-tools > :is(.btn, .switch) .icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--text-2);
+}
+
+.table-tools .switch > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.table-tools .switch b {
+  font-size: inherit;
+}
+
+.side-panel .table-tools {
+  margin-inline: -8px;
+}
+
+/* ------------------------------------------------------------------ Flights */
+
+.flights {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-flights);
+  pointer-events: none;
+}
+
+.flight {
+  position: fixed;
+  transform-origin: 50% 50%;
+  perspective: 900px;
+  will-change: transform;
+}
+
+.flight > svg,
+.flight > div,
+.flight .flight__side > * {
+  width: 100%;
+  height: 100%;
+}
+
+.flight svg.card,
+.flight .trick__card {
+  border-radius: 6.5% / 4.6%;
+  box-shadow: var(--shadow-card);
+}
+
+.flight__turn {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.flight__side {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.flight__side--face {
+  transform: rotateY(180deg);
+}
+
+.flight__chip {
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+  box-shadow: var(--shadow);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* ------------------------------------------------------------------ Entrances (motion on only) */
+
+@media (prefers-reduced-motion: no-preference) {
+  .table[data-motion='on'] .deck--shuffle [data-m='b'] {
+    animation: deck-cut-b 0.6s cubic-bezier(0.5, 0, 0.3, 1) both;
+  }
+
+  .table[data-motion='on'] .deck--shuffle [data-m='a'] {
+    animation: deck-cut-a 0.6s cubic-bezier(0.5, 0, 0.3, 1) both;
+  }
+
+  .table--opening .deck--shuffle [data-m='b'] {
+    animation: deck-cut-b 0.6s cubic-bezier(0.5, 0, 0.3, 1) 0.08s both;
+  }
+
+  .table--opening .deck--shuffle [data-m='a'] {
+    animation: deck-cut-a 0.6s cubic-bezier(0.5, 0, 0.3, 1) 0.08s both;
+  }
+
+  @keyframes deck-cut-b {
+    38%,
+    56% {
+      rotate: 9deg;
+      translate: 48% -6%;
+    }
+  }
+
+  @keyframes deck-cut-a {
+    38%,
+    56% {
+      rotate: -6deg;
+      translate: -30% 3%;
+    }
+  }
+
+  /* The vira turns over 400 ms after the deal starts; the manilha tile pulses after it. */
+  .table[data-motion='on'] .pile__vira {
+    animation: vira-flip 0.24s cubic-bezier(0.3, 0.7, 0.2, 1) 0.4s both;
+  }
+
+  .table[data-motion='on'] .manilha-tile:not(.is-empty) {
+    animation: pulse 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.64s both;
+  }
+
+  .table[data-motion='on'] .hand-info__num {
+    animation: pulse 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  }
+
+  .table[data-motion='on'] .rounds li[data-r] i {
+    animation: pulse 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  }
+
+  .table[data-motion='on'] .score__digit.is-bumped {
+    animation: pulse-num 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.38s;
+  }
+
+  .table[data-motion='on'] .score-marks li.is-new {
+    animation: mark-turn 0.12s cubic-bezier(0.3, 0.7, 0.2, 1) var(--mark-delay, 0ms) both;
+  }
+
+  .table[data-motion='on'] .score__chip {
+    animation: chip-in 0.26s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  }
+
+  .table[data-motion='on'] .dealer-line {
+    animation: line-in 0.32s ease-out 0.7s both;
+  }
+
+  .bubble {
+    animation: bubble-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+
+  .bubble--own {
+    animation-name: bubble-own-in;
+  }
+
+  .table[data-motion='on'] .trick__notice,
+  .table[data-motion='on'] .win-tag {
+    animation: chip-in 0.26s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  }
+
+  .table[data-motion='on'] .match-result {
+    animation: fade-in 0.3s ease-out both;
+  }
+
+  @keyframes vira-flip {
+    from {
+      transform: rotateY(90deg);
+    }
+  }
+
+  @keyframes pulse {
+    40% {
+      scale: 1.2;
+    }
+  }
+
+  @keyframes pulse-num {
+    45% {
+      scale: 1.45;
+    }
+  }
+
+  @keyframes mark-turn {
+    from {
+      transform: rotateY(-180deg);
+    }
+  }
+
+  @keyframes chip-in {
+    from {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+
+  @keyframes line-in {
+    from {
+      opacity: 0;
+      translate: -50% 6px;
+    }
+  }
+
+  @keyframes bubble-in {
+    from {
+      opacity: 0;
+      scale: 0.9;
+    }
+  }
+
+  @keyframes bubble-own-in {
+    from {
+      opacity: 0;
+      translate: -50% 6px;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ Large text on a phone */
+
+@container stage (width < 19rem) {
+  .score__row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 4px;
+  }
+
+  .score__goal {
+    display: none;
+  }
+
+  .hand-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 6px;
+  }
+
+  .hand-info__cell:nth-child(4) {
+    border-left: 1px solid var(--line-soft);
+  }
+
+  .hand-info__cell:nth-child(3) {
+    border-left: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ Short phones (360 by 640, 375 by 667):
+   a smaller fanned hand and tighter rows, so the cards on the table stay about 70 px wide. */
+
+@media (width < 64em) and (max-height: 700px) {
+  .stage {
+    gap: 6px;
+    padding-top: 4px;
+  }
+
+  .score__row {
+    min-height: 34px;
+    padding: 0;
+  }
+
+  .hand-info {
+    padding-top: 5px;
+  }
+
+  .hand-info__value {
+    min-height: 1.95rem;
+  }
+
+  .pile {
+    height: 1.95rem;
+  }
+
+  .pile .mini-card {
+    width: 1.4rem;
+    height: 1.85rem;
+    font-size: 0.92rem;
+  }
+
+  .pile__vira,
+  .pile .mini-card--slot {
+    left: 0.8rem;
+  }
+
+  .manilha-tile {
+    width: 1.85rem;
+    height: 1.85rem;
+    font-size: 1.15rem;
+  }
+
+  .hand-info__num {
+    font-size: 1.4rem;
+  }
+
+  .table-area {
+    --pad-b: 8px;
+    --gap-f: 4px;
+  }
+
+  .actions {
+    min-height: 42px;
+  }
+
+  .actions__status b {
+    font-size: 1.08rem;
+  }
+
+  .turn-bar {
+    margin-bottom: 5px;
+  }
+
+  .hand-area {
+    grid-template-columns: min(100%, 268px);
+  }
+
+  .hand {
+    --hand-gap: -4px;
+    --legend: 1.5rem;
+  }
+
+  .table {
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  .stage {
+    padding-top: 0;
+  }
+
+  .actions__more--hint {
+    display: none;
+  }
+
+  .hand li {
+    gap: 4px;
+  }
+}
+
+/* A narrow stage: the status and the buttons share one row, the buttons as compact as their targets allow. */
+@container stage (width < 26rem) {
+  .actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .actions__status {
+    flex: 1 1 0;
+  }
+
+  .actions__buttons {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .actions__buttons .btn--bet {
+    min-width: 0;
+    padding: 0 12px;
+  }
+
+  .actions__buttons .btn--quiet {
+    padding: 0 8px;
+  }
+}
+
+/* The smallest phones (360 by 640): before the deal the status keeps only who deals and who leads,
+   and the rows close up a little more. */
+@media (width < 64em) and (max-height: 660px) {
+  .stage {
+    gap: 4px;
+  }
+
+  .table-area {
+    --pad-b: 6px;
+  }
+
+  .play-area__grid {
+    --pad-b: 6px;
+  }
+
+  .actions--before .actions__more {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ Landscape phones: two columns,
+   the play area on the left, the actions and the hand on the right. */
+
+@media (width < 64em) and (max-height: 500px) and (orientation: landscape) {
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-areas: "band band" "area actions" "area hand";
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 4px;
+  }
+
+  .band {
+    display: grid;
+    grid-area: band;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .band .hand-info {
+    padding-top: 0;
+    border-top: 0;
+    border-left: 1px solid var(--line-soft);
+  }
+
+  .table-coach {
+    grid-column: 1 / -1;
+  }
+
+  /* The play area keeps the left column; the actions and the hand stand on the right. */
+  .stage__game {
+    display: contents;
+  }
+
+  .table-area,
+  .truco,
+  .match-result {
+    grid-area: area;
+  }
+
+  .actions {
+    grid-area: actions;
+    align-self: end;
+  }
+
+  .hand-area {
+    grid-area: hand;
+    align-content: start;
+    grid-template-columns: min(100%, 22rem);
+  }
+}
+
+/* ------------------------------------------------------------------ Tablet: a centred column */
+
+@media (width >= 37.5em) and (width < 64em) {
+  .table {
+    width: min(100%, 46rem);
+    margin-inline: auto;
+  }
+
+  .hand-area {
+    grid-template-columns: min(100%, 28rem);
+  }
+
+  .score__name,
+  .score__goal {
+    font-size: 0.86rem;
+  }
+}
+
+/* ------------------------------------------------------------------ Desktop: the same calm table, a
+   side panel with the score history, the hand log and the tools. Labels never go under 13 px. */
+
+@media (width >= 64em) {
+  .table {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(15rem, 23vw, 21rem);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 28px;
+    height: calc(100dvh - var(--header-h, 57px));
+    min-height: 40rem;
+    padding: 0 24px 14px;
+  }
+
+  .stage {
+    justify-self: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 54rem;
+    min-height: 0;
+  }
+
+  .stage__game {
+    min-height: 0;
+    gap: 6px;
+  }
+
+  .band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: center;
+    padding: 6px 0 8px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .score {
+    max-width: none;
+    padding-right: 18px;
+  }
+
+  .score__row {
+    min-height: 52px;
+    column-gap: 12px;
+  }
+
+  .score__name {
+    font-size: 0.9rem;
+  }
+
+  .score__goal {
+    font-size: 0.82rem;
+  }
+
+  .score-marks li {
+    height: 13px;
+  }
+
+  .hand-info {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.85fr) minmax(0, 1.15fr) minmax(0, 1.2fr);
+    padding-top: 0;
+    border-top: 0;
+    border-left: 1px solid var(--line-soft);
+  }
+
+  .hand-info__value {
+    min-height: 2.7rem;
+  }
+
+  .hand-info__value small {
+    font-size: 0.82rem;
+  }
+
+  .pile {
+    width: 3rem;
+    height: 2.7rem;
+  }
+
+  .pile .mini-card {
+    width: 1.8rem;
+    height: 2.5rem;
+    font-size: 1.15rem;
+  }
+
+  .pile__vira,
+  .pile .mini-card--slot {
+    left: 1rem;
+  }
+
+  .manilha-tile {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.5rem;
+  }
+
+  .hand-info__num {
+    font-size: 1.9rem;
+  }
+
+  .rounds {
+    gap: 4px;
+  }
+
+  .rounds i {
+    width: 1.7rem;
+    height: 1.7rem;
+    font-size: 0.82rem;
+  }
+
+  .actions {
+    width: min(100%, 32rem);
+    min-height: 56px;
+    margin-inline: auto;
+  }
+
+  .actions--before {
+    width: min(100%, 44rem);
+  }
+
+  .actions__status {
+    font-size: 0.92rem;
+  }
+
+  .actions__status b {
+    display: inline;
+    margin-right: 10px;
+  }
+
+  .hand-area {
+    grid-template-columns: min(100%, 27rem, calc((100dvh - 480px) * 1.25));
+  }
+
+  .hand {
+    --hand-gap: 14px;
+  }
+
+  .table--opening {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ Side panel (desktop only) */
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px 0 0 22px;
+  border-left: 1px solid var(--line-soft);
+}
+
+.side-panel__block {
+  padding: 0 0 16px;
+}
+
+.side-panel__block + .side-panel__block {
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.side-panel__title {
+  margin-bottom: 12px;
+  font-family: var(--font-text);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.side-panel__note {
+  margin: 10px 0 0;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.history {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  column-gap: 10px;
+}
+
+.history__axis,
+.history__total {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 0;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.history__total b {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.history__total .is-us {
+  color: var(--nos);
+}
+
+.history__total .is-them {
+  color: var(--eles);
+}
+
+/* One narrow column per hand, from the left; they narrow only when a long match needs the room. */
+.history__hands {
+  position: relative;
+  display: grid;
+  grid-auto-columns: minmax(4px, 14px);
+  grid-auto-flow: column;
+  justify-content: start;
+  gap: 4px;
+  height: 68px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history__hands::before {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line);
+  content: "";
+}
+
+.history__hands li {
+  position: relative;
+}
+
+.history__hands li::after {
+  position: absolute;
+  right: 12%;
+  left: 12%;
+  height: calc(var(--p, 1) * 5px);
+  border-radius: 2px;
+  content: "";
+}
+
+.history__hands li[data-t='us']::after {
+  bottom: calc(50% + 1px);
+  background: var(--nos);
+}
+
+.history__hands li[data-t='them']::after {
+  top: calc(50% + 1px);
+  background: var(--eles);
+}
+
+.history__hands li[data-t='tie']::after {
+  top: 50%;
+  height: 4px;
+  background: var(--text-2);
+  translate: 0 -50%;
+}
+
+.history__hands li.is-now::after {
+  top: 50%;
+  height: 26px;
+  border-radius: 3px;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--text-2);
+  translate: 0 -50%;
+}
+
+.side-panel__block--log {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.hand-log {
+  min-height: 0;
+  margin: 0;
+  padding: 0 4px 0 0;
+  overflow-y: auto;
+  font-size: 0.88rem;
+  list-style: none;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+}
+
+.hand-log li {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line-soft);
+  color: var(--text-2);
+  line-height: 1.3;
+}
+
+.hand-log li:first-child {
+  border-top: 0;
+}
+
+.hand-log li.is-strong {
+  color: var(--text);
+  font-weight: 750;
+}
+
+.hand-log__ic {
+  display: grid;
+  place-items: center;
+  height: 1.3em;
+}
+
+.hand-log__ic svg {
+  width: 12px;
+  height: 12px;
+}
+
+.hand-log__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.hand-log__t {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+}
+
+.hand-log li[data-t='us'] .hand-log__ic {
+  color: var(--nos);
+}
+
+.hand-log li[data-t='them'] .hand-log__ic {
+  color: var(--eles);
+}
+
+.side-panel__foot {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.side-panel__keys {
+  min-height: var(--tap);
+}
+
+.side-panel__keys b {
+  font-size: 0.95rem;
+}
+
+.keys {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.9;
+}
+
+.keys kbd {
+  margin-right: 2px;
+  color: var(--text);
+}
+
+@media (forced-colors: active) {
+  .trick__spot.wins .trick__card {
+    outline-color: Highlight;
+  }
+
+  .rounds li[data-r] i {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* ------------------------------------------------------------------ The guided match's coach
+   (guided/slot.ts): under the hand info row on phones, at the top of the side panel from 64em. */
+
+.table-coach {
+  width: 100%;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.side-panel__coach {
+  margin-bottom: 14px;
+}

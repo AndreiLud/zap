@@ -1,0 +1,36 @@
+/* The heatmap (F15, F21): imported by Heatmap.tsx, so it loads with the chapters that use it. */
+
+.hm-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* Heatmap */
+.chart .hm-cell { stroke: none; }
+.chart .hm-s1 { fill: var(--seq-1); }
+.chart .hm-s2 { fill: var(--seq-2); }
+.chart .hm-s3 { fill: var(--seq-3); }
+.chart .hm-s4 { fill: var(--seq-4); }
+.chart .hm-s5 { fill: var(--seq-5); }
+.chart .hm-empty { fill: var(--chart-surface); stroke: var(--chart-grid); stroke-width: 1; }
+.chart .hm-cell.is-active { stroke: var(--chart-ink); stroke-width: 2.5; }
+.chart .hatch-line { stroke: var(--chart-ink-2); stroke-width: 1.5; }
+.chart .hm-label { font-weight: 750; }
+.chart .hm-l1 { fill: var(--hm-ink-1); }
+.chart .hm-l2 { fill: var(--hm-ink-2); }
+.chart .hm-l3 { fill: var(--hm-ink-3); }
+.chart .hm-l4 { fill: var(--hm-ink-4); }
+.chart .hm-l5 { fill: var(--hm-ink-5); }
+
+/* Forced colors: the cells as outlines; their labels in CanvasText (this rule comes after .hm-l1 to
+   .hm-l5 at the same specificity, so it wins). */
+@media (forced-colors: active) {
+  .chart .hm-cell {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+
+  .chart .hm-label {
+    fill: CanvasText;
+  }
+}

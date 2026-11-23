@@ -1,0 +1,213 @@
+/* Dialogs: the age gate, the notice, the report, the human check and the confirm dialog of the You page
+   (CLIENT-SPEC 10.7), in the modal look of the prototype's .folha: a light sheet over a veil, a
+   title bar with a hairline, the body, and the buttons at the foot.
+   * dialog.dialog: a padded sheet for dialogs that write their content directly (the human check).
+   * dialog.dialog--framed: no padding; the content is .dialog__top, .dialog__body and .dialog__foot,
+     and the top and the foot stay in view while a long body (the notice) scrolls.
+   Imported by Gate.tsx and Report.tsx; the lobby imports Report.tsx, so these rules are in the
+   entry chunk and also cover the human check (components/Dialogs.tsx). */
+
+dialog.dialog {
+  width: min(30rem, calc(100vw - 24px));
+  max-height: min(86dvh, 760px);
+  padding: 20px 22px 22px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+dialog.dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.dialog::backdrop {
+  background: var(--veil);
+}
+
+.dialog > * + * {
+  margin-top: 12px;
+}
+
+.dialog h2 {
+  font-size: 1.4rem;
+  letter-spacing: -0.015em;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* The Turnstile widget keeps its height while it loads, so the dialog does not jump. */
+.turnstile {
+  min-height: 65px;
+}
+
+/* ------------------------------------------------------------------ Framed dialogs */
+
+dialog.dialog--framed {
+  padding: 0;
+}
+
+.dialog--framed > * + * {
+  margin-top: 0;
+}
+
+.dialog__top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 18px 22px 12px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface);
+}
+
+.dialog__body {
+  display: grid;
+  gap: 14px;
+  padding: 18px 22px 4px;
+}
+
+.dialog__foot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 22px 20px;
+  background: var(--surface);
+}
+
+.dialog__foot--line {
+  margin-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.dialog__note {
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+
+.dialog .field select {
+  width: 100%;
+}
+
+.dialog__links {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dialog__links--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+}
+
+/* Links and link-like buttons: cobalt, underlined, with room to tap. */
+.dialog__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ Age gate */
+
+.gate__birthday {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.gate__birthday legend {
+  width: 100%;
+  margin-bottom: 2px;
+  padding: 0;
+  font-weight: 650;
+}
+
+/* ------------------------------------------------------------------ Notice */
+
+.notice__list {
+  display: grid;
+  margin: 0;
+}
+
+.notice__row {
+  display: grid;
+  gap: 2px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.notice__row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.notice__row dt {
+  font-weight: 750;
+}
+
+.notice__row dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+@media (min-width: 37.5em) {
+  dialog.notice {
+    width: min(36rem, calc(100vw - 24px));
+  }
+
+  .notice__row {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    column-gap: 16px;
+  }
+}
+
+/* ------------------------------------------------------------------ Report button */
+
+.report-button .icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.dialog[open] {
+    animation: dialog-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  dialog.dialog {
+    border: 1px solid CanvasText;
+  }
+}

@@ -1,0 +1,101 @@
+/* The frame of the four chapters of the plan and the closing block of the data page (DATA-SPEC
+   4.6 to 4.10): the chapter's section and heading, its place while the chapters load, and the
+   closing links. The pieces inside the chapters that are not charts (chapter-figures.css) load with
+   the chapters. Colors come from the tokens of styles/tokens.css and the chart tokens on
+   .data-root, so both themes follow. */
+
+/* Zero specificity for the chapter frame and its heading: the page's own part styles
+   (.dp-part, .dp-part__h in data-page.css) win where they set the same thing. */
+:where(.chap) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 7vw, 56px);
+  scroll-margin-top: 72px;
+}
+
+:where(.chap__head) {
+  display: grid;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 2px solid var(--text);
+}
+
+:where(.chap__title) {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-h2, clamp(1.5rem, 6vw, 2rem));
+  line-height: 1.1;
+  text-wrap: balance;
+  scroll-margin-top: 72px;
+}
+
+.chap__title:focus {
+  outline: none;
+}
+
+:where(.chap__lead) {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--text-2);
+  font-size: var(--fs-lead, 1.05rem);
+  line-height: 1.45;
+}
+
+.chap__rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-weight: 650;
+}
+
+.chap__rule svg {
+  flex: none;
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chap-wait {
+  min-height: 1px;
+}
+
+/* A chapter whose figures have not loaded yet keeps about a screen of room, so the parts after it
+   do not jump far when they come in (they load before the reader reaches them). */
+.chap-wait--lazy {
+  min-height: 100vh;
+}
+
+/* ===================================================================== */
+/* Closing                                                                */
+/* ===================================================================== */
+
+.chap__end {
+  display: grid;
+  gap: 14px;
+}
+
+.chap__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+}
+
+.chap__links {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.chap__links a {
+  color: var(--text);
+  font-weight: 650;
+}
+
+.chap__title--terms {
+  font-size: clamp(1.2rem, 4.6vw, 1.5rem);
+}

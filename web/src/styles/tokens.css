@@ -1,0 +1,158 @@
+/* Design tokens (CLIENT-SPEC 5, prototype azulejo-v2/style.css). Light theme: lime-washed plaster
+   and glazed cobalt tile in daylight. Dark theme: night concrete with lit tile colors, its own
+   steps, not an inversion. Every color in the client comes from these names. Contrast ratios are
+   in CLIENT-SPEC 5.2. */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #F2EDE2;
+  --surface: #FBF8F2;
+  --surface-2: #E8E1D4;
+  --line: #D3C9B7;
+  --line-soft: #E2D9C8;
+  --text: #17181C;
+  --text-2: #4B4A50;
+  --accent: #1D3B9A;
+  --nos: #1D3B9A;
+  --nos-fg: #FFFFFF;
+  --eles: #A8401F;
+  --eles-fg: #FFFFFF;
+  --ocre-fill: #E3A72F;
+  --ocre-fg: #17181C;
+  --ocre-line: #A87210;
+  --btn-bg: #1D3B9A;
+  --btn-fg: #FFFFFF;
+  --btn-alert-bg: #A8401F;
+  --btn-alert-fg: #FFFFFF;
+  --focus: #17181C;
+  --focus-halo: #FBF8F2;
+  /* The selected mode tile: 7% cobalt on the surface. */
+  --chosen: #EBEBEC;
+  /* The line medallion on the table, decorative: ground, ring and corners, centre point. */
+  --medallion-0: #F2EDE2;
+  --medallion: #D9DCE8;
+  --medallion-2: #EDD9AE;
+  --veil: rgb(14 16 24 / .42);
+  --outline-quiet: #84827F;
+
+  /* Cards are physical objects: the face stays light in both themes. */
+  --card-face: #FFFDF8;
+  --card-edge: #D8CFBF;
+  --card-line: #1D3B9A;
+  --card-motif: #E9EEF9;
+  --card-back: #1F3E9E;
+  --card-back-motif: #F2EDE2;
+  --card-back-accent: #E3A72F;
+  --card-accent: #E3A72F;
+  --suit-red: #A8401F;
+  --suit-black: #1D3B9A;
+  /* Four-color deck: clubs cobalt, hearts terracotta, spades ink, diamonds ochre. */
+  --suit-four-c: #1D3B9A;
+  --suit-four-h: #A8401F;
+  --suit-four-s: #17181C;
+  --suit-four-d: #E3A72F;
+  --suit-ink: #17181C;
+
+  --shadow: 0 1px 0 rgb(23 24 28 / .05), 0 10px 28px -14px rgb(23 24 28 / .35);
+  --shadow-card: 0 1px 1px rgb(23 24 28 / .16), 0 8px 16px -9px rgb(10 20 60 / .42);
+
+  --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --font-text: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --radius: 10px;
+  --radius-s: 6px;
+  --radius-l: 20px;
+  --tap: 44px;
+  --gutter: 16px;
+
+  /* Type scale (CLIENT-SPEC 5.3). Pages may step these up at their breakpoints. */
+  --fs-hook: clamp(2.75rem, 12vw, 4.5rem);
+  --fs-h1-play: clamp(2.1rem, 9vw, 4.25rem);
+  --fs-h1-page: clamp(2.1rem, 8.6vw, 4rem);
+  --fs-h2: clamp(1.55rem, 6vw, 2.3rem);
+  --fs-lead: 1.06rem;
+  --fs-body: 1rem;
+  --fs-note: .84rem;
+  --fs-label: .72rem;
+  --fs-score: 1.45rem;
+  --fs-seat: .9rem;
+  --fs-seat-line: .74rem;
+  --fs-status: 1.15rem;
+  --fs-btn-big: 1.14rem;
+
+  /* Motion (durations of the table live in web/src/table/timing.ts). */
+  --ease-out: cubic-bezier(.2, .75, .25, 1);
+  --ease-flip: cubic-bezier(.4, .1, .3, 1);
+
+  /* Layers: the sheet and dialogs use the top layer. */
+  --z-header: 30;
+  --z-flights: 40;
+  --z-toast: 50;
+  --z-skip: 60;
+}
+
+@media (min-width: 37.5em) {
+  :root {
+    --fs-label: .8rem;
+    --fs-score: 1.6rem;
+  }
+}
+
+@media (min-width: 64em) {
+  :root {
+    --fs-hook: clamp(3.5rem, 5.5vw, 5.25rem);
+    --fs-label: .82rem;
+    --fs-score: 1.7rem;
+    --fs-status: 1.2rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --fs-hook: clamp(2rem, 9vh, 2.75rem);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111317;
+    --surface: #1A1D24;
+    --surface-2: #232730;
+    --line: #3A404C;
+    --line-soft: #262A33;
+    --text: #EFE8DA;
+    --text-2: #A8A397;
+    --accent: #8EA2FF;
+    --nos: #8EA2FF;
+    --nos-fg: #111317;
+    --eles: #FF8B62;
+    --eles-fg: #111317;
+    --ocre-fill: #F2BC4A;
+    --ocre-fg: #111317;
+    --ocre-line: #F2BC4A;
+    /* A glazed cobalt that still reads as cobalt at night: white text 6.12:1. */
+    --btn-bg: #3D57CC;
+    --btn-fg: #FFFFFF;
+    --btn-alert-bg: #FF8B62;
+    --btn-alert-fg: #111317;
+    --focus: #F2BC4A;
+    --focus-halo: #111317;
+    --chosen: #222633;
+    --medallion-0: #15171C;
+    --medallion: #283047;
+    --medallion-2: #4A3F27;
+    --veil: rgb(0 0 0 / .6);
+    --outline-quiet: #807E78;
+
+    --card-face: #F4EEE2;
+    --card-edge: #0B0C10;
+    --card-motif: #E2E5EF;
+    --card-back: #1A3590;
+    --card-back-motif: #EDE6D6;
+    --card-back-accent: #F2BC4A;
+
+    --shadow: 0 1px 0 rgb(255 255 255 / .03), 0 12px 28px -12px rgb(0 0 0 / .85);
+    --shadow-card: 0 1px 1px rgb(0 0 0 / .4), 0 10px 22px -8px rgb(0 0 0 / .75);
+  }
+}

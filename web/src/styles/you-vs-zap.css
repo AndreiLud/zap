@@ -1,0 +1,258 @@
+/* "You against Zap" (DATA-SPEC 5): the reading page look of the You page (styles/page.css, .doc) with the
+   chart kit of the data pages (styles/data.css, .data-root). Only what the personal page adds: the
+   history table, the result marks, the replay panel, the best hands and the links to the data.
+   Colors are the site and chart tokens, so both themes follow them; the person is --series-3 and
+   Zap --series-1, and every mark also has a shape or a word. */
+
+/* Grid items take the width of the page, never of their content (the history table scrolls in its
+   own box, so the page never scrolls sideways). */
+.vs .doc__section > *,
+.vs-list > * {
+  min-width: 0;
+}
+
+.vs .doc__section > .figure + .figure,
+.vs .doc__section > .figure + .vs-list {
+  margin-top: 18px;
+}
+
+.vs .sub {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text-2);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.vs-stat {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 4.4vw, 1.4rem);
+  font-weight: 750;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+/* A data page: wider than the reading pages, so the history table fits on a computer. */
+.doc.vs {
+  max-width: 62rem;
+}
+
+/* The names on the rating scale sit on a halo of the chart surface, so a guide that passes behind
+   a name never crosses its letters (data/charts/RatingBand.tsx). */
+.vs .chart .rating-name {
+  paint-order: stroke;
+  stroke: var(--chart-surface);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
+/* The tick of Zap on the rating scale. */
+.vs .chart .tick--strong {
+  stroke: var(--chart-ink);
+  stroke-width: 1.5;
+}
+
+/* ------------------------------------------------------------------ History table */
+
+.vs-list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.vs-list h3 {
+  font-size: clamp(1.1rem, 4.2vw, 1.25rem);
+}
+
+/* Positioned, so the visually hidden header text stays inside the box that scrolls (an absolute
+   child of an unpositioned scroller would widen the page). */
+.vs-list .doc__table-scroll {
+  position: relative;
+}
+
+.vs-table {
+  min-width: 44rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.vs-table th[scope='row'] {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.vs-table td {
+  vertical-align: middle;
+}
+
+.vs-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.vs-table__btn {
+  min-height: var(--tap);
+  white-space: nowrap;
+}
+
+.vs-list__count {
+  font-size: var(--fs-note);
+}
+
+.vs-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.vs-result svg {
+  flex: none;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vs-result--win svg {
+  stroke: var(--series-3);
+}
+
+.vs-result--loss svg {
+  stroke: var(--chart-ink-2);
+}
+
+/* ------------------------------------------------------------------ Reading */
+
+.vs-inmatch {
+  max-width: 62ch;
+}
+
+.vs-inmatch a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vs-meter {
+  display: grid;
+  gap: 6px;
+  max-width: 34rem;
+}
+
+/* ------------------------------------------------------------------ Best hands */
+
+.vs-hands {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vs-hand {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--chart-surface);
+}
+
+.vs-hand__title {
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.vs-hand__line {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.vs-hand__drop {
+  width: 100%;
+  max-width: 18rem;
+  height: auto;
+  overflow: visible;
+}
+
+.vs-hand__track {
+  stroke: var(--chart-axis);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.vs-hand__half {
+  stroke: var(--chart-ink-2);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.vs-hand__fall {
+  stroke: var(--series-1);
+  stroke-width: 2;
+}
+
+.vs-hand__before {
+  fill: var(--chart-surface);
+  stroke: var(--series-1);
+  stroke-width: 2;
+}
+
+.vs-hand__after {
+  fill: var(--series-1);
+  stroke: var(--chart-surface);
+  stroke-width: 1.5;
+}
+
+.vs-hand__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vs-hand__tags li {
+  padding: 2px 10px;
+  border: 1px solid var(--ocre-line);
+  border-radius: 999px;
+  background: var(--ocre-fill);
+  color: var(--text);
+  font-size: var(--fs-note);
+  font-weight: 700;
+}
+
+.vs-hand__btn {
+  justify-self: start;
+  min-height: var(--tap);
+}
+
+/* ------------------------------------------------------------------ Your data */
+
+.vs-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (forced-colors: active) {
+  .vs-result--win svg,
+  .vs-result--loss svg,
+  .vs-hand__fall,
+  .vs-hand__before {
+    stroke: CanvasText;
+  }
+  .vs-hand__after {
+    fill: CanvasText;
+  }
+}

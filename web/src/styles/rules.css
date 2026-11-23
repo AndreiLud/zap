@@ -1,0 +1,1228 @@
+/* The rules page (CLIENT-SPEC 10.6) and the quick rules dialog. Port of the prototype
+   azulejo-v2 regras.css and pagina.css: sections separated by thin rules, numbers and labels set
+   in type, a box only around what you can touch. Every selector is scoped to .rules-page or
+   .rules-dialog: this file loads with the page or the dialog, after the table styles. */
+
+/* ------------------------------------------------------------------ Page column and cover */
+
+.rules-page {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 4px var(--gutter) 48px;
+}
+
+.rules-page .cover {
+  display: grid;
+  gap: 14px;
+  padding: 26px 0 22px;
+}
+
+.rules-page .kicker {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.rules-page h1 {
+  max-width: 16ch;
+  font-size: var(--fs-h1-page);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variation-settings: 'opsz' 96;
+}
+
+.rules-page .cover__lead {
+  max-width: 46ch;
+  margin-top: 2px;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+/* Cover art (wide screens only): three cards over one inlaid tile, cobalt as the primary button. */
+.rules-page .cover__art {
+  display: none;
+}
+
+@media (min-width: 56.25em) {
+  .rules-page .cover--art {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 48px;
+  }
+
+  .rules-page .cover__text {
+    display: grid;
+    gap: 14px;
+  }
+
+  .rules-page .cover__art {
+    position: relative;
+    display: block;
+    justify-self: end;
+    width: 100%;
+    max-width: 21rem;
+    aspect-ratio: 1;
+  }
+
+  .rules-page .rules-medallion {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    --medallion-ground: var(--surface);
+    --medallion-ring: var(--btn-bg);
+    --medallion-point: var(--ocre-fill);
+  }
+
+  .rules-page .cover__fan {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 34%;
+    aspect-ratio: 5 / 7;
+    translate: -50% -50%;
+  }
+
+  .rules-page .cover__fan > span {
+    position: absolute;
+    inset: 0;
+    filter: drop-shadow(0 10px 14px rgb(10 20 60 / 0.28));
+    transform-origin: 50% 115%;
+  }
+
+  .rules-page .cover__fan > span:nth-child(1) {
+    rotate: -15deg;
+  }
+
+  .rules-page .cover__fan > span:nth-child(3) {
+    rotate: 15deg;
+  }
+}
+
+/* ------------------------------------------------------------------ Variant switch */
+
+.rules-page .rules-variant {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  min-width: 0;
+  margin: 0 0 22px;
+  padding: 0;
+  border: 0;
+}
+
+.rules-page .rules-variant__hint {
+  font-size: 0.92rem;
+  font-weight: 550;
+  color: var(--text-2);
+}
+
+.rules-page .segmented,
+.rules-dialog .segmented {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.rules-page .segmented__option,
+.rules-dialog .segmented__option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: var(--tap);
+  padding: 0 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-2);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.rules-page .segmented__option:hover,
+.rules-dialog .segmented__option:hover {
+  color: var(--text);
+}
+
+.rules-page .segmented__option input,
+.rules-dialog .segmented__option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rules-page .segmented__option:has(input:checked),
+.rules-dialog .segmented__option:has(input:checked) {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.rules-page .segmented__option:has(input:focus-visible),
+.rules-dialog .segmented__option:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ Sections */
+
+.rules-page .section {
+  display: grid;
+  gap: 18px;
+  padding: 30px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.rules-page .section__head {
+  display: grid;
+  gap: 8px;
+}
+
+.rules-page .section__head--num {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 12px;
+}
+
+.rules-page .section__head--num > :not(.section__num) {
+  grid-column: 2;
+}
+
+.rules-page .section__num {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.rules-page .section h2 {
+  font-size: var(--fs-h2);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.rules-page .section__head p {
+  max-width: 58ch;
+  font-size: 1.02rem;
+  color: var(--text-2);
+}
+
+.rules-page .rules-note {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* The only box: around something you can touch. */
+.rules-page .example {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.rules-page .example h3 {
+  font-size: 1.15rem;
+}
+
+.rules-page .example__hint {
+  font-size: 0.92rem;
+  color: var(--text-2);
+}
+
+.rules-page .example__result {
+  min-height: 1.45em;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+/* ------------------------------------------------------------------ 1. Card order */
+
+.rules-page .card-ladder {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rules-page .card-ladder__step {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.rules-page .card-ladder__card {
+  width: 100%;
+  max-width: 92px;
+  filter: drop-shadow(0 5px 7px rgb(10 20 60 / 0.16));
+}
+
+.rules-page .card-ladder__step small {
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.rules-page .axis {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.rules-page .axis i {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: var(--text-2);
+}
+
+.rules-page .axis i::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -4px;
+  border: 4.5px solid transparent;
+  border-left: 7px solid var(--text-2);
+  border-right: 0;
+}
+
+.rules-page .manilha-note {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.98rem;
+}
+
+.rules-page .manilha-note .star {
+  translate: 0 1px;
+}
+
+.rules-page .star,
+.rules-dialog .star {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  fill: var(--ocre-line);
+}
+
+/* Rank pickers: ten radios in a grid, the chosen one filled with ink. */
+.rules-page .rank-picker {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rules-page .rank-picker legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.rules-page .rank-picker__ranks {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.rules-page .rank-picker__rank {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.rules-page .rank-picker__rank:hover {
+  box-shadow: inset 0 0 0 1.5px var(--text-2);
+}
+
+.rules-page .rank-picker__rank input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rules-page .rank-picker__rank:has(input:checked) {
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: none;
+}
+
+.rules-page .rank-picker__rank:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.rules-page .duel__result.is-tie {
+  color: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ 2. The vira lab */
+
+.rules-page .vira-picker__result {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin-top: 6px;
+}
+
+.rules-page .vira-picker__vira {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.rules-page .vira-picker__card {
+  width: 84px;
+  rotate: -3deg;
+  filter: drop-shadow(0 7px 9px rgb(10 20 60 / 0.18));
+}
+
+.rules-page .vira-picker__vira figcaption {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.rules-page .vira-picker__says {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+}
+
+.rules-page .vira-picker__is {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 5.4vw, 1.9rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.rules-page .vira-picker__big {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35em;
+  height: 1.35em;
+  margin-left: 0.1em;
+  padding: 0 0.2em;
+  border-radius: 6px;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+}
+
+.rules-page .vira-picker__note {
+  font-size: 0.92rem;
+  color: var(--text-2);
+}
+
+.rules-page .vira-picker__result .manilha-cards {
+  grid-column: 1 / -1;
+}
+
+.rules-page .vira-picker__order {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.rules-page .vira-picker__order > p {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.rules-page .fixed-manilhas__note {
+  font-size: 0.95rem;
+  color: var(--text-2);
+}
+
+/* The four manilhas: cards with their names (page: one row of four; dialog: two columns). */
+.manilha-cards {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.manilha-cards--big {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.manilha-cards--big .manilha-cards__item {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 3px;
+  text-align: center;
+}
+
+.manilha-cards--big .manilha-cards__card {
+  width: 100%;
+  max-width: 96px;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 5px 7px rgb(10 20 60 / 0.16));
+}
+
+.manilha-cards__text {
+  display: grid;
+  gap: 1px;
+}
+
+.manilha-cards__text b {
+  font-size: 0.92rem;
+}
+
+.manilha-cards__text small {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.manilha-cards__tip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+/* Large text on a phone, or a 320 px screen: two by two, so each name has room (media query ems
+   follow the browser's font size; at the default size this starts below 352 px). */
+@media (width < 22em) {
+  .manilha-cards--big {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 16px;
+  }
+}
+
+.manilha-cards--small {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.manilha-cards--small .manilha-cards__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.9rem;
+}
+
+.manilha-cards--small .manilha-cards__card {
+  width: 30px;
+  flex: none;
+}
+
+/* Ten equal columns, so the whole order fits one line on the narrowest phone. */
+.order-line {
+  display: grid;
+  gap: 4px;
+  max-width: 32rem;
+}
+
+.order-line__ranks {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.order-line__rank {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  height: 38px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+/* The manilha keeps its star in the corner, so it differs by shape as well as by color. */
+.order-line__rank.is-manilha {
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+  box-shadow: none;
+}
+
+.order-line__rank .star {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  fill: currentColor;
+}
+
+.order-line__axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+/* The new manilhas turn over when the vira changes (not on the first load). */
+@media (prefers-reduced-motion: no-preference) {
+  .rules-page .is-changed .manilha-cards--big .manilha-cards__item {
+    animation: manilha-in 0.42s cubic-bezier(0.2, 0.8, 0.25, 1.15) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  .rules-page .is-changed .vira-picker__vira .vira-picker__card {
+    animation: vira-in 0.4s cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  }
+
+  @keyframes manilha-in {
+    from {
+      opacity: 0;
+      transform: perspective(500px) rotateY(-80deg);
+    }
+  }
+
+  @keyframes vira-in {
+    from {
+      transform: perspective(500px) rotateY(90deg);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ 3. Rounds */
+
+.rules-page .rounds-table-wrap {
+  overflow-x: auto;
+}
+
+.rules-page .rounds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.rules-page .rounds-table caption {
+  margin-bottom: 8px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.rules-page .rounds-table th {
+  padding: 6px 4px;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.rules-page .rounds-table td {
+  padding: 8px 4px;
+  border-top: 1px solid var(--line-soft);
+  vertical-align: middle;
+}
+
+.rules-page .rounds-table__why {
+  display: none;
+}
+
+.rules-page .round-mark {
+  display: inline-grid;
+  place-items: center;
+  min-width: 3.6em;
+  min-height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.rules-page .round-mark--us {
+  background: var(--nos);
+  color: var(--nos-fg);
+}
+
+.rules-page .round-mark--them {
+  background: var(--eles);
+  color: var(--eles-fg);
+}
+
+.rules-page .round-mark--tie {
+  box-shadow: inset 0 0 0 1.5px var(--text-2);
+  border-radius: 6px;
+}
+
+.rules-page .round-mark--skip {
+  min-width: 0;
+  font-weight: 550;
+  color: var(--text-2);
+}
+
+.rules-page .round-mark--nobody {
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* ------------------------------------------------------------------ 4. Truco */
+
+.rules-page .truco-steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rules-page .truco-steps li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 14px;
+  row-gap: 8px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.rules-page .truco-steps li:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+
+.rules-page .truco-steps li > :not(.truco-steps__n) {
+  grid-column: 2;
+}
+
+.rules-page .truco-steps__n {
+  grid-row: span 3;
+  min-width: 0.7em;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--eles);
+}
+
+.rules-page .truco-steps h3 {
+  font-size: 1.2rem;
+}
+
+.rules-page .truco-steps p {
+  max-width: 44ch;
+  color: var(--text-2);
+}
+
+.rules-page .truco-steps__picture {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+}
+
+.rules-page .truco-steps__arrow {
+  font-weight: 800;
+  color: var(--text-2);
+}
+
+.rules-page .mini-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.3em;
+  padding: 0 13px;
+  border-radius: 9px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.rules-page .mini-btn--accept {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: none;
+}
+
+.rules-page .mini-btn--bet {
+  box-shadow: inset 0 0 0 1.5px var(--eles);
+  color: var(--eles);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.rules-page .mini-btn--alert {
+  background: var(--btn-alert-bg);
+  color: var(--btn-alert-fg);
+  box-shadow: none;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.rules-page .ladder {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.rules-page .ladder__step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1em;
+  height: calc(1.5em + var(--h, 0) * 0.4em);
+  padding: 0 0.25em;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.rules-page .ladder__step.is-on {
+  background: var(--eles);
+  color: var(--eles-fg);
+  box-shadow: none;
+}
+
+.rules-page .truco-demo__buttons,
+.rules-page .truco-demo__answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rules-page .truco-demo .btn {
+  min-height: 48px;
+}
+
+/* ------------------------------------------------------------------ 5 to 9. Small pictures */
+
+.rules-page .onze-picture {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.rules-page .onze-picture__score {
+  margin-right: 6px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.rules-page .cover-card {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.rules-page .cover-card__pair {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rules-page .cover-card__card {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 72px;
+  filter: drop-shadow(0 5px 7px rgb(10 20 60 / 0.16));
+}
+
+.rules-page .cover-card__card small {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.rules-page .cover-card__vs {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-2);
+}
+
+.rules-page .cover-card figcaption {
+  font-size: 0.92rem;
+  color: var(--text-2);
+}
+
+.rules-page .signal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rules-page .signal-chips li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.rules-page .time-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rules-page .time-row p {
+  max-width: 44ch;
+  font-size: 0.95rem;
+  color: var(--text-2);
+}
+
+.rules-page .time-ring {
+  position: relative;
+  flex: none;
+  width: 72px;
+  height: 72px;
+  margin: 0;
+}
+
+.rules-page .time-ring svg {
+  width: 100%;
+  height: 100%;
+  rotate: -90deg;
+}
+
+.rules-page .time-ring__track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.2;
+}
+
+.rules-page .time-ring__bar {
+  fill: none;
+  stroke: var(--ocre-line);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 72 100;
+}
+
+.rules-page .time-ring__label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.rules-page .score-marks-picture {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.rules-page .score-marks-picture__marks {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 22rem;
+}
+
+.rules-page .score-marks-picture__marks i {
+  height: 18px;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+.rules-page .score-marks-picture__marks i:nth-child(-n + 7) {
+  background: var(--nos);
+}
+
+.rules-page .score-marks-picture figcaption {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ 10 to 13. Lists */
+
+.rules-page .house-list,
+.rules-page .sources-list {
+  display: grid;
+  gap: 0;
+  max-width: 60ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rules-page .house-list li,
+.rules-page .sources-list li {
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.rules-page .house-list li:first-child,
+.rules-page .sources-list li:first-child {
+  border-top: 0;
+}
+
+.rules-page .sources-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  font-weight: 650;
+}
+
+.rules-page .keys-list {
+  display: grid;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.rules-page .keys-list__row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.rules-page .keys-list__row:first-child {
+  border-top: 0;
+}
+
+.rules-page .keys-list dt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.rules-page .keys-list kbd {
+  min-width: 1.9em;
+  height: 1.9em;
+  font-size: 0.85rem;
+  opacity: 1;
+}
+
+.rules-page .keys-list dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.rules-page .glossary {
+  display: grid;
+  max-width: 64ch;
+  margin: 0;
+}
+
+.rules-page .glossary__item {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+  scroll-margin-top: 72px;
+}
+
+.rules-page .glossary__item:first-child {
+  border-top: 0;
+}
+
+.rules-page .glossary dt {
+  scroll-margin-top: 72px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.rules-page .glossary dt:focus {
+  outline: none;
+}
+
+.rules-page .glossary dt:focus-visible,
+.rules-page .glossary dt:focus {
+  text-decoration: underline;
+  text-decoration-color: var(--ocre-line);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+}
+
+.rules-page .glossary dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ Call to action */
+
+.rules-page .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+/* ------------------------------------------------------------------ Wider screens */
+
+@media (min-width: 47.5em) {
+  .rules-page {
+    padding: 8px 32px 64px;
+  }
+
+  .rules-page .cover {
+    padding: 44px 0 34px;
+  }
+
+  .rules-page .section {
+    gap: 24px;
+    padding: 44px 0;
+  }
+
+  .rules-page .example {
+    padding: 24px;
+  }
+
+  .rules-page .card-ladder,
+  .rules-page .rank-picker__ranks {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  .rules-page .vira-picker__result {
+    grid-template-columns: auto minmax(0, 0.9fr) minmax(0, 1.6fr);
+    gap: 28px;
+  }
+
+  .rules-page .vira-picker__card {
+    width: 112px;
+  }
+
+  .rules-page .vira-picker__result .manilha-cards {
+    grid-column: auto;
+  }
+
+  .rules-page .rounds-table__why {
+    display: table-cell;
+    color: var(--text-2);
+  }
+
+  /* Subgrid rows: the three titles, paragraphs and pictures line up. */
+  .rules-page .truco-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    row-gap: 8px;
+  }
+
+  .rules-page .truco-steps li {
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    padding: 4px 24px 8px;
+    border-top: 0;
+    border-left: 1px solid var(--line-soft);
+  }
+
+  .rules-page .truco-steps li:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ Quick rules dialog */
+
+.rules-dialog .modal__body h3 {
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+}
+
+.rules-dialog .rules-dialog__variant {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rules-dialog .rules-dialog__lead {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.rules-dialog .order-line__rank {
+  height: 42px;
+  font-size: 1.15rem;
+}
+
+.rules-dialog .rules-dialog__steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.rules-dialog .rules-dialog__steps li {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rules-dialog .rules-dialog__steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.rules-dialog .rules-dialog__keys {
+  font-size: 0.9rem;
+  color: var(--text-2);
+}
+
+.rules-dialog .rules-dialog__keys-switch {
+  margin-top: 6px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .rules-dialog .rules-dialog__keys-section {
+    display: none;
+  }
+}

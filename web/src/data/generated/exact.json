@@ -1,0 +1,53 @@
+{
+  "provenance": {
+    "script": "tools/data/exact.ts",
+    "command": "docker compose run --rm -T node node tools/data/exact.ts",
+    "measuredAt": "2026-11-23T03:29:39.865Z",
+    "node": "v24.22.2",
+    "cpu": "QEMU Virtual CPU version 2.5+",
+    "commit": "9f20bbe4cf238a6d68572db4c37418a4ab6dd47e",
+    "inputs": [
+      {"path":"engine/src/cards.ts","sha256":"af097dbe43040bd33b0af9d448dd1c88c8e5928ba7ef18d75c2310b1e9cb4a94"},
+      {"path":"tools/data/exact.ts","sha256":"ba7f631b399dd72a07edd0e46a826953b2ee611bb835d43706fb5f3da9b8b65e"}
+    ]
+  },
+  "rankLabels": ["4","5","6","7","Q","J","K","A","2","3"],
+  "manilha": {
+    "paulista": {"p0":0.7162,"p1":0.2604,"p2":0.023,"p3":0.0004,"atLeastOne":0.2838,"team":0.5025},
+    "mineiro": {"p0":0.7227,"p1":0.2551,"p2":0.0219,"p3":0.0004,"atLeastOne":0.2773,"team":0.4925}
+  },
+  "cards": {
+    "paulista": [
+      {"beats":0,"ties":0.0767,"loses":0.9233},
+      {"beats":0.0932,"ties":0.0767,"loses":0.8301},
+      {"beats":0.1835,"ties":0.0767,"loses":0.7398},
+      {"beats":0.2737,"ties":0.0767,"loses":0.6496},
+      {"beats":0.3639,"ties":0.0767,"loses":0.5594},
+      {"beats":0.4541,"ties":0.0767,"loses":0.4692},
+      {"beats":0.5444,"ties":0.0767,"loses":0.3789},
+      {"beats":0.6346,"ties":0.0767,"loses":0.2887},
+      {"beats":0.7248,"ties":0.0767,"loses":0.1985},
+      {"beats":0.818,"ties":0.0767,"loses":0.1053},
+      {"beats":0.9211,"ties":0,"loses":0.0789},
+      {"beats":0.9474,"ties":0,"loses":0.0526},
+      {"beats":0.9737,"ties":0,"loses":0.0263},
+      {"beats":1,"ties":0,"loses":0}
+    ],
+    "mineiro": [
+      {"beats":0,"ties":0.0513,"loses":0.9487},
+      {"beats":0.0769,"ties":0.0769,"loses":0.8462},
+      {"beats":0.1795,"ties":0.0769,"loses":0.7436},
+      {"beats":0.2821,"ties":0.0256,"loses":0.6923},
+      {"beats":0.3333,"ties":0.0769,"loses":0.5897},
+      {"beats":0.4359,"ties":0.0769,"loses":0.4872},
+      {"beats":0.5385,"ties":0.0769,"loses":0.3846},
+      {"beats":0.641,"ties":0.0513,"loses":0.3077},
+      {"beats":0.7179,"ties":0.0769,"loses":0.2051},
+      {"beats":0.8205,"ties":0.0769,"loses":0.1026},
+      {"beats":0.9231,"ties":0,"loses":0.0769},
+      {"beats":0.9487,"ties":0,"loses":0.0513},
+      {"beats":0.9744,"ties":0,"loses":0.0256},
+      {"beats":1,"ties":0,"loses":0}
+    ]
+  }
+}

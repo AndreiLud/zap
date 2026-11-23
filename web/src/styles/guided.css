@@ -1,0 +1,131 @@
+/* The guided first match (CLIENT-SPEC 10.5): the coach card (a quiet card with one or two
+   sentences and "Continuar"), the intro and outro cards, and the suggested hand card. The table
+   itself is styled by the table's own files. */
+
+.guided {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Text and "Continuar" share a row while there is room; in the narrow side panel the button wraps
+   under the text, at the right. */
+.coach {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.coach__text {
+  flex: 1 1 14rem;
+  min-height: 1.4em;
+}
+
+.coach__next {
+  min-height: var(--tap);
+  margin-left: auto;
+  padding: 0 14px;
+}
+
+/* Intro and outro: a title, a line and the buttons below. */
+.coach--intro,
+.coach--outro {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+}
+
+.coach--intro h2,
+.coach--outro h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.coach--intro h2:focus,
+.coach--outro h2:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.coach--intro p,
+.coach--outro p {
+  color: var(--text-2);
+}
+
+.coach__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* The suggested card: an ochre outline and the tag on its top edge, like a label on a frame, so it
+   stays clear of the actions row above the hand. Positioned only when the table left the card in
+   normal flow, so the table's own placement always wins. */
+:where([data-suggest]) {
+  position: relative;
+}
+
+[data-suggest] {
+  outline: 2.5px solid var(--ocre-line);
+  outline-offset: 3px;
+}
+
+[data-suggest]::after {
+  content: attr(data-suggest);
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  z-index: 1;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+  font-family: var(--font-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.4;
+  white-space: nowrap;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+/* Nothing of the practice hand reaches the server: no report from this table. */
+html[data-guided] [data-testid='report-button'] {
+  display: none !important;
+}
+
+@media (forced-colors: active) {
+  [data-suggest] {
+    outline-color: Highlight;
+  }
+}
+
+/* Short phones (360 by 640): the coach card closes up and the trick's cards may get a little smaller,
+   so the suggested card stays on the first screen with the coach above the table. */
+@media (width < 64em) and (max-height: 700px) {
+  .table-coach .coach {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .table-coach .coach__next {
+    min-height: 40px;
+  }
+
+  html[data-guided] .table-area {
+    --cw-min: 50px;
+  }
+}

@@ -1,0 +1,331 @@
+/* Reading pages: the You page, Privacidade, Termos, Como verificamos and the data placeholder
+   (CLIENT-SPEC 10.7 and 10.8, prototype azulejo-v2/pagina.css). A cover with the title and one
+   line, sections separated by thin rules, numbers and labels set in type, and a box only around
+   something you can touch. Every rule is scoped to .doc, so the rules page (rules.css) and these
+   pages never restyle each other. Loaded with pages/Doc.tsx, in the lazy chunks of these pages. */
+
+.doc {
+  max-width: 46rem;
+  padding-bottom: 56px;
+}
+
+/* ------------------------------------------------------------------ Cover */
+
+.doc__cover {
+  display: grid;
+  gap: 14px;
+  padding: 14px 0 28px;
+}
+
+.doc h1 {
+  max-width: 16ch;
+  font-size: var(--fs-h1-page);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variation-settings: "opsz" 96;
+}
+
+.doc__updated {
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 650;
+}
+
+.doc__lede {
+  max-width: 46ch;
+  color: var(--text-2);
+  font-size: 1.08rem;
+  line-height: 1.5;
+}
+
+/* The page's one tile accent: a slim strip of whole tiles; the rest wrap onto a hidden row. */
+.doc__strip {
+  --tile: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr));
+  grid-auto-rows: var(--tile);
+  gap: 3px;
+  width: min(100%, 26rem);
+  height: var(--tile);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.doc__strip svg {
+  width: 100%;
+  height: var(--tile);
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------ Sections */
+
+.doc__section {
+  display: grid;
+  gap: 12px;
+  padding: 26px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.doc__section h2 {
+  font-size: clamp(1.3rem, 5vw, 1.65rem);
+  letter-spacing: -0.02em;
+}
+
+.doc__section > p,
+.doc__section li {
+  max-width: 62ch;
+}
+
+/* A numeral set in type beside the title (legal pages). */
+.doc__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 12px;
+}
+
+.doc__num {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 5vw, 1.65rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.doc__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.doc__list li::marker {
+  color: var(--accent);
+}
+
+/* A link that leads on ("Open the You page"): cobalt, bold, with room to tap. */
+.doc__go a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--accent);
+  font-weight: 750;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+.doc__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.doc .doc__cta-quiet {
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+/* ------------------------------------------------------------------ You page */
+
+/* Live regions stay in the accessibility tree while empty (no display: none), or a screen reader
+   may miss the first message. Empty, they take no room. */
+.doc__page-status:empty {
+  padding: 0;
+}
+
+.doc__page-status {
+  padding: 0 0 18px;
+  color: var(--text-2);
+  font-weight: 650;
+}
+
+.doc__status {
+  display: grid;
+  gap: 4px;
+}
+
+/* Facts as rows between hairlines: the label above, the value below, notes quieter. */
+.doc__facts {
+  display: grid;
+  margin: 0;
+}
+
+.doc__facts > div {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.doc__facts > div:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.doc__facts dt {
+  color: var(--text-2);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.doc__facts dd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.doc__facts dd .hint {
+  font-weight: 500;
+}
+
+.doc__facts code,
+.doc__code {
+  font-family: var(--font-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.doc__table-scroll {
+  overflow-x: auto;
+}
+
+.doc__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.doc__table th,
+.doc__table td {
+  padding: 10px 8px 10px 0;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+}
+
+.doc__table th {
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Forms and the recovery code: the only boxes, around what you can touch. */
+.doc__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.doc__form .field {
+  flex: 1 1 14rem;
+}
+
+.doc__form .hint {
+  width: 100%;
+}
+
+.doc__form input {
+  width: 100%;
+}
+
+#you-recover {
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.doc__box {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.doc__code {
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+}
+
+.doc__warn {
+  color: var(--eles);
+  font-weight: 650;
+}
+
+.doc .doc__switch {
+  align-items: flex-start;
+  padding: 6px 0;
+}
+
+.doc .doc__switch + .doc__switch {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
+}
+
+.doc .doc__switch small {
+  margin-top: 2px;
+  max-width: 52ch;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.doc .doc__switch input {
+  margin-top: 2px;
+}
+
+/* Deleting: the one place terracotta marks an action. */
+.doc__section--danger h2 {
+  color: var(--eles);
+}
+
+.doc .btn--danger {
+  border: 1.5px solid var(--eles);
+  background: transparent;
+  color: var(--eles);
+  font-weight: 800;
+}
+
+.doc .btn--danger:hover {
+  border-color: var(--eles);
+  background: color-mix(in srgb, var(--eles) 8%, transparent);
+}
+
+/* ------------------------------------------------------------------ Wider screens */
+
+@media (min-width: 37.5em) {
+  .doc__cover {
+    padding: 30px 0 36px;
+  }
+
+  .doc__section {
+    gap: 14px;
+    padding: 34px 0;
+  }
+
+  .doc__facts > div {
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    column-gap: 20px;
+  }
+}
+
+@media (forced-colors: active) {
+  .doc__form,
+  .doc__box {
+    border: 1px solid CanvasText;
+  }
+}

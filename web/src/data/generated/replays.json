@@ -1,0 +1,203 @@
+{
+  "provenance": {
+    "script": "tools/data/simulate.ts",
+    "command": "docker compose run --rm -T node node tools/data/simulate.ts",
+    "measuredAt": "2026-11-23T15:41:01.973Z",
+    "node": "v24.22.2",
+    "cpu": "QEMU Virtual CPU version 2.5+",
+    "commit": "9f20bbe4cf238a6d68572db4c37418a4ab6dd47e",
+    "inputs": [
+      {"path":"ai/models/bootstrap/manifest-v2.json","sha256":"555a92c8f28cb31704d4761aa615b1929b65872d7bd19c269335673b07c6d3d4"},
+      {"path":"ai/models/bootstrap/zap-v2.zapw","sha256":"afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632"},
+      {"path":"ai/src/agent.ts","sha256":"958a1cc27a35439c93864e7dae18138f35086d5e7b451210efd0f673d72e8d2c"},
+      {"path":"ai/src/evaluate.ts","sha256":"718579d1b598b8bfb7c08dde812321f00b3bff9d938c8605abae0a54ae1cfcf7"},
+      {"path":"ai/src/features.ts","sha256":"0de650f029c3049205a17c952a30220b67b0a63f679163530c88bea0c46942a9"},
+      {"path":"ai/src/heuristic.ts","sha256":"ce125e0a9df5618aca6d47957479af05745dcf25d74d33cfe7859c35a2f2c98e"},
+      {"path":"ai/src/league.ts","sha256":"405032379d19d4980a0ee184fc2578eade201ad02e834792332a213f08eb36a0"},
+      {"path":"ai/src/mlp.ts","sha256":"3747dfa171faa30e91e6fba8429fd7fc9d59fa62f3b97e887008ea9bb096ec02"},
+      {"path":"ai/src/net-agent.ts","sha256":"30007ec4ecdc1f6bd04f8e2870264363d0f11b8b018d99b6ba5044f78ebc0762"},
+      {"path":"ai/src/opponent-stats.ts","sha256":"ea95bd12559f89a4c43a1e331c5007d1b21d8b48aa844b96bb4a659b87a7c658"},
+      {"path":"ai/src/personas.ts","sha256":"69d0ec157d2ba19a6217fb6b4f2417b341da33d7fe89e1e355e3dcf7be659feb"},
+      {"path":"ai/src/safety.ts","sha256":"ee452a2bcf1a2a82e5b83b9ffd0ee64bbfeacb24711903de8bb50c0c422205e3"},
+      {"path":"ai/src/stats.ts","sha256":"b911670c8694868bf7ab734ca8d801bbdbe5e2271cd7d459129e988fe4445f36"},
+      {"path":"ai/src/styles.ts","sha256":"27cdc16ab87ee202958e4c0964cf84d5a6362daf9a5b5f57b30bbd923c25a7e2"},
+      {"path":"ai/src/winprob.ts","sha256":"dd0032bcc00f3484f446a168a7e302fe7ec4591ccdb3d66f7980fd1354965d0e"},
+      {"path":"engine/src/cards.ts","sha256":"af097dbe43040bd33b0af9d448dd1c88c8e5928ba7ef18d75c2310b1e9cb4a94"},
+      {"path":"engine/src/config.ts","sha256":"6a85b2dc76b48f2d825bd2733d65ae77de08f93d10fd896ee266b99348311d79"},
+      {"path":"engine/src/engine.ts","sha256":"13bbeb86e53ea8e7511d732d451dd671bf5d421798f9c342bd3fee387315985a"},
+      {"path":"engine/src/index.ts","sha256":"3dad6917073f18367a27e37d5520b2d3f99fa531f415a74cf079592d3dd458b8"},
+      {"path":"engine/src/observe.ts","sha256":"35ae37616e6d7e26133b7f60ea9944a21c0de22ef3c703aaef14572cbdd0f930"},
+      {"path":"engine/src/public.ts","sha256":"a79233e3c664b4be04d41278a2238bcedc3a59d3a7f7e5680f13816980b63c49"},
+      {"path":"engine/src/rng.ts","sha256":"6064bab80ebf0e0d219d713b7cf70ae6b293685b53bc455111da781225ab0e11"},
+      {"path":"engine/src/simulate.ts","sha256":"317aa98128f11c727bda039d697ddb87a705d504ba6a8d393abbc7c83a2ddc18"},
+      {"path":"tools/data/lib/outcomes.ts","sha256":"35d239fd4491afa62f116a413c315efeb2e02bd685002a658858a67770a14657"},
+      {"path":"tools/data/lib/stats.ts","sha256":"a065d70fac0e1675feeb9d05ffe88392951153a694547fa135d86149efcea75a"},
+      {"path":"tools/data/sim-worker.ts","sha256":"110bbb01cdf7c33f923df5129cae77bebec498b82a7c043f11c45486214debc8"},
+      {"path":"tools/data/simulate.ts","sha256":"8cb2defd4c966f44fa215e11668c41b904537cb6980db00e8b53c564320c0ffe"},
+      {"path":"tools/data/sources.json","sha256":"a05b953a29bed08b15797d44cbe17eecc7968a7a1817924018e1f6c9a3f738f5"}
+    ],
+    "seed": "d7",
+    "sizes": {"matchesPerSegment":20000,"personaMatchesPerSegment":2000},
+    "model": {"version":"v2","path":"ai/models/bootstrap/zap-v2.zapw","sha256":"afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632","manifest":"ai/models/bootstrap/manifest-v2.json","manifestSha256":"555a92c8f28cb31704d4761aa615b1929b65872d7bd19c269335673b07c6d3d4","stats":"empty"},
+    "threads": 3,
+    "seconds": 609.9
+  },
+  "replays": [
+    {
+      "id": "virada",
+      "segment": "paulista-2",
+      "config": {
+        "variant": "paulista",
+        "players": 2,
+        "options": {
+          "ladder": "standard",
+          "raiseAnyTime": false,
+          "bestOf": 1,
+          "onzeSeesPartner": true,
+          "onzeTieToOpponents": false,
+          "ironHand": "blind",
+          "faceDownFirstRound": false,
+          "allTieToMao": false,
+          "signals": "p25"
+        }
+      },
+      "seed": "27a53ab188a5c378e7afe57ffa7ed15b369f97369506cd1df553ae08ec9fa38b",
+      "log": [17,0,2,18,16,6,24,6,23,1,16,5,22,6,23,17,18,0,17,1,2,16,8,7,17,0,18,2,1,16,8,7,17,1,18,5,8,7,17,1,0,16,18,2],
+      "handIndex": 8,
+      "actions": [
+        {"i":37,"seat":0,"action":7,"chance":0.6007},
+        {"i":38,"seat":1,"action":1,"chance":0.9441},
+        {"i":39,"seat":0,"action":1,"chance":0.5454},
+        {"i":40,"seat":0,"action":0,"chance":0.5298},
+        {"i":41,"seat":1,"action":0,"chance":0.9607},
+        {"i":42,"seat":1,"action":2,"chance":0.9185},
+        {"i":43,"seat":0,"action":2,"chance":0.7169}
+      ],
+      "chanceAfter": 0,
+      "detail": {"rise":0.9441,"team":1}
+    },
+    {
+      "id": "blefe",
+      "segment": "paulista-2",
+      "config": {
+        "variant": "paulista",
+        "players": 2,
+        "options": {
+          "ladder": "standard",
+          "raiseAnyTime": false,
+          "bestOf": 1,
+          "onzeSeesPartner": true,
+          "onzeTieToOpponents": false,
+          "ironHand": "blind",
+          "faceDownFirstRound": false,
+          "allTieToMao": false,
+          "signals": "p25"
+        }
+      },
+      "seed": "57220083436b16e168ac9d0a81e0c642a7c10814428be10458c513b85c48f4c0",
+      "log": [18,1,16,0,2,22,8,0,18,17,5,17,2,16,1,0,22,7,18,2,17,3,18,16,6,24,17,1,0,16,18,2,2,16,4,22,8],
+      "handIndex": 5,
+      "actions": [
+        {"i":32,"seat":0,"action":2,"chance":0.2896},
+        {"i":33,"seat":1,"action":0,"chance":0.1728},
+        {"i":34,"seat":0,"action":4,"chance":0.2571},
+        {"i":35,"seat":1,"action":6,"chance":0.1974},
+        {"i":36,"seat":0,"action":8,"chance":0.2357}
+      ],
+      "chanceAfter": 0.151,
+      "detail": {"estimate":0.0024,"seat":1,"at":35}
+    },
+    {
+      "id": "doze",
+      "segment": "paulista-4",
+      "config": {
+        "variant": "paulista",
+        "players": 4,
+        "options": {
+          "ladder": "standard",
+          "raiseAnyTime": false,
+          "bestOf": 1,
+          "onzeSeesPartner": true,
+          "onzeTieToOpponents": false,
+          "ironHand": "blind",
+          "faceDownFirstRound": false,
+          "allTieToMao": false,
+          "signals": "p25"
+        }
+      },
+      "seed": "647ac476f3102f05127c0f6744b4b9d6c154787b26826082f4e65414c52227bd",
+      "log": [26,18,41,33,62,49,14,2,48,1,22,38,55,22,39,17,34,38,55,32,50,0,16],
+      "handIndex": 0,
+      "actions": [
+        {"i":0,"seat":1,"action":10,"chance":0.3419},
+        {"i":1,"seat":1,"action":2,"chance":0.3248},
+        {"i":2,"seat":2,"action":9,"chance":0.6537},
+        {"i":3,"seat":2,"action":1,"chance":0.6563},
+        {"i":4,"seat":3,"action":14,"chance":0.3629},
+        {"i":5,"seat":3,"action":1,"chance":0.3628},
+        {"i":6,"seat":0,"action":14,"chance":0.5928},
+        {"i":7,"seat":0,"action":2,"chance":0.5884},
+        {"i":8,"seat":3,"action":0,"chance":0.3534},
+        {"i":9,"seat":0,"action":1,"chance":0.5557},
+        {"i":10,"seat":1,"action":6,"chance":0.3049},
+        {"i":11,"seat":2,"action":6,"chance":0.6218},
+        {"i":12,"seat":3,"action":7,"chance":0.3938},
+        {"i":13,"seat":1,"action":6,"chance":0.2005},
+        {"i":14,"seat":2,"action":7,"chance":0.5081},
+        {"i":15,"seat":1,"action":1,"chance":0.1952},
+        {"i":16,"seat":2,"action":2,"chance":0.3528},
+        {"i":17,"seat":2,"action":6,"chance":0.4325},
+        {"i":18,"seat":3,"action":7,"chance":0.209},
+        {"i":19,"seat":2,"action":0,"chance":0.0978},
+        {"i":20,"seat":3,"action":2,"chance":0.2551},
+        {"i":21,"seat":0,"action":0,"chance":0.1913},
+        {"i":22,"seat":1,"action":0,"chance":0.0068}
+      ],
+      "chanceAfter": 0,
+      "detail": {}
+    },
+    {
+      "id": "onze",
+      "segment": "paulista-4",
+      "config": {
+        "variant": "paulista",
+        "players": 4,
+        "options": {
+          "ladder": "standard",
+          "raiseAnyTime": false,
+          "bestOf": 1,
+          "onzeSeesPartner": true,
+          "onzeTieToOpponents": false,
+          "ironHand": "blind",
+          "faceDownFirstRound": false,
+          "allTieToMao": false,
+          "signals": "p25"
+        }
+      },
+      "seed": "f71d3d8d2d53467dc112ace409bbf37059164259ae4c61ba3217d099e07164bf",
+      "log": [43,34,48,1,30,16,18,33,54,8,62,48,13,2,25,18,41,34,49,3,22,40,14,0,29,16,34,59,54,8,18,44,38,56,46,34,58,50,14,1,25,18,20,36,54,8,62,50,6,23,11,2,28,17,46,32,52,1,18,33,48,0,16,34,9,1,28,17,46,34,60,48,36,52,6,24,27,18,45,38,55,32,57,54,8,41,33,48,9,1,28,18,20,34,54,6,24,62,50,14,1,29,16,45,32,51,2,22,40,14,1,30,16,41,32,62,49,48,5,17,38,56,30,18,42,32,49,14,6,24,46,34,60,49,2,25,17,33,53,0,18,22,40,61,50,2,25,17,46,34,33,52,1,18,19,32,48,0,1,26,16,46,33,60,54,8,23,27,18,42,32,59,49,12,2,53,1,16,34,33,48,0,20],
+      "handIndex": 15,
+      "actions": [
+        {"i":166,"seat":1,"action":7,"chance":0.121},
+        {"i":167,"seat":1,"action":11,"chance":0.0759},
+        {"i":168,"seat":1,"action":2,"chance":0.1292},
+        {"i":169,"seat":2,"action":10,"chance":0.6616},
+        {"i":170,"seat":2,"action":0,"chance":0.661},
+        {"i":171,"seat":3,"action":11,"chance":0.1136},
+        {"i":172,"seat":3,"action":1,"chance":0.1159},
+        {"i":173,"seat":0,"action":12,"chance":0.4933},
+        {"i":174,"seat":0,"action":2,"chance":0.4754},
+        {"i":175,"seat":3,"action":5,"chance":0.0164},
+        {"i":176,"seat":0,"action":1,"chance":0.4688},
+        {"i":177,"seat":1,"action":0,"chance":0.0067},
+        {"i":178,"seat":2,"action":2,"chance":0.4341},
+        {"i":179,"seat":2,"action":1,"chance":0.4568},
+        {"i":180,"seat":3,"action":0,"chance":0.1077},
+        {"i":181,"seat":0,"action":0,"chance":0.0925},
+        {"i":182,"seat":1,"action":4,"chance":0.0275}
+      ],
+      "chanceAfter": 0,
+      "detail": {"team":1}
+    }
+  ]
+}

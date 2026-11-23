@@ -1,0 +1,19 @@
+{
+  "truco.who": "{name} pediu",
+  "truco.aria": "{name} pediu {call}",
+  "truco.value.accept": "Aceitando, a mão vale {value} tentos.",
+  "truco.value.run.4": "Correndo, eles levam {points}.",
+  "truco.value.run.2": "Correndo, {name} leva {points}.",
+  "truco.ctx.us": "Sua dupla levou a {n}ª rodada.",
+  "truco.ctx.you": "Você levou a {n}ª rodada.",
+  "truco.ctx.them": "Eles levaram a {n}ª rodada.",
+  "truco.ctx.other": "{name} levou a {n}ª rodada.",
+  "truco.ctx.tie": "A {n}ª rodada empatou.",
+  "truco.ctx.first": "Primeira rodada.",
+  "truco.ctx.table": "Na mesa, {list}.",
+  "truco.ctx.mine": "seu {card}",
+  "truco.ctx.mine.f": "sua {card}",
+  "truco.ctx.theirs": "{card} {of}",
+  "truco.ctx.covered": "uma coberta {of}",
+  "truco.ctx.covered.mine": "sua coberta"
+}

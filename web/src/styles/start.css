@@ -1,0 +1,369 @@
+/* The start page (CLIENT-SPEC 10.1, prototype azulejo-v2/home.css). A very short presentation: the
+   hook and one line, one picture, three buttons. Phone first: the page fills the first screen like
+   a game's title screen (hook on top, the picture takes the free space, the buttons sit at the
+   thumb), so the three buttons are on the first screen also at 375 by 667. Wide screens and phones
+   in landscape: the hook and the buttons on the left, the picture on the right.
+   Every rule is scoped to .start, so no other page picks these up. */
+
+.start {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  /* The first screen below the header, but never taller than the layout needs: on a tall phone the
+     footer shows too, on a short one it waits below the fold. */
+  min-height: min(calc(100svh - 57px), 38rem);
+  padding: 22px var(--gutter) 20px;
+}
+
+.start__text {
+  display: grid;
+  gap: 10px;
+}
+
+.start h1 {
+  font-size: var(--fs-hook);
+  font-weight: 800;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  font-variation-settings: "opsz" 96;
+}
+
+.start__lead {
+  max-width: 30ch;
+  color: var(--text-2);
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------------------ The picture */
+
+/* It takes whatever height is left, and the tile is the largest square that fits. */
+.start__art {
+  display: grid;
+  flex: 1 1 0;
+  place-items: center;
+  min-height: 10rem;
+  container-type: size;
+}
+
+.start__stage {
+  position: relative;
+  width: min(100cqw, 100cqh, 26rem);
+  aspect-ratio: 1;
+}
+
+.start__tile {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The full tile in cobalt and ochre, the same cobalt as the main button in both themes. */
+  --medallion-ground: var(--surface);
+  --medallion-ring: var(--btn-bg);
+  --medallion-point: var(--ocre-fill);
+}
+
+.start__tile .medallion__ground {
+  stroke: var(--line-soft);
+  stroke-width: 0.008;
+}
+
+/* The stroke closes the seams between the quarter rings. */
+.start__tile .medallion__ring {
+  stroke: var(--btn-bg);
+  stroke-width: 0.006;
+}
+
+/* Three cards fanned from a point below them; the manilha in the middle sits a little higher, so
+   its ochre seal peeks over the king in front. */
+.start__fan {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 37%;
+  aspect-ratio: 200 / 280;
+  translate: -50% -42%;
+}
+
+.start__card {
+  --turn: 0deg;
+  --open: 0;
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 130%;
+  rotate: calc(var(--turn) * (1 + var(--open) * 0.3));
+  filter: drop-shadow(0 12px 16px rgb(10 20 60 / 0.3));
+}
+
+.start__card:nth-child(1) {
+  --turn: -17deg;
+}
+
+.start__card:nth-child(2) {
+  translate: 0 -8%;
+}
+
+.start__card:nth-child(3) {
+  --turn: 17deg;
+}
+
+@media (prefers-color-scheme: dark) {
+  .start__card {
+    filter: drop-shadow(0 12px 18px rgb(0 0 0 / 0.6));
+  }
+}
+
+/* The deal: each card comes in from across the table and opens into the fan, one after the other.
+   Only the start state is written; the end is the resting style above (fill mode backwards), so
+   the hover spread below can transition once the deal is over. Reduced motion: the resting fan. */
+@media (prefers-reduced-motion: no-preference) {
+  .start__stage.is-dealing .start__card {
+    animation: start-deal 0.56s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+
+  .start__stage.is-dealing .start__card:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+
+  .start__stage.is-dealing .start__card:nth-child(3) {
+    animation-delay: 0.24s;
+  }
+
+  @keyframes start-deal {
+    from {
+      opacity: 0;
+      translate: 0 -40%;
+      rotate: 0deg;
+    }
+
+    30% {
+      opacity: 1;
+    }
+  }
+}
+
+/* Pointing at "Jogar" opens the hand a little more: the button and the cards are one gesture. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .start__card {
+    transition: rotate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .start:has(.start__play:hover, .start__play:focus-visible) .start__card {
+    --open: 1;
+  }
+}
+
+/* ------------------------------------------------------------------ The three buttons */
+
+.start__actions {
+  display: grid;
+  gap: 10px;
+}
+
+.start .start__play {
+  width: 100%;
+  min-height: 58px;
+  gap: 10px;
+  padding: 0 28px;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.start .start__play .icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Two outlined buttons side by side, second to "Jogar" by size and weight, not by a faint edge: the
+   outline measures 3.28:1 on the light page and 4.58:1 at night. A label never breaks: when both do
+   not fit on one line (large text) they stack instead. */
+.start__out {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.start .start__ext {
+  flex: 1 1 9rem;
+  gap: 7px;
+  min-height: 50px;
+  padding: 0 10px;
+  border-color: var(--outline-quiet);
+  border-radius: 12px;
+  background: transparent;
+  font-size: 0.95rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.start .start__ext:hover {
+  border-color: var(--text-2);
+  background: var(--surface);
+}
+
+.start .start__ext .icon {
+  width: 19px;
+  height: 19px;
+}
+
+.start .start__ext .icon--arrow {
+  width: 12px;
+  height: 12px;
+  margin-left: -2px;
+  opacity: 0.65;
+}
+
+/* Very narrow phones (320 px, or a 360 px Android with a large display size): the two outlined
+   buttons keep one row. The arrow goes; the hidden "(abre em nova aba)" stays. */
+@media (max-width: 22.49em) {
+  .start__out {
+    gap: 8px;
+  }
+
+  .start .start__ext {
+    flex-basis: 8rem;
+    gap: 6px;
+    padding: 0 6px;
+    font-size: 0.9rem;
+  }
+
+  .start .start__ext .icon--arrow {
+    display: none;
+  }
+}
+
+/* Short phones: a tighter column, so the three buttons stay on the first screen. */
+@media (max-height: 600px) and (orientation: portrait) {
+  .start {
+    gap: 12px;
+    padding-top: 14px;
+  }
+
+  .start__art {
+    min-height: 7rem;
+  }
+}
+
+/* ------------------------------------------------------------------ Phones in landscape */
+
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 36em) {
+  .start {
+    display: grid;
+    grid-template-areas: "text art" "actions art";
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 14px clamp(20px, 4vw, 48px);
+    max-width: 60rem;
+    min-height: 0;
+    padding: 14px 24px 18px;
+  }
+
+  .start__text {
+    grid-area: text;
+    align-self: end;
+    gap: 8px;
+  }
+
+  .start__lead {
+    font-size: 1rem;
+  }
+
+  .start__actions {
+    grid-area: actions;
+    align-self: start;
+  }
+
+  .start .start__play {
+    min-height: 52px;
+  }
+
+  .start .start__ext {
+    min-height: 46px;
+  }
+
+  .start__art {
+    grid-area: art;
+    min-height: 0;
+    container-type: normal;
+  }
+
+  .start__stage {
+    width: min(calc(100svh - 57px - 32px), 42vw);
+  }
+}
+
+/* ------------------------------------------------------------------ Wide screens */
+
+@media (min-width: 64em) {
+  .start {
+    display: grid;
+    grid-template-areas: "text art" "actions art";
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 40px clamp(48px, 5.5vw, 88px);
+    max-width: 72rem;
+    min-height: 0;
+    padding: 40px 40px 48px;
+  }
+
+  .start__text {
+    grid-area: text;
+    align-self: end;
+    gap: 18px;
+  }
+
+  .start__lead {
+    font-size: 1.25rem;
+  }
+
+  .start__actions {
+    grid-area: actions;
+    align-self: start;
+    width: min(100%, 27rem);
+    gap: 12px;
+  }
+
+  .start .start__play {
+    min-height: 64px;
+    font-size: 1.4rem;
+  }
+
+  .start .start__ext {
+    min-height: 54px;
+  }
+
+  .start__out {
+    gap: 12px;
+  }
+
+  /* On a wide screen the picture has a set size: as big as the screen height allows. */
+  .start__art {
+    grid-area: art;
+    min-height: 0;
+    container-type: normal;
+  }
+
+  .start__stage {
+    width: clamp(20rem, calc(100svh - 17rem), 34rem);
+  }
+}
+
+/* Forced colors: the tile keeps an outline, the buttons keep their borders. */
+@media (forced-colors: active) {
+  .start__tile .medallion__ground {
+    stroke: CanvasText;
+  }
+
+  .start .start__ext,
+  .start .start__play {
+    border: 1px solid CanvasText;
+  }
+}

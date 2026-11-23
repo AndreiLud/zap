@@ -1,0 +1,830 @@
+/* The data pages' chart kit (DATA-SPEC 3): chart tokens, the figure anatomy, the marks, the
+   tooltip, the table view, the states, the meters, the hero number and the replay viewer. Imported
+   by charts/Figure.tsx, so it rides in the data chunks only.
+
+   Chart colors live on .data-root (the wrapper of both data pages). The categorical trio and both
+   ramps passed the dataviz validator in both themes (lightness band, chroma floor, CVD separation,
+   normal vision floor, contrast against --chart-surface). Ochre never marks a series. The values
+   are repeated in web/src/data/charts/palette.ts; web/test/data-contrast.test.ts fails when the two
+   disagree. Dark mode is its own set of steps, not an inversion. */
+
+.data-root {
+  --chart-surface: #FBF8F2;
+  --chart-ink: #17181C;
+  --chart-ink-2: #4B4A50;
+  --chart-grid: #E2D9C8;
+  --chart-axis: #D3C9B7;
+  --chart-neutral: #8A857C;
+  --series-1: #2F4FC0;
+  --series-2: #B5531F;
+  --series-3: #008A6E;
+  --seq-1: #9AABE9;
+  --seq-2: #7A90DE;
+  --seq-3: #5571CF;
+  --seq-4: #3653B8;
+  --seq-5: #1F3A92;
+  /* The ink of a label inside a heatmap cell: the one of #17181C and white with the higher contrast
+     on that step (every step reaches 4.5:1 in both themes, see palette.ts). */
+  --hm-ink-1: #17181C;
+  --hm-ink-2: #17181C;
+  --hm-ink-3: #FFFFFF;
+  --hm-ink-4: #FFFFFF;
+  --hm-ink-5: #FFFFFF;
+  --band-mix: 18%;
+  --zone-mix: 22%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .data-root {
+    --chart-surface: #1A1D24;
+    --chart-ink: #EFE8DA;
+    --chart-ink-2: #A8A397;
+    --chart-grid: #262A33;
+    --chart-axis: #3A404C;
+    --chart-neutral: #7A808C;
+    --series-1: #6A80EE;
+    --series-2: #D0652F;
+    --series-3: #1F9E83;
+    --seq-1: #3E4C8E;
+    --seq-2: #4E64B6;
+    --seq-3: #6A84DD;
+    --seq-4: #91A6F1;
+    --seq-5: #BCC9FB;
+    --hm-ink-1: #FFFFFF;
+    --hm-ink-2: #FFFFFF;
+    --hm-ink-3: #17181C;
+    --hm-ink-4: #17181C;
+    --hm-ink-5: #17181C;
+    --band-mix: 24%;
+    --zone-mix: 12%;
+  }
+}
+
+/* ===================================================================== */
+/* Figure anatomy                                                         */
+/* ===================================================================== */
+
+.figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+}
+
+.figure__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 4.6vw, 1.5rem);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.figure .sub {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text-2);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.figure__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.seg__btn {
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 0;
+  border-inline-end: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.seg__btn:last-child {
+  border-inline-end: 0;
+}
+
+.seg__btn[aria-pressed='true'] {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* .seg clips its children (overflow: hidden, for the rounded ends): the focus ring goes inside. */
+.seg__btn:focus-visible {
+  outline-offset: -4px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart {
+  position: relative;
+  padding: 12px 14px 10px;
+  border-radius: var(--radius);
+  background: var(--chart-surface);
+  color: var(--chart-ink);
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chart:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.chart--plain {
+  padding: 0;
+  background: none;
+}
+
+.chart__plot {
+  position: relative;
+}
+
+.chart svg.plot {
+  display: block;
+  max-width: none;
+  overflow: visible;
+}
+
+.chart--state {
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  min-height: 120px;
+  padding: 20px;
+  border: 1px dashed var(--line);
+  background: transparent;
+  text-align: center;
+}
+
+.chart__msg {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.chart__extra {
+  text-align: left;
+}
+
+.reading {
+  margin: 0;
+  max-width: 62ch;
+  padding-left: 13px;
+  border-left: 3px solid var(--ocre-line);
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+/* Tooltip: the value leads, the label follows. */
+.chart-tip {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: 1px;
+  width: max-content;
+  max-width: 16rem;
+  padding: 8px 11px 9px;
+  border: 1px solid var(--text-2);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: 0.84rem;
+  line-height: 1.3;
+  pointer-events: none;
+}
+
+.chart-tip b {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.1;
+}
+
+.chart-tip span {
+  font-weight: 650;
+}
+
+.chart-tip small {
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Source, date and sample size in one line, then the button that opens the table of numbers. The
+   line sits outside <summary>: its tap terms are buttons of their own. */
+.source__line {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--text-2);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+details.source {
+  border-top: 1px solid var(--line-soft);
+}
+
+.source__line + details.source {
+  border-top: 0;
+}
+
+.source__line + details.source summary {
+  padding-top: 4px;
+}
+
+details.source summary {
+  display: block;
+  min-height: var(--tap);
+  padding: 11px 0 9px;
+  border-radius: var(--radius-s);
+  color: var(--text-2);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  list-style: none;
+  cursor: pointer;
+}
+
+details.source summary::-webkit-details-marker {
+  display: none;
+}
+
+details.source summary b {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 4px;
+  color: var(--text);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+details.source summary b::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -2px;
+}
+
+details.source[open] summary b::after {
+  rotate: -135deg;
+  translate: 0 2px;
+}
+
+details.source summary:hover b {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.source--plain {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--text-2);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.source__scroll {
+  overflow-x: auto;
+  border-radius: var(--radius-s);
+}
+
+.source__scroll table {
+  margin: 2px 0 8px;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.source__scroll th,
+.source__scroll td {
+  padding: 7px 14px 7px 0;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.source__scroll thead th {
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.source__scroll tbody th {
+  font-weight: 650;
+}
+
+.source__scroll .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ===================================================================== */
+/* Marks and furniture (SVG)                                              */
+/* ===================================================================== */
+
+/* Only the chart SVGs (class plot): a card drawn inside a figure (the replay of F23) keeps its own
+   text styles. :where() keeps the specificity of ".chart text". */
+.chart :where(svg.plot) text {
+  fill: var(--chart-ink-2);
+  font-family: var(--font-text);
+  font-size: calc(12px * var(--fs, 1));
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart .axis-label,
+.chart .ref-label {
+  font-weight: 700;
+}
+
+.chart .row-label {
+  font-size: calc(13px * var(--fs, 1));
+  font-weight: 650;
+}
+
+.chart .row-label--strong,
+.chart .group-label,
+.chart .panel-title,
+.chart .note--strong,
+.chart .end-label--strong,
+.chart .val--strong {
+  fill: var(--chart-ink);
+  font-weight: 800;
+}
+
+.chart .group-label,
+.chart .panel-title {
+  font-size: calc(13px * var(--fs, 1));
+}
+
+.chart .row-note {
+  font-size: calc(11.5px * var(--fs, 1));
+  font-weight: 600;
+}
+
+/* Row labels sit above their track on a phone, where reference lines pass: a halo in the chart's
+   surface keeps the words clear of the dashed line behind them. */
+.chart .row-label,
+.chart .row-note {
+  paint-order: stroke fill;
+  stroke: var(--chart-surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.chart .end-label,
+.chart .val {
+  font-size: calc(12.5px * var(--fs, 1));
+  font-weight: 700;
+}
+
+.chart .note {
+  font-weight: 700;
+}
+
+/* Words drawn over lines and bands keep a halo of the chart surface. */
+.chart .note,
+.chart .ref-label,
+.chart .zone-label,
+.chart .end-label {
+  paint-order: stroke;
+  stroke: var(--chart-surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.chart .grid,
+.chart .track,
+.chart .tick {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.chart .track--strong {
+  stroke: var(--chart-axis);
+  stroke-width: 2;
+}
+
+.chart .ref,
+.chart .vmark {
+  stroke: var(--chart-ink-2);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.chart .vmark--strong,
+.chart .ref--limit {
+  stroke: var(--chart-ink);
+}
+
+.chart .leader {
+  stroke: var(--chart-ink-2);
+  stroke-width: 1;
+}
+
+.chart .crosshair {
+  stroke: var(--chart-ink);
+  stroke-width: 1;
+}
+
+.chart .zone {
+  fill: color-mix(in srgb, var(--ocre-fill) var(--zone-mix), transparent);
+}
+
+.chart .zone-label {
+  fill: var(--chart-ink);
+  font-weight: 750;
+}
+
+.chart .zone-band {
+  fill: color-mix(in srgb, var(--chart-ink-2) 14%, transparent);
+}
+
+.chart .ln {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart .ln--dashed {
+  stroke-dasharray: 4 3;
+  stroke-linecap: butt;
+}
+
+.chart .ln--s0 { stroke: var(--chart-ink-2); }
+.chart .ln--s1 { stroke: var(--series-1); }
+.chart .ln--s2 { stroke: var(--series-2); }
+.chart .ln--s3 { stroke: var(--series-3); }
+
+.chart .band--s0 { fill: color-mix(in srgb, var(--chart-ink-2) var(--band-mix), transparent); }
+.chart .band--s1 { fill: color-mix(in srgb, var(--series-1) var(--band-mix), transparent); }
+.chart .band--s2 { fill: color-mix(in srgb, var(--series-2) var(--band-mix), transparent); }
+.chart .band--s3 { fill: color-mix(in srgb, var(--series-3) var(--band-mix), transparent); }
+
+/* Marks: a 2 px surface ring keeps overlapping marks apart. */
+.chart .mk {
+  stroke: var(--chart-surface);
+  stroke-width: 2;
+}
+
+.chart .mk--s0 { fill: var(--chart-ink-2); }
+.chart .mk--s1 { fill: var(--series-1); }
+.chart .mk--s2 { fill: var(--series-2); }
+.chart .mk--s3 { fill: var(--series-3); }
+
+.chart .mk--open {
+  fill: var(--chart-surface);
+  stroke-width: 2;
+}
+
+.chart .mk--open.mk--s0 { stroke: var(--chart-ink-2); }
+.chart .mk--open.mk--s1 { stroke: var(--series-1); }
+.chart .mk--open.mk--s2 { stroke: var(--series-2); }
+.chart .mk--open.mk--s3 { stroke: var(--series-3); }
+
+.chart .mk.is-active {
+  stroke: var(--chart-ink);
+  stroke-width: 2.5;
+}
+
+.chart .whisker line {
+  stroke-width: 1.5;
+}
+
+.chart .whisker--s0 line { stroke: var(--chart-ink-2); }
+.chart .whisker--s1 line { stroke: var(--series-1); }
+.chart .whisker--s2 line { stroke: var(--series-2); }
+.chart .whisker--s3 line { stroke: var(--series-3); }
+
+.legend__key {
+  flex: none;
+  overflow: visible;
+}
+
+.legend__key .ln {
+  fill: none;
+  stroke-width: 2;
+}
+
+.legend__key .ln--dashed {
+  stroke-dasharray: 4 3;
+}
+
+.legend__key .ln--s1 { stroke: var(--series-1); }
+.legend__key .ln--s2 { stroke: var(--series-2); }
+.legend__key .ln--s3 { stroke: var(--series-3); }
+.legend__key .mk { stroke: var(--chart-surface); stroke-width: 1.5; }
+.legend__key .mk--s0 { fill: var(--chart-ink-2); }
+.legend__key .mk--s1 { fill: var(--series-1); }
+.legend__key .mk--s2 { fill: var(--series-2); }
+.legend__key .mk--s3 { fill: var(--series-3); }
+.legend__key .mk--open { fill: var(--chart-surface); stroke-width: 2; }
+.legend__key .mk--open.mk--s1 { stroke: var(--series-1); }
+.legend__key .mk--open.mk--s2 { stroke: var(--series-2); }
+.legend__key .mk--open.mk--s3 { stroke: var(--series-3); }
+
+/* Bars, bullet, rating (stacks and waffles: charts/shares.css) */
+.chart .bar--s0 { fill: var(--chart-ink-2); }
+.chart .bar--s1 { fill: var(--series-1); }
+.chart .bar--s2 { fill: var(--series-2); }
+.chart .bar--s3 { fill: var(--series-3); }
+
+.chart .bar.is-active {
+  stroke: var(--chart-ink);
+  stroke-width: 2;
+}
+
+.chart .bar-tick {
+  stroke: var(--chart-ink);
+  stroke-width: 2;
+}
+
+.chart .bullet-track {
+  fill: var(--chart-grid);
+}
+
+.chart .upper {
+  stroke: var(--chart-ink);
+  stroke-width: 2.5;
+}
+
+.chart .you-band {
+  fill: color-mix(in srgb, var(--series-3) 26%, transparent);
+  stroke: var(--series-3);
+  stroke-width: 1.5;
+}
+
+.chart .rating-avatar {
+  overflow: hidden;
+}
+
+.chart .rating-avatar.is-active {
+  outline: 2px solid var(--chart-ink);
+}
+
+.chart .legend-text { fill: var(--chart-ink); }
+
+/* Draw-in once (DATA-SPEC 3.7): 600 ms, never with reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .figure.is-drawing .ln--draw {
+    stroke-dasharray: 1;
+    animation: data-draw 600ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .figure.is-drawing .band,
+  .figure.is-drawing .mk,
+  .figure.is-drawing .whisker,
+  .figure.is-drawing .end-label,
+  .figure.is-drawing .ln--dashed,
+  .figure.is-drawing .bar,
+  .figure.is-drawing .hm-cell {
+    animation: data-fade 300ms ease-out 300ms both;
+  }
+
+  @keyframes data-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes data-fade {
+    from { opacity: 0; }
+  }
+}
+
+/* ===================================================================== */
+/* Meter and hero                                                         */
+/* ===================================================================== */
+
+.meter {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.meter__icon {
+  margin-top: 2px;
+}
+
+.meter__icon-ring,
+.meter__icon-mark {
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.meter--on .meter__icon-ring,
+.meter--on .meter__icon-mark {
+  stroke: var(--text);
+}
+
+.meter__body {
+  display: grid;
+  gap: 5px;
+}
+
+.meter__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.meter__state {
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.meter__track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--chart-grid);
+  overflow: hidden;
+}
+
+.meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  background: var(--series-3);
+}
+
+.meter__text {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.88rem;
+}
+
+.hero {
+  display: grid;
+  gap: 4px;
+}
+
+.hero__value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 11vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__label {
+  margin: 0;
+  font-weight: 700;
+}
+
+.hero__detail {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--text-2);
+}
+
+.hero__bar {
+  display: block;
+  width: min(100%, 22rem);
+  height: 14px;
+  margin: 6px 0 2px;
+}
+
+.hero__track { fill: var(--chart-grid); }
+.hero__ci { fill: none; stroke: var(--chart-ink-2); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.hero__half { stroke: var(--chart-ink-2); stroke-width: 1; stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; }
+.hero__fill.bar--s1 { fill: var(--series-1); }
+.hero__fill.bar--s2 { fill: var(--series-2); }
+.hero__fill.bar--s3 { fill: var(--series-3); }
+
+/* ===================================================================== */
+/* Forced colors: marks in CanvasText, the active mark in Highlight,       */
+/* bands as outlines, cells keep their order by label.                      */
+/* ===================================================================== */
+
+@media (forced-colors: active) {
+  .chart {
+    border: 1px solid CanvasText;
+  }
+
+  .chart :where(svg.plot) text {
+    fill: CanvasText;
+  }
+
+  /* The chosen view of a segmented control (Paulista, 2 against 2, A virada). */
+  .seg__btn[aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .chart .row-label,
+  .chart .row-note {
+    stroke: Canvas;
+  }
+
+  .chart .mk,
+  .chart .bar,
+  .legend__key .mk {
+    fill: CanvasText;
+    stroke: Canvas;
+  }
+
+  .chart .mk--open {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+
+  .chart .is-active {
+    fill: Highlight;
+    stroke: Highlight;
+  }
+
+  .chart .ln,
+  .chart .whisker line,
+  .chart .ref,
+  .chart .vmark,
+  .chart .grid,
+  .chart .track,
+  .legend__key .ln {
+    stroke: CanvasText;
+  }
+
+  .chart .band,
+  .chart .zone,
+  .chart .zone-band,
+  .chart .you-band {
+    fill: none;
+    stroke: CanvasText;
+    stroke-dasharray: 2 3;
+  }
+
+  .meter__fill {
+    background: CanvasText;
+  }
+}
+
+/* The closing list of data terms (#termos). */
+.terms {
+  display: grid;
+  gap: 4px 0;
+  margin: 0;
+}
+
+.terms dt {
+  margin-top: 10px;
+  font-weight: 800;
+  scroll-margin-top: 80px;
+}
+
+.terms dd {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-2);
+  line-height: 1.45;
+}

@@ -1,0 +1,210 @@
+/* The room before the match (CLIENT-SPEC 10.3): a reading page in the Azulejo look. The code is the
+   page's big type; the invite and the seats sit in sections with thin rules; the start button is
+   the one primary action. The small table drawing uses the .mini-table classes of play.css and the
+   connection badge its own conn.css.
+   Every rule is scoped to .lobby. */
+
+.lobby {
+  display: grid;
+  gap: 0;
+  padding-bottom: 40px;
+}
+
+.lobby__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 0 22px;
+}
+
+.lobby__head h1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  font-size: var(--fs-h2);
+}
+
+.lobby__title {
+  color: var(--text-2);
+  font-size: 0.7em;
+}
+
+/* Room codes are set in Figtree: its Q has a crossing tail, so it never reads as the O the alphabet leaves out. */
+.lobby__code {
+  font-family: var(--font-text);
+  font-size: clamp(2.2rem, 10vw, 3.2rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+.lobby__summary {
+  grid-column: 1 / -1;
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+/* The connection badge (styles/conn.css) sits at the end of the title row. */
+.lobby .conn {
+  justify-self: end;
+}
+
+.lobby__section {
+  display: grid;
+  gap: 14px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.lobby__section h2 {
+  font-size: clamp(1.3rem, 5vw, 1.6rem);
+  letter-spacing: -0.02em;
+}
+
+.lobby__invite {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 0.98rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.lobby .lobby__copy {
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.lobby .lobby__copy:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.lobby .lobby__whatsapp .icon--arrow {
+  width: 12px;
+  height: 12px;
+  opacity: 0.65;
+}
+
+.lobby__seats-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lobby__table {
+  flex: none;
+  width: 52px;
+  height: 52px;
+}
+
+.lobby__seats {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lobby__seat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 60px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+
+.lobby__seat--you {
+  box-shadow: inset 0 0 0 1.5px var(--nos);
+}
+
+.lobby__seat--empty {
+  background: transparent;
+  box-shadow: none;
+  outline: 1.5px dashed var(--line);
+  outline-offset: -1.5px;
+}
+
+.lobby__seat .seat-label__name {
+  white-space: normal;
+}
+
+/* A free place: a dashed tile where the avatar goes. */
+.lobby__free {
+  border: 1.5px dashed var(--text-2);
+  border-radius: 6px;
+}
+
+.lobby .lobby__sit {
+  flex: none;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.lobby__note,
+.lobby__wait {
+  color: var(--text-2);
+  font-size: 0.9rem;
+  font-weight: 550;
+}
+
+.lobby__actions {
+  display: grid;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.lobby .lobby__start {
+  width: 100%;
+  min-height: 58px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.lobby .lobby__start .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.lobby__wait {
+  font-size: 1rem;
+}
+
+.lobby__more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+@media (min-width: 37.5em) {
+  .lobby__seats--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lobby__actions {
+    grid-template-columns: minmax(0, 22rem) auto;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (forced-colors: active) {
+  .lobby__seat,
+  .lobby__invite {
+    border: 1px solid CanvasText;
+  }
+}

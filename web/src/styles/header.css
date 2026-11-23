@@ -1,0 +1,542 @@
+/* Header, menu sheet and footer (CLIENT-SPEC 9; prototype azulejo-v2/style.css .topo, .gaveta,
+   .rodape). Below 64em: logo, PT/EN, hamburger. From 64em: the navigation inline, the external
+   links, the four-color pill and PT/EN. */
+
+.site-header {
+  position: relative;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 57px;
+  padding: max(6px, env(safe-area-inset-top)) var(--gutter) 6px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: var(--tap);
+  margin-right: auto;
+  padding-right: 4px;
+  border-radius: var(--radius-s);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand .brand-mark {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.brand b {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 800;
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+/* Language switch: one button, the current language filled. */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.lang-switch span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.2em;
+  height: 2.2em;
+  padding: 0 0.15em;
+  border-radius: 999px;
+  color: var(--text-2);
+}
+
+.lang-switch span.is-current {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.lang-switch:hover {
+  border-color: var(--text-2);
+}
+
+@media (min-width: 64em) {
+  .site-header {
+    gap: 4px;
+    min-height: 60px;
+    padding-inline: 24px;
+  }
+
+  .brand {
+    margin-right: 22px;
+  }
+
+  .site-header__nav {
+    margin-right: auto;
+  }
+
+  .site-header__nav ul {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-header__nav a,
+  .site-header__nav button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: var(--tap);
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-s);
+    background: none;
+    color: var(--text-2);
+    font-size: 0.95rem;
+    font-weight: 650;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .site-header__nav a:hover,
+  .site-header__nav button:hover {
+    color: var(--text);
+  }
+
+  /* The current page, or the section it sits in (a table marks "Jogar" with aria-current="true"). */
+  .site-header__nav [aria-current='page'],
+  .site-header__nav [aria-current='true'] {
+    border-radius: 0;
+    box-shadow: inset 0 -2.5px 0 var(--accent);
+    color: var(--text);
+    font-weight: 800;
+  }
+
+  .site-header__nav kbd {
+    font-size: 0.64rem;
+  }
+
+  .site-header__ext {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 6px;
+  }
+
+  .site-header__ext .link-ext {
+    padding: 0 10px;
+    font-size: 0.92rem;
+  }
+
+  .four-color-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--tap);
+    margin-right: 6px;
+    padding: 0 12px 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .four-color-toggle .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .four-color-toggle[aria-pressed='true'] {
+    border-color: var(--text);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .four-color-toggle:hover {
+    border-color: var(--text-2);
+  }
+}
+
+/* Narrow desktop: the four-color pill keeps its icon and its accessible name only. */
+@media (min-width: 64em) and (max-width: 79.99em) {
+  .four-color-toggle {
+    justify-content: center;
+    width: var(--tap);
+    padding: 0;
+  }
+
+  .four-color-toggle__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* The four suits of the four-color icon, in their deck colors. */
+.icon__them {
+  fill: var(--eles);
+}
+
+.icon__us {
+  fill: var(--nos);
+}
+
+.icon__ochre {
+  fill: var(--ocre-fill);
+}
+
+/* ------------------------------------------------------------------ Menu sheet (below 64em) */
+
+dialog.sheet {
+  width: min(21.5rem, 88vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--line-soft);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  overscroll-behavior: contain;
+}
+
+dialog.sheet[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog.sheet::backdrop {
+  background: var(--veil);
+}
+
+.sheet__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 57px;
+  padding: max(6px, env(safe-area-inset-top)) 10px 6px 22px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.sheet__top h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.sheet__body {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  padding: 6px 0 max(18px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.sheet__group {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+/* The table's tools in the sheet ("This table"): the same rows as the navigation below them. */
+.sheet__group .table-tools :is(.btn, .switch) {
+  gap: 14px;
+  min-height: 50px;
+  padding: 0 22px;
+  border-radius: 0;
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+
+.sheet__group .table-tools > :is(.btn, .switch) .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.sheet__group-title {
+  padding: 6px 22px 2px;
+  color: var(--text-2);
+  font-family: var(--font-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sheet__list {
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+}
+
+.sheet__list + .sheet__list {
+  border-top: 1px solid var(--line-soft);
+}
+
+.sheet__list a,
+.sheet__list button,
+.sheet__group :is(a, button) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 22px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-size: 1.02rem;
+  font-weight: 650;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sheet__list a:hover,
+.sheet__list button:hover {
+  background: var(--surface-2);
+}
+
+.sheet__list .icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--text-2);
+}
+
+.sheet__list .icon--arrow {
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+}
+
+.sheet__list--quiet a {
+  min-height: var(--tap);
+  color: var(--text-2);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.sheet__list :is([aria-current='page'], [aria-current='true']) {
+  font-weight: 800;
+}
+
+.sheet__list :is([aria-current='page'], [aria-current='true'])::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+
+.sheet__list :is([aria-current='page'], [aria-current='true']) .icon {
+  color: var(--accent);
+}
+
+.sheet__list kbd {
+  margin-left: auto;
+}
+
+.sheet__switches {
+  padding: 10px 22px;
+  border-top: 1px solid var(--line-soft);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.sheet[open] {
+    animation: sheet-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  dialog.sheet[open]::backdrop {
+    animation: veil-in 0.2s ease-out;
+  }
+
+  @keyframes sheet-in {
+    from {
+      translate: 100% 0;
+    }
+  }
+
+  @keyframes veil-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* A real switch: a checkbox with role="switch", drawn as a track and a thumb. */
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 52px;
+  cursor: pointer;
+}
+
+.switch b {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.switch small {
+  display: block;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.switch input {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 28px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px var(--text-2);
+  appearance: none;
+  cursor: pointer;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.switch input::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-2);
+  transition: translate 0.15s, background-color 0.15s;
+}
+
+.switch input:checked {
+  background: var(--nos);
+  box-shadow: none;
+}
+
+.switch input:checked::after {
+  translate: 18px 0;
+  background: var(--nos-fg);
+}
+
+/* ------------------------------------------------------------------ Footer and external links */
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 18px;
+  padding: 14px var(--gutter) max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line-soft);
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+
+/* The links wrap as balanced lines (two and two on a phone), never one word alone on a row. */
+.site-footer__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.site-footer__links li {
+  display: inline-block;
+  margin: 1px 7px;
+}
+
+.site-footer__links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0 4px;
+  color: var(--text-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-footer__links a:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-footer__ext {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 18px;
+}
+
+.link-ext {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: var(--tap);
+  padding: 0 4px;
+  border-radius: var(--radius-s);
+  color: var(--text);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.link-ext:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-ext .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.link-ext .icon--arrow {
+  width: 11px;
+  height: 11px;
+  opacity: 0.65;
+}
+
+@media (forced-colors: active) {
+  .lang-switch,
+  .four-color-toggle,
+  .switch input {
+    border: 1px solid CanvasText;
+  }
+}

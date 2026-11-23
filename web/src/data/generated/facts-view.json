@@ -1,0 +1,2450 @@
+{
+  "provenance": {
+    "script": "tools/data/facts-view.ts",
+    "command": "docker compose run --rm -T node node tools/data/facts-view.ts",
+    "measuredAt": "2026-11-23T21:42:17.177Z",
+    "node": "v24.22.2",
+    "cpu": "QEMU Virtual CPU version 2.5+",
+    "commit": "9f20bbe4cf238a6d68572db4c37418a4ab6dd47e",
+    "inputs": [
+      {"path":"ai/models/bootstrap/manifest-v2.json","sha256":"555a92c8f28cb31704d4761aa615b1929b65872d7bd19c269335673b07c6d3d4"},
+      {"path":"ai/models/bootstrap/zap-v2.zapw","sha256":"afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632"},
+      {"path":"facts.json","sha256":"c42ea936533f8015e8abbfe667fc4c3ab8ea5334ada9c342e44eb88c5148df3c"},
+      {"path":"tools/data/facts-view.ts","sha256":"e2329f6bbaf0312c7cfe889082b94f1ca3eb8c76ec762fb5d774abdcf4ea72e7"},
+      {"path":"tools/data/sources.json","sha256":"a05b953a29bed08b15797d44cbe17eecc7968a7a1817924018e1f6c9a3f738f5"},
+      {"path":"wrangler.jsonc","sha256":"ba063220dcd4bb75ebdecf7af14be0f49bd1abde7c0ab914f6bb63dcd5a3237a"}
+    ]
+  },
+  "missing": ["cycle.gate.seconds","cycle.ab.detectablePoints","cycle.train.secondsPerIteration"],
+  "model": {
+    "version": "v2",
+    "path": "ai/models/bootstrap/zap-v2.zapw",
+    "sha256": "afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632",
+    "features": "v2-empty",
+    "inputs": 461,
+    "hidden": [256,256],
+    "bytes": 193512,
+    "weights": 188176
+  },
+  "served": {
+    "version": "v2",
+    "AI_ADAPT": "off",
+    "releaseAI_ADAPT": "off",
+    "readsOpponents": false,
+    "explorerCriterionPass": true,
+    "carried": false,
+    "rolledBack": null,
+    "judged": null,
+    "criterionSha": "7223c227"
+  },
+  "derived": {"twinServed":false,"evidenceModel":"v1","headToHeadJudged":true,"controlJudged":true,"controlTrainedOnServed":true,"controlMeasuredOnOwn":false},
+  "ai": {
+    "strength": {
+      "measuredAt": "2026-11-22T16:36:22.619Z",
+      "pairsPerSegment": 1000,
+      "model": "ai/models/bootstrap/zap-v2.zapw",
+      "table": {
+        "zap-random": {
+          "overall": {
+            "mean": 0.9595,
+            "ci95": [0.95523,0.96377],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.9805,
+              "ci95": [0.9745,0.9865],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.966,
+              "ci95": [0.95819,0.97381],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.948,
+              "ci95": [0.93843,0.95757],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.9435,
+              "ci95": [0.93349,0.95351],
+              "pairs": 1000
+            }
+          }
+        },
+        "heuristic-random": {
+          "overall": {
+            "mean": 0.91525,
+            "ci95": [0.90916,0.92134],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.9895,
+              "ci95": [0.98505,0.99395],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.864,
+              "ci95": [0.84932,0.87868],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.958,
+              "ci95": [0.9494,0.9666],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.8495,
+              "ci95": [0.83436,0.86464],
+              "pairs": 1000
+            }
+          }
+        },
+        "tuned-random": {
+          "overall": {
+            "mean": 0.9025,
+            "ci95": [0.89616,0.90884],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.938,
+              "ci95": [0.9275,0.9485],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.909,
+              "ci95": [0.8968,0.9212],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.889,
+              "ci95": [0.8756,0.9024],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.874,
+              "ci95": [0.85998,0.88802],
+              "pairs": 1000
+            }
+          }
+        },
+        "tuned-heuristic": {
+          "overall": {
+            "mean": 0.7115,
+            "ci95": [0.70288,0.72012],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.801,
+              "ci95": [0.78526,0.81674],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.724,
+              "ci95": [0.70642,0.74158],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.6925,
+              "ci95": [0.67567,0.70933],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.6285,
+              "ci95": [0.61143,0.64557],
+              "pairs": 1000
+            }
+          }
+        },
+        "zap-heuristic": {
+          "overall": {
+            "mean": 0.78775,
+            "ci95": [0.77957,0.79593],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.8345,
+              "ci95": [0.81926,0.84974],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.8425,
+              "ci95": [0.82725,0.85775],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.7175,
+              "ci95": [0.7011,0.7339],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.7565,
+              "ci95": [0.7393,0.7737],
+              "pairs": 1000
+            }
+          }
+        },
+        "zap-tuned": {
+          "overall": {
+            "mean": 0.87488,
+            "ci95": [0.8679,0.88185],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.923,
+              "ci95": [0.91164,0.93436],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.867,
+              "ci95": [0.85295,0.88105],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.8825,
+              "ci95": [0.86906,0.89594],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.827,
+              "ci95": [0.81106,0.84294],
+              "pairs": 1000
+            }
+          }
+        },
+        "zap-v1": {
+          "overall": {
+            "mean": 0.6955,
+            "ci95": [0.68652,0.70448],
+            "pairs": 4000
+          },
+          "segments": {
+            "paulista-1x1": {
+              "mean": 0.8075,
+              "ci95": [0.79204,0.82296],
+              "pairs": 1000
+            },
+            "paulista-2x2": {
+              "mean": 0.656,
+              "ci95": [0.63702,0.67498],
+              "pairs": 1000
+            },
+            "mineiro-1x1": {
+              "mean": 0.725,
+              "ci95": [0.70896,0.74104],
+              "pairs": 1000
+            },
+            "mineiro-2x2": {
+              "mean": 0.5935,
+              "ci95": [0.57516,0.61184],
+              "pairs": 1000
+            }
+          }
+        }
+      }
+    },
+    "strengthByVersion": {
+      "v1": {
+        "measuredAt": "2026-11-21T11:18:21.588Z",
+        "pairsPerSegment": 1000,
+        "model": "ai/models/bootstrap/zap-v1.zapw",
+        "table": {
+          "zap-random": {
+            "overall": {
+              "mean": 0.93013,
+              "ci95": [0.92465,0.9356],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.944,
+                "ci95": [0.93403,0.95397],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.946,
+                "ci95": [0.93638,0.95562],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.914,
+                "ci95": [0.90197,0.92603],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.9165,
+                "ci95": [0.90469,0.92831],
+                "pairs": 1000
+              }
+            }
+          },
+          "heuristic-random": {
+            "overall": {
+              "mean": 0.91525,
+              "ci95": [0.90916,0.92134],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.9895,
+                "ci95": [0.98505,0.99395],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.864,
+                "ci95": [0.84932,0.87868],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.958,
+                "ci95": [0.9494,0.9666],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.8495,
+                "ci95": [0.83436,0.86464],
+                "pairs": 1000
+              }
+            }
+          },
+          "tuned-random": {
+            "overall": {
+              "mean": 0.9025,
+              "ci95": [0.89616,0.90884],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.938,
+                "ci95": [0.9275,0.9485],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.909,
+                "ci95": [0.8968,0.9212],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.889,
+                "ci95": [0.8756,0.9024],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.874,
+                "ci95": [0.85998,0.88802],
+                "pairs": 1000
+              }
+            }
+          },
+          "tuned-heuristic": {
+            "overall": {
+              "mean": 0.7115,
+              "ci95": [0.70288,0.72012],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.801,
+                "ci95": [0.78526,0.81674],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.724,
+                "ci95": [0.70642,0.74158],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.6925,
+                "ci95": [0.67567,0.70933],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.6285,
+                "ci95": [0.61143,0.64557],
+                "pairs": 1000
+              }
+            }
+          },
+          "zap-heuristic": {
+            "overall": {
+              "mean": 0.74488,
+              "ci95": [0.73621,0.75354],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.8465,
+                "ci95": [0.83187,0.86113],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.7415,
+                "ci95": [0.72338,0.75962],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.7405,
+                "ci95": [0.72422,0.75678],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.651,
+                "ci95": [0.63311,0.66889],
+                "pairs": 1000
+              }
+            }
+          },
+          "zap-tuned": {
+            "overall": {
+              "mean": 0.79625,
+              "ci95": [0.78798,0.80452],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.8525,
+                "ci95": [0.83802,0.86698],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.7985,
+                "ci95": [0.78208,0.81492],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.837,
+                "ci95": [0.82214,0.85186],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.697,
+                "ci95": [0.67858,0.71542],
+                "pairs": 1000
+              }
+            }
+          }
+        }
+      },
+      "v2": {
+        "measuredAt": "2026-11-22T16:36:22.619Z",
+        "pairsPerSegment": 1000,
+        "model": "ai/models/bootstrap/zap-v2.zapw",
+        "table": {
+          "zap-random": {
+            "overall": {
+              "mean": 0.9595,
+              "ci95": [0.95523,0.96377],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.9805,
+                "ci95": [0.9745,0.9865],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.966,
+                "ci95": [0.95819,0.97381],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.948,
+                "ci95": [0.93843,0.95757],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.9435,
+                "ci95": [0.93349,0.95351],
+                "pairs": 1000
+              }
+            }
+          },
+          "heuristic-random": {
+            "overall": {
+              "mean": 0.91525,
+              "ci95": [0.90916,0.92134],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.9895,
+                "ci95": [0.98505,0.99395],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.864,
+                "ci95": [0.84932,0.87868],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.958,
+                "ci95": [0.9494,0.9666],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.8495,
+                "ci95": [0.83436,0.86464],
+                "pairs": 1000
+              }
+            }
+          },
+          "tuned-random": {
+            "overall": {
+              "mean": 0.9025,
+              "ci95": [0.89616,0.90884],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.938,
+                "ci95": [0.9275,0.9485],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.909,
+                "ci95": [0.8968,0.9212],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.889,
+                "ci95": [0.8756,0.9024],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.874,
+                "ci95": [0.85998,0.88802],
+                "pairs": 1000
+              }
+            }
+          },
+          "tuned-heuristic": {
+            "overall": {
+              "mean": 0.7115,
+              "ci95": [0.70288,0.72012],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.801,
+                "ci95": [0.78526,0.81674],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.724,
+                "ci95": [0.70642,0.74158],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.6925,
+                "ci95": [0.67567,0.70933],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.6285,
+                "ci95": [0.61143,0.64557],
+                "pairs": 1000
+              }
+            }
+          },
+          "zap-heuristic": {
+            "overall": {
+              "mean": 0.78775,
+              "ci95": [0.77957,0.79593],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.8345,
+                "ci95": [0.81926,0.84974],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.8425,
+                "ci95": [0.82725,0.85775],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.7175,
+                "ci95": [0.7011,0.7339],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.7565,
+                "ci95": [0.7393,0.7737],
+                "pairs": 1000
+              }
+            }
+          },
+          "zap-tuned": {
+            "overall": {
+              "mean": 0.87488,
+              "ci95": [0.8679,0.88185],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.923,
+                "ci95": [0.91164,0.93436],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.867,
+                "ci95": [0.85295,0.88105],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.8825,
+                "ci95": [0.86906,0.89594],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.827,
+                "ci95": [0.81106,0.84294],
+                "pairs": 1000
+              }
+            }
+          },
+          "zap-v1": {
+            "overall": {
+              "mean": 0.6955,
+              "ci95": [0.68652,0.70448],
+              "pairs": 4000
+            },
+            "segments": {
+              "paulista-1x1": {
+                "mean": 0.8075,
+                "ci95": [0.79204,0.82296],
+                "pairs": 1000
+              },
+              "paulista-2x2": {
+                "mean": 0.656,
+                "ci95": [0.63702,0.67498],
+                "pairs": 1000
+              },
+              "mineiro-1x1": {
+                "mean": 0.725,
+                "ci95": [0.70896,0.74104],
+                "pairs": 1000
+              },
+              "mineiro-2x2": {
+                "mean": 0.5935,
+                "ci95": [0.57516,0.61184],
+                "pairs": 1000
+              }
+            }
+          }
+        }
+      }
+    },
+    "personas": {
+      "measuredAt": "2026-11-22T16:48:34.454Z",
+      "model": "ai/models/bootstrap/zap-v2.zapw",
+      "pairsPerSegment": 400,
+      "stats": {
+        "otavio": {
+          "trucoRate": 0.18771,
+          "bluffRate": 0.03031,
+          "runRate": 0.66311,
+          "reraiseRate": 0.05558,
+          "signalTruth": 0.31871,
+          "vsZap": 0.26063,
+          "vsZapSe": 0.00691,
+          "vsZapCi95": [0.24709,0.27416],
+          "hands": 39967
+        },
+        "bento": {
+          "trucoRate": 0.61037,
+          "bluffRate": 0.33221,
+          "runRate": 0.47224,
+          "reraiseRate": 0.12869,
+          "signalTruth": 0.36458,
+          "vsZap": 0.30531,
+          "vsZapSe": 0.00708,
+          "vsZapCi95": [0.29143,0.31919],
+          "hands": 23226
+        },
+        "lia": {
+          "trucoRate": 0.66587,
+          "bluffRate": 0.149,
+          "runRate": 0.27345,
+          "reraiseRate": 0.2697,
+          "signalTruth": 0.41284,
+          "vsZap": 0.30375,
+          "vsZapSe": 0.00693,
+          "vsZapCi95": [0.29017,0.31733],
+          "hands": 18088
+        },
+        "ravi": {
+          "trucoRate": 0.45421,
+          "bluffRate": 0.09312,
+          "runRate": 0.4406,
+          "reraiseRate": 0.17407,
+          "signalTruth": 0.41427,
+          "vsZap": 0.31313,
+          "vsZapSe": 0.00708,
+          "vsZapCi95": [0.29925,0.327],
+          "hands": 25026
+        },
+        "iara": {
+          "trucoRate": 0.3579,
+          "bluffRate": 0.09111,
+          "runRate": 0.53034,
+          "reraiseRate": 0.11683,
+          "signalTruth": 0.4663,
+          "vsZap": 0.405,
+          "vsZapSe": 0.00692,
+          "vsZapCi95": [0.39144,0.41856],
+          "hands": 32044
+        },
+        "zap": {
+          "trucoRate": 0.37376,
+          "bluffRate": 0.14505,
+          "runRate": 0.51251,
+          "reraiseRate": 0.09807,
+          "signalTruth": 0.46555,
+          "vsZap": 0.50531,
+          "vsZapSe": 0.00618,
+          "vsZapCi95": [0.4932,0.51742],
+          "hands": 33403
+        }
+      },
+      "order": {"otavioEasiest":true,"iaraHardestAfterZap":true},
+      "margin": {
+        "required": 0.03,
+        "otavio": {"gap":0.04313,"against":"lia"},
+        "iara": {"gap":0.09188,"against":"ravi"},
+        "holds": true
+      },
+      "freshCheck": {
+        "pairsPerSegment": 400,
+        "order": {"otavioEasiest":true,"iaraHardestAfterZap":true},
+        "margins": {
+          "otavio": {"diff":-0.03719,"se":0.00977,"holds":true,"against":"ravi"},
+          "iara": {"diff":-0.09062,"se":0.00978,"holds":true,"against":"bento"}
+        },
+        "vsZap": {
+          "otavio": {
+            "mean": 0.26594,
+            "ci95": [0.25253,0.27934]
+          },
+          "bento": {
+            "mean": 0.31969,
+            "ci95": [0.30618,0.33319]
+          },
+          "lia": {
+            "mean": 0.31813,
+            "ci95": [0.3046,0.33165]
+          },
+          "ravi": {
+            "mean": 0.30312,
+            "ci95": [0.28945,0.3168]
+          },
+          "iara": {
+            "mean": 0.41031,
+            "ci95": [0.39672,0.42391]
+          },
+          "zap": {
+            "mean": 0.5,
+            "ci95": [0.48751,0.51249]
+          }
+        }
+      }
+    },
+    "personasByVersion": {
+      "v1": {
+        "measuredAt": "2026-11-21T11:41:00.173Z",
+        "model": "ai/models/bootstrap/zap-v1.zapw",
+        "pairsPerSegment": 200,
+        "stats": {
+          "otavio": {
+            "trucoRate": 0.24662,
+            "bluffRate": 0.05709,
+            "runRate": 0.62094,
+            "reraiseRate": 0.02096,
+            "signalTruth": 0.6838,
+            "vsZap": 0.3,
+            "vsZapSe": 0.01038,
+            "hands": 17919
+          },
+          "bento": {
+            "trucoRate": 0.58354,
+            "bluffRate": 0.35896,
+            "runRate": 0.46766,
+            "reraiseRate": 0.07384,
+            "signalTruth": 0.68751,
+            "vsZap": 0.31437,
+            "vsZapSe": 0.01022,
+            "hands": 12482
+          },
+          "lia": {
+            "trucoRate": 0.73536,
+            "bluffRate": 0.16933,
+            "runRate": 0.22424,
+            "reraiseRate": 0.25133,
+            "signalTruth": 0.87232,
+            "vsZap": 0.32438,
+            "vsZapSe": 0.01023,
+            "hands": 9082
+          },
+          "ravi": {
+            "trucoRate": 0.43487,
+            "bluffRate": 0.08195,
+            "runRate": 0.50238,
+            "reraiseRate": 0.13326,
+            "signalTruth": 0.8582,
+            "vsZap": 0.31437,
+            "vsZapSe": 0.01031,
+            "hands": 13596
+          },
+          "iara": {
+            "trucoRate": 0.3926,
+            "bluffRate": 0.11365,
+            "runRate": 0.47015,
+            "reraiseRate": 0.0348,
+            "signalTruth": 0.91865,
+            "vsZap": 0.4,
+            "vsZapSe": 0.00973,
+            "hands": 14962
+          },
+          "zap": {
+            "trucoRate": 0.4728,
+            "bluffRate": 0.17491,
+            "runRate": 0.41896,
+            "reraiseRate": 0.00085,
+            "signalTruth": 0.92109,
+            "vsZap": 0.50375,
+            "vsZapSe": 0.00782,
+            "hands": 14164
+          }
+        },
+        "order": {"otavioEasiest":true,"iaraHardestAfterZap":true}
+      },
+      "v2": {
+        "measuredAt": "2026-11-22T16:48:34.454Z",
+        "model": "ai/models/bootstrap/zap-v2.zapw",
+        "pairsPerSegment": 400,
+        "stats": {
+          "otavio": {
+            "trucoRate": 0.18771,
+            "bluffRate": 0.03031,
+            "runRate": 0.66311,
+            "reraiseRate": 0.05558,
+            "signalTruth": 0.31871,
+            "vsZap": 0.26063,
+            "vsZapSe": 0.00691,
+            "vsZapCi95": [0.24709,0.27416],
+            "hands": 39967
+          },
+          "bento": {
+            "trucoRate": 0.61037,
+            "bluffRate": 0.33221,
+            "runRate": 0.47224,
+            "reraiseRate": 0.12869,
+            "signalTruth": 0.36458,
+            "vsZap": 0.30531,
+            "vsZapSe": 0.00708,
+            "vsZapCi95": [0.29143,0.31919],
+            "hands": 23226
+          },
+          "lia": {
+            "trucoRate": 0.66587,
+            "bluffRate": 0.149,
+            "runRate": 0.27345,
+            "reraiseRate": 0.2697,
+            "signalTruth": 0.41284,
+            "vsZap": 0.30375,
+            "vsZapSe": 0.00693,
+            "vsZapCi95": [0.29017,0.31733],
+            "hands": 18088
+          },
+          "ravi": {
+            "trucoRate": 0.45421,
+            "bluffRate": 0.09312,
+            "runRate": 0.4406,
+            "reraiseRate": 0.17407,
+            "signalTruth": 0.41427,
+            "vsZap": 0.31313,
+            "vsZapSe": 0.00708,
+            "vsZapCi95": [0.29925,0.327],
+            "hands": 25026
+          },
+          "iara": {
+            "trucoRate": 0.3579,
+            "bluffRate": 0.09111,
+            "runRate": 0.53034,
+            "reraiseRate": 0.11683,
+            "signalTruth": 0.4663,
+            "vsZap": 0.405,
+            "vsZapSe": 0.00692,
+            "vsZapCi95": [0.39144,0.41856],
+            "hands": 32044
+          },
+          "zap": {
+            "trucoRate": 0.37376,
+            "bluffRate": 0.14505,
+            "runRate": 0.51251,
+            "reraiseRate": 0.09807,
+            "signalTruth": 0.46555,
+            "vsZap": 0.50531,
+            "vsZapSe": 0.00618,
+            "vsZapCi95": [0.4932,0.51742],
+            "hands": 33403
+          }
+        },
+        "order": {"otavioEasiest":true,"iaraHardestAfterZap":true},
+        "margin": {
+          "required": 0.03,
+          "otavio": {"gap":0.04313,"against":"lia"},
+          "iara": {"gap":0.09188,"against":"ravi"},
+          "holds": true
+        },
+        "freshCheck": {
+          "pairsPerSegment": 400,
+          "order": {"otavioEasiest":true,"iaraHardestAfterZap":true},
+          "margins": {
+            "otavio": {
+              "diff": -0.03719,
+              "se": 0.00977,
+              "holds": true,
+              "against": "ravi",
+              "ci95": [-0.05633,-0.01804]
+            },
+            "iara": {
+              "diff": -0.09062,
+              "se": 0.00978,
+              "holds": true,
+              "against": "bento",
+              "ci95": [-0.10979,-0.07146]
+            }
+          },
+          "vsZap": {
+            "otavio": {
+              "mean": 0.26594,
+              "ci95": [0.25253,0.27934]
+            },
+            "bento": {
+              "mean": 0.31969,
+              "ci95": [0.30618,0.33319]
+            },
+            "lia": {
+              "mean": 0.31813,
+              "ci95": [0.3046,0.33165]
+            },
+            "ravi": {
+              "mean": 0.30312,
+              "ci95": [0.28945,0.3168]
+            },
+            "iara": {
+              "mean": 0.41031,
+              "ci95": [0.39672,0.42391]
+            },
+            "zap": {
+              "mean": 0.5,
+              "ci95": [0.48751,0.51249]
+            }
+          }
+        },
+        "styleSeparationCi95": {
+          "measuredAt": "2026-11-22T18:44:36.389Z",
+          "target": 0.8,
+          "atTarget": {"pairs":15,"accuracyAtLeast80":3,"lowerBoundAtLeast80":3,"upperBoundBelow80":10}
+        }
+      }
+    },
+    "bootstrapModel": {
+      "version": "v2",
+      "bytes": 193512,
+      "sha256": "afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632",
+      "inputs": 461,
+      "hidden": [256,256],
+      "features": "v2-empty",
+      "adapt": null,
+      "createdAt": "2026-11-22T16:48:34.672Z",
+      "previous": {
+        "version": "v1",
+        "bytes": 184976,
+        "inputs": 431,
+        "hidden": [256,256]
+      }
+    },
+    "decisionTime": {
+      "measuredAt": "2026-11-23T21:36:45.335Z",
+      "model": "ai/models/bootstrap/zap-v2.zapw",
+      "features": "v2-empty",
+      "decisionMs": {"p50":0.21885,"p99":0.33344},
+      "roomEventMs": {"p99":2.09044}
+    },
+    "decisionTimeByVersion": {
+      "v1": {
+        "measuredAt": "2026-11-21T11:31:13.463Z",
+        "model": "ai/models/bootstrap/zap-v1.zapw",
+        "decisionMs": {"p50":0.41007,"p99":0.5627}
+      },
+      "v1SameRun": {
+        "measuredAt": "2026-11-23T21:36:51.336Z",
+        "model": "ai/models/bootstrap/zap-v1.zapw",
+        "decisionMs": {"p50":0.21105,"p99":0.32239},
+        "roomEventMs": {"p99":2.13425}
+      },
+      "v2": {
+        "measuredAt": "2026-11-23T21:36:45.335Z",
+        "model": "ai/models/bootstrap/zap-v2.zapw",
+        "decisionMs": {"p50":0.21885,"p99":0.33344},
+        "roomEventMs": {"p99":2.09044}
+      }
+    },
+    "releases": {
+      "v2": {
+        "date": "2026-11-22",
+        "version": "v2",
+        "file": "ai/models/bootstrap/zap-v2.zapw",
+        "sha256": "afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632",
+        "features": "v2-empty",
+        "gate": {
+          "stats": "empty",
+          "pass": true,
+          "sprt": {"decision":"accept","pairs":400,"mean":0.7025},
+          "segments": {
+            "paulista-2": {"pairs":2500,"mean":0.805},
+            "paulista-4": {"pairs":2500,"mean":0.6748},
+            "mineiro-2": {"pairs":2500,"mean":0.7248},
+            "mineiro-4": {"pairs":2500,"mean":0.6076}
+          },
+          "panel": [
+            {
+              "member": "random",
+              "pairs": 10000,
+              "candidate": {"mean":0.9552,"lo":0.95237,"hi":0.95803},
+              "current": {"mean":0.93205,"lo":0.92862,"hi":0.93548},
+              "diff": {"mean":0.02315,"lo95":0.01948},
+              "pass": true
+            },
+            {
+              "member": "base",
+              "pairs": 10000,
+              "candidate": {"mean":0.79055,"lo":0.78545,"hi":0.79565},
+              "current": {"mean":0.7494,"lo":0.74397,"hi":0.75483},
+              "diff": {"mean":0.04115,"lo95":0.0355},
+              "pass": true
+            },
+            {
+              "member": "tuned",
+              "pairs": 10000,
+              "candidate": {"mean":0.87395,"lo":0.86952,"hi":0.87838},
+              "current": {"mean":0.81155,"lo":0.80646,"hi":0.81664},
+              "diff": {"mean":0.0624,"lo95":0.05715},
+              "pass": true
+            },
+            {
+              "member": "v1",
+              "pairs": 10000,
+              "candidate": {"mean":0.7036,"lo":0.69799,"hi":0.70921},
+              "current": {"mean":0.50085,"lo":0.49671,"hi":0.50499},
+              "diff": {"mean":0.20275,"lo95":0.1969},
+              "pass": true
+            }
+          ]
+        },
+        "headToHeadV1": {
+          "source": "ai.strengthByVersion.v2.table.zap-v1",
+          "mean": 0.6955,
+          "ci95": [0.68652,0.70448],
+          "pairs": 4000
+        },
+        "adaptation": {"AI_ADAPT":"off"}
+      }
+    },
+    "adaptation": {
+      "design": {
+        "measuredAt": "2026-11-21T23:15:31.702Z",
+        "inputs": 461,
+        "statsPerSeat": 10,
+        "statsSlots": ["next seat","partner","previous seat"],
+        "rates": ["raise","run","accept","reraise","shown","cover"],
+        "alpha": 2,
+        "countingRule": "finished hands of the current match only, plain counts without decay; mão de onze decisions are not counted"
+      },
+      "matchLength": {
+        "measuredAt": "2026-11-21T23:15:31.702Z",
+        "segments": {
+          "paulista-2": {"mean":6.945,"p50":6,"p90":12,"matches":4000},
+          "paulista-4": {"mean":9.42625,"p50":9,"p90":15,"matches":4000},
+          "mineiro-2": {"mean":4.92225,"p50":5,"p90":8,"matches":4000},
+          "mineiro-4": {"mean":5.99275,"p50":6,"p90":9,"matches":4000}
+        }
+      },
+      "evidence": {
+        "measuredAt": "2026-11-21T23:15:31.702Z",
+        "pooled": {
+          "betDecisions": 503071,
+          "share": [0.2988,0.18695,0.15576,0.1022,0.07491,0.05027,0.03469,0.02422,0.01792,0.01318,0.00969,0.00706,0.02433],
+          "medianPositive": 3
+        },
+        "segments": {
+          "paulista-2": {
+            "betDecisions": 94771,
+            "medianByHand": {
+              "1": 0,
+              "2": 1,
+              "3": 3,
+              "4": 4,
+              "5": 6,
+              "6": 7,
+              "7": 8,
+              "8": 9,
+              "9": 10,
+              "10": 14
+            }
+          },
+          "paulista-4": {
+            "betDecisions": 223344,
+            "medianByHand": {
+              "1": 0,
+              "2": 0,
+              "3": 1,
+              "4": 1,
+              "5": 2,
+              "6": 2,
+              "7": 3,
+              "8": 3,
+              "9": 4,
+              "10": 5
+            }
+          },
+          "mineiro-2": {
+            "betDecisions": 60521,
+            "medianByHand": {
+              "1": 0,
+              "2": 1,
+              "3": 3,
+              "4": 4,
+              "5": 5,
+              "6": 6,
+              "7": 7,
+              "8": 8,
+              "9": 9,
+              "10": 12
+            }
+          },
+          "mineiro-4": {
+            "betDecisions": 124435,
+            "medianByHand": {
+              "1": 0,
+              "2": 0,
+              "3": 1,
+              "4": 1,
+              "5": 2,
+              "6": 2,
+              "7": 2,
+              "8": 3,
+              "9": 3,
+              "10": 5
+            }
+          }
+        },
+        "nW": 3
+      },
+      "priors": {
+        "measuredAt": "2026-11-21T23:15:31.702Z",
+        "alpha": 2,
+        "matchesPerSegment": 4000,
+        "file": "ai/models/opponent-priors.json",
+        "segments": {
+          "paulista-2": {"raise":0.6558,"run":0.38987,"accept":0.58738,"reraise":0.02276,"shown":0.46337,"cover":0.1618},
+          "paulista-4": {"raise":0.30296,"run":0.57974,"accept":0.39631,"reraise":0.02395,"shown":0.53274,"cover":0.19954},
+          "mineiro-2": {"raise":0.70162,"run":0.30792,"accept":0.66389,"reraise":0.02819,"shown":0.46617,"cover":0.1361},
+          "mineiro-4": {"raise":0.3181,"run":0.51454,"accept":0.45397,"reraise":0.03149,"shown":0.52308,"cover":0.17037}
+        }
+      },
+      "safetyNet": {
+        "measuredAt": "2026-11-22T10:40:56.617Z",
+        "model": "training/runs/m6-adaptive/export/zap-v2.zapw",
+        "bmax": 0.5,
+        "nHalf": 1,
+        "flagged": false,
+        "stage2": [
+          {"setting":"b0.5-h1","bmax":0.5,"nHalf":1,"lambdaBelow1Share":0.0178,"topChangedShare":0.03175,"decisions":5370311},
+          {"setting":"b0.5-h2","bmax":0.5,"nHalf":2,"lambdaBelow1Share":0.02335,"topChangedShare":0.03074,"decisions":5372261},
+          {"setting":"b0.5-h4","bmax":0.5,"nHalf":4,"lambdaBelow1Share":0.03398,"topChangedShare":0.02912,"decisions":5376533}
+        ]
+      },
+      "perStyle": {
+        "measuredAt": "2026-11-23T14:34:15.980Z",
+        "pairsPerSegment": 1500,
+        "styles": {
+          "otavio": {
+            "gainVsAblated": {
+              "mean": -0.00175,
+              "ci95": [-0.00685,0.00335],
+              "upper95": 0.00253,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": -0.0045,
+              "ci95": [-0.01283,0.00383],
+              "upper95": 0.00249,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": -0.00275,
+              "ci95": [-0.01111,0.00561],
+              "upper95": 0.00427,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "bento": {
+            "gainVsAblated": {
+              "mean": 0.00075,
+              "ci95": [-0.00333,0.00483],
+              "upper95": 0.00418,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.011,
+              "ci95": [0.00326,0.01874],
+              "upper95": 0.01749,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.01025,
+              "ci95": [0.00261,0.01789],
+              "upper95": 0.01666,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "lia": {
+            "gainVsAblated": {
+              "mean": -0.0035,
+              "ci95": [-0.00662,-0.00038],
+              "upper95": -0.00089,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.00658,
+              "ci95": [-0.00042,0.01358],
+              "upper95": 0.01246,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.01008,
+              "ci95": [0.0031,0.01706],
+              "upper95": 0.01594,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "ravi": {
+            "gainVsAblated": {
+              "mean": 0.00125,
+              "ci95": [-0.00277,0.00527],
+              "upper95": 0.00463,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.0075,
+              "ci95": [-0.0002,0.0152],
+              "upper95": 0.01397,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00625,
+              "ci95": [-0.00152,0.01402],
+              "upper95": 0.01277,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "iara": {
+            "gainVsAblated": {
+              "mean": -0.00483,
+              "ci95": [-0.00929,-0.00038],
+              "upper95": -0.0011,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": -0.00342,
+              "ci95": [-0.01178,0.00495],
+              "upper95": 0.0036,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00142,
+              "ci95": [-0.00692,0.00975],
+              "upper95": 0.00841,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "raisesAll": {
+            "gainVsAblated": {
+              "mean": 0.00325,
+              "ci95": [0.00023,0.00627],
+              "upper95": 0.00579,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.01642,
+              "ci95": [0.01046,0.02237],
+              "upper95": 0.02142,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.01317,
+              "ci95": [0.00715,0.01918],
+              "upper95": 0.01821,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "neverRaises": {
+            "gainVsAblated": {
+              "mean": 0.00008,
+              "ci95": [-0.00434,0.00451],
+              "upper95": 0.0038,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": -0.00867,
+              "ci95": [-0.01559,-0.00174],
+              "upper95": -0.00285,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": -0.00875,
+              "ci95": [-0.0158,-0.0017],
+              "upper95": -0.00283,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "neverRuns": {
+            "gainVsAblated": {
+              "mean": 0.01025,
+              "ci95": [0.00654,0.01396],
+              "upper95": 0.01337,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.01683,
+              "ci95": [0.00925,0.02442],
+              "upper95": 0.0232,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00658,
+              "ci95": [-0.00107,0.01424],
+              "upper95": 0.01301,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "runsAll": {
+            "gainVsAblated": {
+              "mean": 0.0125,
+              "ci95": [0.00813,0.01687],
+              "upper95": 0.01616,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.00992,
+              "ci95": [0.00375,0.01608],
+              "upper95": 0.01509,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": -0.00258,
+              "ci95": [-0.00889,0.00372],
+              "upper95": 0.00271,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "bluffer": {
+            "gainVsAblated": {
+              "mean": 0.00992,
+              "ci95": [0.00606,0.01378],
+              "upper95": 0.01316,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.0165,
+              "ci95": [0.00971,0.02329],
+              "upper95": 0.02219,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00658,
+              "ci95": [-0.00021,0.01337],
+              "upper95": 0.01228,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "coversALot": {
+            "gainVsAblated": {
+              "mean": 0.0015,
+              "ci95": [-0.00285,0.00585],
+              "upper95": 0.00515,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.00083,
+              "ci95": [-0.00709,0.00876],
+              "upper95": 0.00748,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": -0.00067,
+              "ci95": [-0.00853,0.0072],
+              "upper95": 0.00593,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "trapper": {
+            "gainVsAblated": {
+              "mean": 0.00192,
+              "ci95": [-0.00104,0.00487],
+              "upper95": 0.0044,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.0165,
+              "ci95": [0.00912,0.02388],
+              "upper95": 0.0227,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.01458,
+              "ci95": [0.00721,0.02196],
+              "upper95": 0.02077,
+              "pairs": 6000
+            },
+            "heldOut": false
+          },
+          "coversAll": {
+            "gainVsAblated": {
+              "mean": -0.0005,
+              "ci95": [-0.00397,0.00297],
+              "upper95": 0.00241,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.00633,
+              "ci95": [0.00002,0.01265],
+              "upper95": 0.01163,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00683,
+              "ci95": [0.00053,0.01314],
+              "upper95": 0.01213,
+              "pairs": 6000
+            },
+            "heldOut": true
+          },
+          "coinFlip": {
+            "gainVsAblated": {
+              "mean": 0.00217,
+              "ci95": [-0.00169,0.00602],
+              "upper95": 0.0054,
+              "pairs": 6000
+            },
+            "gainVsTwin": {
+              "mean": 0.00858,
+              "ci95": [0.00138,0.01578],
+              "upper95": 0.01463,
+              "pairs": 6000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00642,
+              "ci95": [-0.00079,0.01363],
+              "upper95": 0.01247,
+              "pairs": 6000
+            },
+            "heldOut": true
+          }
+        },
+        "pooled": {
+          "allStyles": {
+            "gainVsAblated": {
+              "mean": 0.00236,
+              "ci95": [0.00126,0.00346],
+              "upper95": 0.00328,
+              "pairs": 84000
+            },
+            "gainVsTwin": {
+              "mean": 0.00717,
+              "ci95": [0.00491,0.00943],
+              "upper95": 0.00907,
+              "pairs": 84000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00482,
+              "ci95": [0.00253,0.0071],
+              "upper95": 0.00673,
+              "pairs": 84000
+            },
+            "seedFloor": {
+              "mean": 0.00224,
+              "ci95": [-0.00009,0.00458],
+              "upper95": 0.00421,
+              "pairs": 84000
+            }
+          },
+          "trainingStyles": {
+            "gainVsAblated": {
+              "mean": 0.00261,
+              "ci95": [0.00142,0.00381],
+              "upper95": 0.00361,
+              "pairs": 72000
+            },
+            "gainVsTwin": {
+              "mean": 0.00712,
+              "ci95": [0.00472,0.00953],
+              "upper95": 0.00915,
+              "pairs": 72000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00451,
+              "ci95": [0.00208,0.00694],
+              "upper95": 0.00655,
+              "pairs": 72000
+            },
+            "seedFloor": {
+              "mean": 0.00273,
+              "ci95": [0.00023,0.00523],
+              "upper95": 0.00483,
+              "pairs": 72000
+            }
+          },
+          "heldOutStyles": {
+            "gainVsAblated": {
+              "mean": 0.00083,
+              "ci95": [-0.00174,0.00341],
+              "upper95": 0.003,
+              "pairs": 12000
+            },
+            "gainVsTwin": {
+              "mean": 0.00746,
+              "ci95": [0.00268,0.01224],
+              "upper95": 0.01147,
+              "pairs": 12000
+            },
+            "ablatedVsTwin": {
+              "mean": 0.00663,
+              "ci95": [0.00187,0.01138],
+              "upper95": 0.01062,
+              "pairs": 12000
+            },
+            "seedFloor": {
+              "mean": -0.00067,
+              "ci95": [-0.00563,0.00429],
+              "upper95": 0.0035,
+              "pairs": 12000
+            }
+          }
+        },
+        "seedCheck": {"note":"The twin has 590 training iterations and the second twin 390: second twin minus twin mixes the seeds with that extra training, so it is not a seed floor here (seedCheck makes no claim; the seed floor of two twins with the same training is kept in ai.adaptation.history)."},
+        "twinIterations": {"twin":590,"twin2":390}
+      },
+      "headToHead": {
+        "measuredAt": "2026-11-23T15:10:58.034Z",
+        "rows": {
+          "adaptive-twin": {
+            "mean": 0.49113,
+            "ci95": [0.48287,0.49938],
+            "pairs": 4000
+          },
+          "twin2-twin": {
+            "mean": 0.506,
+            "ci95": [0.49777,0.51423],
+            "pairs": 4000
+          },
+          "adaptive-v1": {
+            "mean": 0.713,
+            "ci95": [0.70416,0.72184],
+            "pairs": 4000
+          },
+          "twin-v1": {
+            "mean": 0.7225,
+            "ci95": [0.71361,0.73139],
+            "pairs": 4000
+          },
+          "adaptive-random": {
+            "mean": 0.95563,
+            "ci95": [0.9512,0.96005],
+            "pairs": 4000
+          },
+          "twin-random": {
+            "mean": 0.95088,
+            "ci95": [0.94615,0.9556],
+            "pairs": 4000
+          },
+          "adaptive-heuristic": {
+            "mean": 0.8025,
+            "ci95": [0.79452,0.81048],
+            "pairs": 4000
+          },
+          "twin-heuristic": {
+            "mean": 0.80725,
+            "ci95": [0.79919,0.81531],
+            "pairs": 4000
+          },
+          "adaptive-tuned": {
+            "mean": 0.89463,
+            "ci95": [0.8881,0.90115],
+            "pairs": 4000
+          },
+          "twin-tuned": {
+            "mean": 0.88463,
+            "ci95": [0.8778,0.89145],
+            "pairs": 4000
+          },
+          "adaptive-ablated": {
+            "mean": 0.5065,
+            "ci95": [0.49889,0.51411],
+            "pairs": 4000
+          },
+          "ablated-twin": {
+            "mean": 0.48538,
+            "ci95": [0.47702,0.49373],
+            "pairs": 4000
+          }
+        }
+      },
+      "ablation": {
+        "measuredAt": "2026-11-23T15:10:58.034Z",
+        "pooledGain": {
+          "mean": 0.00236,
+          "ci95": [0.00126,0.00346],
+          "upper95": 0.00328,
+          "pairs": 84000
+        },
+        "headToHead": {
+          "mean": 0.5065,
+          "ci95": [0.49889,0.51411],
+          "pairs": 4000
+        },
+        "offPolicy": {
+          "pooledAblatedMinusTwin": {
+            "mean": 0.00482,
+            "ci95": [0.00253,0.0071],
+            "upper95": 0.00673,
+            "pairs": 84000
+          },
+          "headToHead": {
+            "mean": 0.48538,
+            "ci95": [0.47702,0.49373],
+            "pairs": 4000
+          },
+          "servesAdaptiveWhileOff": false
+        }
+      },
+      "explorer": {
+        "measuredAt": "2026-11-23T12:52:15.385Z",
+        "grid": {
+          "size": 1008,
+          "searched": 1008,
+          "styles": ["rock","honest","trapper","bluffer","raisesAll","neverRaises","neverRuns","runsAll"],
+          "handSwitches": [1,2,3,4,6,8],
+          "evidenceSwitches": [2,4,8],
+          "partner": ["same","v1"]
+        },
+        "chosen": {"a":"runsAll","b":"trapper","k":4,"trigger":"evidence","partner":"same"},
+        "chosenInTraining": true,
+        "searchRankedBy": "ablated",
+        "freshGain": {
+          "mean": -0.01025,
+          "ci95": [-0.01657,-0.00393],
+          "upper95": -0.00495,
+          "pairs": 8000
+        },
+        "split": {
+          "adaptationPart": {
+            "mean": -0.00012,
+            "ci95": [-0.00455,0.0043],
+            "upper95": 0.00359,
+            "pairs": 8000
+          },
+          "basePart": {
+            "mean": -0.01012,
+            "ci95": [-0.0165,-0.00375],
+            "upper95": -0.00477,
+            "pairs": 8000
+          }
+        },
+        "outsideTraining": null,
+        "requirement": 0.01,
+        "passTwinRule": true,
+        "passAdaptationPart": true,
+        "attempts": [
+          {
+            "attempt": 5,
+            "explorer": "neverRaises>bluffer@3/same",
+            "searchRankedBy": "ablated",
+            "adapt": {"bmax":0.2,"nHalf":1},
+            "pairsPerSegment": 2000,
+            "gain": {
+              "mean": -0.00812,
+              "ci95": [-0.01431,-0.00194],
+              "upper95": -0.00294,
+              "pairs": 8000
+            },
+            "adaptationPart": {
+              "mean": 0.00488,
+              "ci95": [0.00147,0.00828],
+              "upper95": 0.00773,
+              "pairs": 8000
+            },
+            "passTwinRule": true,
+            "passAdaptationPart": true,
+            "outside": {
+              "explorer": "trapper<>raisesAll@1/same",
+              "gain": {
+                "mean": -0.00944,
+                "ci95": [-0.01561,-0.00327],
+                "upper95": -0.00426,
+                "pairs": 8000
+              },
+              "adaptationPart": {
+                "mean": 0.0035,
+                "ci95": [0.00086,0.00614],
+                "upper95": 0.00572,
+                "pairs": 8000
+              },
+              "passTwinRule": true,
+              "passAdaptationPart": true
+            }
+          },
+          {
+            "attempt": 6,
+            "explorer": "runsAll>neverRaises@4/same",
+            "searchRankedBy": "twin",
+            "adapt": {"bmax":0.2,"nHalf":1},
+            "pairsPerSegment": 2000,
+            "gain": {
+              "mean": 0.00619,
+              "ci95": [0.00041,0.01197],
+              "upper95": 0.01104,
+              "pairs": 8000
+            },
+            "adaptationPart": {
+              "mean": -0.00056,
+              "ci95": [-0.00469,0.00356],
+              "upper95": 0.0029,
+              "pairs": 8000
+            },
+            "passTwinRule": false,
+            "passAdaptationPart": true,
+            "outside": {
+              "explorer": "rock>runsAll@1/same",
+              "gain": {
+                "mean": -0.00869,
+                "ci95": [-0.01418,-0.00319],
+                "upper95": -0.00408,
+                "pairs": 8000
+              },
+              "adaptationPart": {
+                "mean": -0.00481,
+                "ci95": [-0.0085,-0.00113],
+                "upper95": -0.00172,
+                "pairs": 8000
+              },
+              "passTwinRule": true,
+              "passAdaptationPart": true
+            }
+          },
+          {
+            "attempt": 7,
+            "explorer": "trapper>bluffer@3/v1",
+            "searchRankedBy": "ablated",
+            "adapt": {"bmax":0.2,"nHalf":1},
+            "pairsPerSegment": 2000,
+            "gain": {
+              "mean": -0.00244,
+              "ci95": [-0.00905,0.00417],
+              "upper95": 0.00311,
+              "pairs": 8000
+            },
+            "adaptationPart": {
+              "mean": 0.00256,
+              "ci95": [-0.00035,0.00548],
+              "upper95": 0.00501,
+              "pairs": 8000
+            },
+            "passTwinRule": true,
+            "passAdaptationPart": true,
+            "outside": null
+          },
+          {
+            "attempt": 8,
+            "explorer": "runsAll>trapper@e4/same",
+            "searchRankedBy": "ablated",
+            "adapt": {"bmax":0.2,"nHalf":1},
+            "pairsPerSegment": 2000,
+            "gain": {
+              "mean": -0.01025,
+              "ci95": [-0.01657,-0.00393],
+              "upper95": -0.00495,
+              "pairs": 8000
+            },
+            "adaptationPart": {
+              "mean": -0.00012,
+              "ci95": [-0.00455,0.0043],
+              "upper95": 0.00359,
+              "pairs": 8000
+            },
+            "passTwinRule": true,
+            "passAdaptationPart": true,
+            "outside": null
+          }
+        ],
+        "criterion": {
+          "measuredAt": "2026-11-23T17:49:30.756Z",
+          "primary": "adaptationPart",
+          "requirement": 0.01,
+          "servedModel": {
+            "adapt": {"bmax":0.2,"nHalf":1}
+          },
+          "pass": true,
+          "passTwinRule": false,
+          "verdicts": {
+            "scripted": [
+              {
+                "attempt": 5,
+                "searchRankedBy": "ablated",
+                "adapt": {"bmax":0.2,"nHalf":1},
+                "explorers": [
+                  {
+                    "explorer": "neverRaises>bluffer@3/same",
+                    "adaptationPart": {
+                      "mean": 0.00488,
+                      "ci95": [0.00147,0.00828],
+                      "upper95": 0.00773,
+                      "pairs": 8000
+                    },
+                    "gainOverTwin": {
+                      "mean": -0.00812,
+                      "ci95": [-0.01431,-0.00194],
+                      "upper95": -0.00294,
+                      "pairs": 8000
+                    },
+                    "basePart": {
+                      "mean": -0.013,
+                      "ci95": [-0.01914,-0.00686],
+                      "upper95": -0.00785,
+                      "pairs": 8000
+                    },
+                    "pass": true,
+                    "passTwinRule": true
+                  },
+                  {
+                    "explorer": "trapper<>raisesAll@1/same",
+                    "adaptationPart": {
+                      "mean": 0.0035,
+                      "ci95": [0.00086,0.00614],
+                      "upper95": 0.00572,
+                      "pairs": 8000
+                    },
+                    "gainOverTwin": {
+                      "mean": -0.00944,
+                      "ci95": [-0.01561,-0.00327],
+                      "upper95": -0.00426,
+                      "pairs": 8000
+                    },
+                    "basePart": {
+                      "mean": -0.01294,
+                      "ci95": [-0.01907,-0.00681],
+                      "upper95": -0.00779,
+                      "pairs": 8000
+                    },
+                    "pass": true,
+                    "passTwinRule": true
+                  }
+                ]
+              },
+              {
+                "attempt": 6,
+                "searchRankedBy": "twin",
+                "adapt": {"bmax":0.2,"nHalf":1},
+                "remeasureOf": {"attempt":1},
+                "explorers": [
+                  {
+                    "explorer": "runsAll>neverRaises@4/same",
+                    "adaptationPart": {
+                      "mean": -0.00056,
+                      "ci95": [-0.00469,0.00356],
+                      "upper95": 0.0029,
+                      "pairs": 8000
+                    },
+                    "gainOverTwin": {
+                      "mean": 0.00619,
+                      "ci95": [0.00041,0.01197],
+                      "upper95": 0.01104,
+                      "pairs": 8000
+                    },
+                    "basePart": {
+                      "mean": 0.00675,
+                      "ci95": [0.00093,0.01257],
+                      "upper95": 0.01163,
+                      "pairs": 8000
+                    },
+                    "pass": true,
+                    "passTwinRule": false
+                  },
+                  {
+                    "explorer": "rock>runsAll@1/same",
+                    "adaptationPart": {
+                      "mean": -0.00481,
+                      "ci95": [-0.0085,-0.00113],
+                      "upper95": -0.00172,
+                      "pairs": 8000
+                    },
+                    "gainOverTwin": {
+                      "mean": -0.00869,
+                      "ci95": [-0.01418,-0.00319],
+                      "upper95": -0.00408,
+                      "pairs": 8000
+                    },
+                    "basePart": {
+                      "mean": -0.00387,
+                      "ci95": [-0.00952,0.00177],
+                      "upper95": 0.00086,
+                      "pairs": 8000
+                    },
+                    "pass": true,
+                    "passTwinRule": true
+                  }
+                ]
+              },
+              {
+                "attempt": 7,
+                "searchRankedBy": "ablated",
+                "adapt": {"bmax":0.2,"nHalf":1},
+                "remeasureOf": {"attempt":2},
+                "explorers": [
+                  {
+                    "explorer": "trapper>bluffer@3/v1",
+                    "adaptationPart": {
+                      "mean": 0.00256,
+                      "ci95": [-0.00035,0.00548],
+                      "upper95": 0.00501,
+                      "pairs": 8000
+                    },
+                    "gainOverTwin": {
+                      "mean": -0.00244,
+                      "ci95": [-0.00905,0.00417],
+                      "upper95": 0.00311,
+                      "pairs": 8000
+                    },
+                    "basePart": {
+                      "mean": -0.005,
+                      "ci95": [-0.01167,0.00167],
+                      "upper95": 0.0006,
+                      "pairs": 8000
+                    },
+                    "pass": true,
+                    "passTwinRule": true
+                  }
+                ]
+              },
+              {
+                "attempt": 8,
+                "searchRankedBy": "ablated",
+                "adapt": {"bmax":0.2,"nHalf":1},
+                "remeasureOf": {"attempt":3},
+                "explorers": [
+                  {
+                    "explorer": "runsAll>trapper@e4/same",
+                    "adaptationPart": {
+                      "mean": -0.00012,
+                      "ci95": [-0.00455,0.0043],
+                      "upper95": 0.00359,
+                      "pairs": 8000
+                    },
+                    "gainOverTwin": {
+                      "mean": -0.01025,
+                      "ci95": [-0.01657,-0.00393],
+                      "upper95": -0.00495,
+                      "pairs": 8000
+                    },
+                    "basePart": {
+                      "mean": -0.01012,
+                      "ci95": [-0.0165,-0.00375],
+                      "upper95": -0.00477,
+                      "pairs": 8000
+                    },
+                    "pass": true,
+                    "passTwinRule": true
+                  }
+                ]
+              }
+            ],
+            "trained": {
+              "explorer": "training/runs/m6-explorer-r/explorer.zapw",
+              "adaptationPart": {
+                "mean": -0.01,
+                "ci95": [-0.01513,-0.00487],
+                "upper95": -0.00569,
+                "pairs": 8000
+              },
+              "gainOverTwin": {
+                "mean": 0.03763,
+                "ci95": [0.0296,0.04565],
+                "upper95": 0.04436,
+                "pairs": 8000
+              },
+              "basePart": {
+                "mean": 0.04763,
+                "ci95": [0.03972,0.05553],
+                "upper95": 0.05426,
+                "pairs": 8000
+              },
+              "pass": true,
+              "passTwinRule": false
+            },
+            "control": {
+              "explorer": "training/runs/m6-explorer-twin/explorer.zapw",
+              "adaptationPart": {
+                "mean": -0.00887,
+                "ci95": [-0.01413,-0.00362],
+                "upper95": -0.00447,
+                "pairs": 8000
+              },
+              "gainOverTwin": {
+                "mean": 0.00575,
+                "ci95": [-0.00229,0.01379],
+                "upper95": 0.0125,
+                "pairs": 8000
+              },
+              "basePart": {
+                "mean": 0.01463,
+                "ci95": [0.00657,0.02268],
+                "upper95": 0.02138,
+                "pairs": 8000
+              },
+              "pass": true,
+              "passTwinRule": false
+            },
+            "otherTrained": [
+              {
+                "explorer": "training/runs/m6-explorer/explorer.zapw",
+                "adaptationPart": {
+                  "mean": -0.00644,
+                  "ci95": [-0.01176,-0.00111],
+                  "upper95": -0.00197,
+                  "pairs": 8000
+                },
+                "gainOverTwin": {
+                  "mean": 0.01206,
+                  "ci95": [0.00395,0.02018],
+                  "upper95": 0.01887,
+                  "pairs": 8000
+                },
+                "basePart": {
+                  "mean": 0.0185,
+                  "ci95": [0.01043,0.02657],
+                  "upper95": 0.02527,
+                  "pairs": 8000
+                },
+                "pass": true,
+                "passTwinRule": false,
+                "trainedAgainst": {
+                  "adapt": {"bmax":0.5,"nHalf":1}
+                }
+              }
+            ]
+          }
+        },
+        "trained": {
+          "measuredAt": "2026-11-23T14:12:32.041Z",
+          "training": {
+            "iterations": 103,
+            "ppoIterations": 98,
+            "minutes": 76.4,
+            "checks": [
+              {"iteration":0,"vsAdaptive":0.4669},
+              {"iteration":10,"vsAdaptive":0.4675},
+              {"iteration":20,"vsAdaptive":0.4988},
+              {"iteration":30,"vsAdaptive":0.5156},
+              {"iteration":40,"vsAdaptive":0.5475},
+              {"iteration":50,"vsAdaptive":0.5506},
+              {"iteration":60,"vsAdaptive":0.5744},
+              {"iteration":70,"vsAdaptive":0.5769},
+              {"iteration":80,"vsAdaptive":0.5725},
+              {"iteration":90,"vsAdaptive":0.5881},
+              {"iteration":100,"vsAdaptive":0.5925}
+            ],
+            "against": {
+              "adapt": {"bmax":0.2,"nHalf":1}
+            }
+          },
+          "fresh": {
+            "pairsPerSegment": 2000,
+            "adaptationPart": {
+              "mean": -0.01,
+              "ci95": [-0.01513,-0.00487],
+              "upper95": -0.00569,
+              "pairs": 8000
+            },
+            "gainOverTwin": {
+              "mean": 0.03763,
+              "ci95": [0.0296,0.04565],
+              "upper95": 0.04436,
+              "pairs": 8000
+            },
+            "basePart": {
+              "mean": 0.04763,
+              "ci95": [0.03972,0.05553],
+              "upper95": 0.05426,
+              "pairs": 8000
+            },
+            "seedFloorSeenByExplorer": {
+              "mean": 0.00994,
+              "ci95": [0.00174,0.01814],
+              "upper95": 0.01682,
+              "pairs": 8000
+            }
+          }
+        },
+        "control": {
+          "measuredAt": "2026-11-23T14:24:54.740Z",
+          "training": {"ppoIterations":98,"minutes":66.8},
+          "fresh": {
+            "pairsPerSegment": 2000,
+            "control": {
+              "scores": {
+                "vsAdaptive": {
+                  "mean": 0.57006,
+                  "ci95": [0.56383,0.57629],
+                  "pairs": 8000
+                },
+                "vsTwin": {
+                  "mean": 0.56431,
+                  "ci95": [0.55807,0.57056],
+                  "pairs": 8000
+                }
+              }
+            },
+            "trained": {
+              "scores": {
+                "vsAdaptive": {
+                  "mean": 0.59875,
+                  "ci95": [0.59244,0.60506],
+                  "pairs": 8000
+                },
+                "vsAblated": {
+                  "mean": 0.60506,
+                  "ci95": [0.59875,0.61137],
+                  "pairs": 8000
+                },
+                "vsTwin": {
+                  "mean": 0.55688,
+                  "ci95": [0.55048,0.56327],
+                  "pairs": 8000
+                }
+              }
+            },
+            "asServed": {
+              "mean": 0.03444,
+              "ci95": [0.026,0.04287],
+              "upper95": 0.04152,
+              "pairs": 8000
+            },
+            "base": {
+              "mean": 0.04075,
+              "ci95": [0.03234,0.04916],
+              "upper95": 0.04781,
+              "pairs": 8000
+            },
+            "crossControlVsAdaptiveMinusTwin": {
+              "mean": 0.00575,
+              "ci95": [-0.00229,0.01379],
+              "upper95": 0.0125,
+              "pairs": 8000
+            }
+          }
+        }
+      },
+      "readingCurve": {
+        "measuredAt": "2026-11-23T15:24:47.002Z",
+        "model": "training/runs/m6-adaptive-r/export/zap-v2-b0.2-h1.zapw",
+        "matchesPerSegment": 300,
+        "styles": {
+          "otavio": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4603},
+              "2": {"changedShare":0.01401,"meanN":0.464,"decisions":4569},
+              "3": {"changedShare":0.03032,"meanN":1.062,"decisions":4255},
+              "4": {"changedShare":0.03937,"meanN":1.647,"decisions":3861},
+              "5": {"changedShare":0.04778,"meanN":2.217,"decisions":3223},
+              "6": {"changedShare":0.05146,"meanN":2.831,"decisions":2371},
+              "7": {"changedShare":0.05459,"meanN":3.248,"decisions":1850},
+              "8": {"changedShare":0.05078,"meanN":3.872,"decisions":1339},
+              "9": {"changedShare":0.0509,"meanN":4.443,"decisions":1061},
+              "10+": {"changedShare":0.05144,"meanN":5.889,"decisions":2255}
+            }
+          },
+          "bento": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4882},
+              "2": {"changedShare":0.02311,"meanN":0.746,"decisions":4327},
+              "3": {"changedShare":0.04048,"meanN":1.627,"decisions":3483},
+              "4": {"changedShare":0.05166,"meanN":2.415,"decisions":2710},
+              "5": {"changedShare":0.06218,"meanN":3.256,"decisions":1737},
+              "6": {"changedShare":0.06092,"meanN":4.198,"decisions":1067},
+              "7": {"changedShare":0.06637,"meanN":4.917,"decisions":663},
+              "8": {"changedShare":0.05191,"meanN":5.923,"decisions":366},
+              "9": {"changedShare":0.04851,"meanN":6.657,"decisions":268},
+              "10+": {"changedShare":0.04074,"meanN":8.715,"decisions":270}
+            }
+          },
+          "lia": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":5406},
+              "2": {"changedShare":0.01703,"meanN":0.725,"decisions":3994},
+              "3": {"changedShare":0.03981,"meanN":1.517,"decisions":2713},
+              "4": {"changedShare":0.04063,"meanN":2.401,"decisions":1649},
+              "5": {"changedShare":0.04432,"meanN":3.177,"decisions":880},
+              "6": {"changedShare":0.06422,"meanN":3.917,"decisions":436},
+              "7": {"changedShare":0.05759,"meanN":5.016,"decisions":191},
+              "8": {"changedShare":0.08434,"meanN":5.47,"decisions":83},
+              "9": {"changedShare":0.01351,"meanN":6.014,"decisions":74},
+              "10+": {"changedShare":0.05263,"meanN":7.921,"decisions":38}
+            }
+          },
+          "ravi": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4854},
+              "2": {"changedShare":0.01717,"meanN":0.542,"decisions":4311},
+              "3": {"changedShare":0.03296,"meanN":1.226,"decisions":3550},
+              "4": {"changedShare":0.0363,"meanN":1.827,"decisions":2755},
+              "5": {"changedShare":0.04623,"meanN":2.5,"decisions":2055},
+              "6": {"changedShare":0.05447,"meanN":3.19,"decisions":1377},
+              "7": {"changedShare":0.05383,"meanN":3.707,"decisions":836},
+              "8": {"changedShare":0.05229,"meanN":4.26,"decisions":612},
+              "9": {"changedShare":0.03684,"meanN":5.129,"decisions":380},
+              "10+": {"changedShare":0.03351,"meanN":6.721,"decisions":567}
+            }
+          },
+          "raisesAll": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4992},
+              "2": {"changedShare":0.02498,"meanN":0.847,"decisions":4443},
+              "3": {"changedShare":0.03177,"meanN":1.717,"decisions":3336},
+              "4": {"changedShare":0.05229,"meanN":2.766,"decisions":2161},
+              "5": {"changedShare":0.06213,"meanN":3.78,"decisions":1529},
+              "6": {"changedShare":0.06434,"meanN":4.597,"decisions":746},
+              "7": {"changedShare":0.06936,"meanN":5.153,"decisions":346},
+              "8": {"changedShare":0.08333,"meanN":6.518,"decisions":168},
+              "9": {"changedShare":0.07477,"meanN":7.075,"decisions":107},
+              "10+": {"changedShare":0.07407,"meanN":7.37,"decisions":54}
+            }
+          },
+          "neverRuns": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4865},
+              "2": {"changedShare":0.01771,"meanN":0.42,"decisions":4008},
+              "3": {"changedShare":0.03096,"meanN":0.999,"decisions":3327},
+              "4": {"changedShare":0.03508,"meanN":1.527,"decisions":2537},
+              "5": {"changedShare":0.05103,"meanN":2.035,"decisions":1646},
+              "6": {"changedShare":0.05709,"meanN":2.569,"decisions":1086},
+              "7": {"changedShare":0.04936,"meanN":3.28,"decisions":628},
+              "8": {"changedShare":0.04202,"meanN":3.95,"decisions":357},
+              "9": {"changedShare":0.02545,"meanN":4.127,"decisions":275},
+              "10+": {"changedShare":0.04484,"meanN":4.614,"decisions":223}
+            }
+          },
+          "bluffer": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4946},
+              "2": {"changedShare":0.02228,"meanN":0.804,"decisions":4713},
+              "3": {"changedShare":0.04052,"meanN":1.644,"decisions":3776},
+              "4": {"changedShare":0.04723,"meanN":2.452,"decisions":3028},
+              "5": {"changedShare":0.06423,"meanN":3.263,"decisions":2164},
+              "6": {"changedShare":0.05785,"meanN":4.264,"decisions":1331},
+              "7": {"changedShare":0.04056,"meanN":4.976,"decisions":715},
+              "8": {"changedShare":0.05081,"meanN":6.275,"decisions":433},
+              "9": {"changedShare":0.06048,"meanN":7.698,"decisions":248},
+              "10+": {"changedShare":0.03265,"meanN":9.098,"decisions":245}
+            }
+          },
+          "v1": {
+            "bet": {
+              "1": {"changedShare":0,"meanN":0,"decisions":4965},
+              "2": {"changedShare":0.01465,"meanN":0.631,"decisions":4299},
+              "3": {"changedShare":0.02908,"meanN":1.35,"decisions":3404},
+              "4": {"changedShare":0.0398,"meanN":2.08,"decisions":2839},
+              "5": {"changedShare":0.04585,"meanN":2.751,"decisions":1941},
+              "6": {"changedShare":0.04802,"meanN":3.387,"decisions":1291},
+              "7": {"changedShare":0.06472,"meanN":3.863,"decisions":788},
+              "8": {"changedShare":0.0656,"meanN":4.606,"decisions":564},
+              "9": {"changedShare":0.04607,"meanN":5.629,"decisions":369},
+              "10+": {"changedShare":0.07009,"meanN":6.614,"decisions":428}
+            }
+          }
+        }
+      },
+      "personasV2": {
+        "measuredAt": "2026-11-23T15:24:15.814Z",
+        "model": "training/runs/m6-adaptive-r/export/zap-v2-b0.2-h1.zapw",
+        "orderHolds": true,
+        "vsZap": {
+          "otavio": {"mean":0.2675,"se":0.00989},
+          "bento": {"mean":0.28812,"se":0.0098},
+          "lia": {"mean":0.31438,"se":0.0099},
+          "ravi": {"mean":0.29625,"se":0.00995},
+          "iara": {"mean":0.41688,"se":0.00999},
+          "zap": {"mean":0.51063,"se":0.00886}
+        },
+        "note": "adaptive candidate training/runs/m6-adaptive-r, not the shipped v2 (ai.personasByVersion.v2)"
+      },
+      "decisionTime": {
+        "measuredAt": "2026-11-23T21:38:03.804Z",
+        "model": "training/runs/m6-adaptive-r/export/zap-v2-b0.2-h1.zapw",
+        "decisionMs": {"p50":0.4319,"p99":0.51131},
+        "roomEventMs": {"p99":3.51289},
+        "targetEventP99Ms": 6,
+        "meetsTarget": true
+      },
+      "warmStart": {
+        "measuredAt": "2026-11-22T14:34:38Z",
+        "pass": true,
+        "v2": {"matches":400,"decisions":22868,"mismatches":0,"maxLogitDiff":0.00000191}
+      },
+      "training": {
+        "runs": {
+          "m6-adaptive": {"run":"training/runs/m6-adaptive","features":"v2","iterations":390,"hours":3.08},
+          "m6-twin": {"run":"training/runs/m6-twin","features":"v2-empty","iterations":390,"hours":3.254},
+          "m6-twin-b": {"run":"training/runs/m6-twin-b","features":"v2-empty","iterations":390,"hours":3.033},
+          "m6-adaptive-r": {"run":"training/runs/m6-adaptive-r","features":"v2","iterations":200,"hours":1.735},
+          "m6-twin-r": {"run":"training/runs/m6-twin-r","features":"v2-empty","iterations":200,"hours":1.742}
+        }
+      },
+      "switchOnCheck": {
+        "date": "2026-11-23",
+        "measuredAt": "2026-11-23T16:06:07.699Z",
+        "decision": "not switched on: v2 (the twin afdc6096) stays in play and AI_ADAPT stays off; switching on is the owner's step (DEPLOY.md section 9)",
+        "explorerCriterionPass": true,
+        "gate": {
+          "stats": "live",
+          "pass": true,
+          "sprt": {"decision":"accept","pairs":1200,"mean":0.53292},
+          "segments": {
+            "paulista-2": {"pairs":2500,"mean":0.5146},
+            "paulista-4": {"pairs":2500,"mean":0.5284},
+            "mineiro-2": {"pairs":2500,"mean":0.5124},
+            "mineiro-4": {"pairs":2500,"mean":0.5166}
+          },
+          "panel": [
+            {
+              "member": "random",
+              "pairs": 10000,
+              "candidate": {"mean":0.95735,"lo":0.95458,"hi":0.96012},
+              "current": {"mean":0.95435,"lo":0.9515,"hi":0.9572},
+              "diff": {"mean":0.003,"lo95":-0.00005},
+              "pass": true
+            },
+            {
+              "member": "base",
+              "pairs": 10000,
+              "candidate": {"mean":0.7992,"lo":0.79415,"hi":0.80425},
+              "current": {"mean":0.79015,"lo":0.78503,"hi":0.79527},
+              "diff": {"mean":0.00905,"lo95":0.00424},
+              "pass": true
+            },
+            {
+              "member": "tuned",
+              "pairs": 10000,
+              "candidate": {"mean":0.8941,"lo":0.88996,"hi":0.89824},
+              "current": {"mean":0.87085,"lo":0.86636,"hi":0.87534},
+              "diff": {"mean":0.02325,"lo95":0.01904},
+              "pass": true
+            },
+            {
+              "member": "v1",
+              "pairs": 10000,
+              "candidate": {"mean":0.706,"lo":0.70028,"hi":0.71172},
+              "current": {"mean":0.69955,"lo":0.69392,"hi":0.70518},
+              "diff": {"mean":0.00645,"lo95":0.00105},
+              "pass": true
+            },
+            {
+              "member": "v2",
+              "pairs": 10000,
+              "candidate": {"mean":0.52855,"lo":0.52332,"hi":0.53378},
+              "current": {"mean":0.5025,"lo":0.49768,"hi":0.50732},
+              "diff": {"mean":0.02605,"lo95":0.02028},
+              "pass": true
+            }
+          ]
+        },
+        "personas": {
+          "orderHolds": true,
+          "freshCheck": {
+            "pairsPerSegment": 200,
+            "vsZap": {
+              "otavio": {
+                "mean": 0.26375,
+                "ci95": [0.24468,0.28282]
+              },
+              "bento": {
+                "mean": 0.29438,
+                "ci95": [0.27494,0.31381]
+              },
+              "lia": {
+                "mean": 0.31,
+                "ci95": [0.29026,0.32974]
+              },
+              "ravi": {
+                "mean": 0.3025,
+                "ci95": [0.28289,0.32211]
+              },
+              "iara": {
+                "mean": 0.41688,
+                "ci95": [0.39696,0.43679]
+              },
+              "zap": {
+                "mean": 0.49438,
+                "ci95": [0.47718,0.51157]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "cycle": {
+    "gate": {"seconds":null},
+    "ab": {"detectablePoints":null},
+    "train": {"secondsPerIteration":null}
+  },
+  "worker": {
+    "brake": {
+      "budget": {"soloDoRowsWritten":60,"room4DoRowsWritten":320,"source":"plan, section 14"},
+      "ledgerRows": {"perMatch":2,"perRoom":1,"perRefusal":1},
+      "measured": {
+        "date": "2026-11-22",
+        "solo": {
+          "matches": 8,
+          "handsMean": 4.875,
+          "match": {"doRowsWrittenMean":18,"doRequests":2,"workerRequests":2,"d1RowsWritten":14,"d1RowsRead":11}
+        },
+        "room4": {
+          "matches": 3,
+          "handsMean": 5.67,
+          "match": {"doRowsWrittenMean":79,"doRequestsMean":11.33,"workerRequests":5,"d1RowsWritten":40,"d1RowsRead":29}
+        }
+      }
+    }
+  }
+}

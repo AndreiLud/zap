@@ -1,0 +1,59 @@
+/* The connection badge (data-testid="conn-status"): a dot, with its text for screen readers only
+   while online and visible otherwise (CLIENT-SPEC 11.7). Shared by the lobby, the opening screen
+   and the table, so it loads with components/common.tsx. */
+
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.conn .dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nos);
+}
+
+/* Reconnecting: a hollow ring; offline: a terracotta square. Shape and text, not color alone. */
+.conn-reconnecting .dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--ocre-line);
+}
+
+.conn-offline .dot {
+  border-radius: 1px;
+  background: var(--eles);
+}
+
+.conn-online .conn-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.conn-reconnecting,
+.conn-offline {
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .conn-reconnecting .dot {
+    animation: conn-wait 1.2s ease-in-out infinite;
+  }
+
+  @keyframes conn-wait {
+    50% {
+      opacity: 0.35;
+    }
+  }
+}

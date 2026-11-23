@@ -1,0 +1,1311 @@
+/* The Play page (CLIENT-SPEC 10.2, prototype azulejo-v2/jogar.css and pagina.css). Phone first.
+   One tile moment: a slim strip of tiles under the title. Everything else is type, white space and
+   thin rules; the only boxes wrap things you can touch. Every rule is scoped to .play, so no other
+   page picks these up (the rules page has its own variant switch). */
+
+.play {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 4px var(--gutter) 48px;
+}
+
+.play__note {
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------------------------ Title */
+
+.play__hero {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 24px 0 22px;
+}
+
+/* The title names the task; the big hook lives on the start page. */
+.play__hero h1 {
+  max-width: 12ch;
+  font-size: var(--fs-h1-play);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 96;
+}
+
+.play__lead {
+  max-width: 34ch;
+  color: var(--text-2);
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+/* As many whole tiles as fit the width; the rest wrap onto a hidden second row. */
+.play__strip {
+  --tile: 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr));
+  grid-auto-rows: var(--tile);
+  gap: 3px;
+  width: 100%;
+  height: var(--tile);
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.play__strip svg {
+  width: 100%;
+  height: var(--tile);
+  border-radius: 3px;
+}
+
+/* ------------------------------------------------------------------ Chooser */
+
+.play__chooser {
+  display: grid;
+  gap: 16px;
+  padding: 4px 0 30px;
+}
+
+/* Modes: three tiles side by side, each with a tiny table seen from above. */
+.play .modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.play .mode {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 5px;
+  min-height: 86px;
+  padding: 10px 4px 9px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  text-align: center;
+  cursor: pointer;
+}
+
+.play .mode:hover {
+  box-shadow: inset 0 0 0 1px var(--text-2);
+}
+
+.play .mode input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.play .mode b {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+/* The chosen mode: a thicker cobalt edge and a check in the corner, so color is not the only cue. */
+.play .mode.is-chosen {
+  background: var(--chosen);
+  box-shadow: inset 0 0 0 2px var(--nos);
+}
+
+.play .mode:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.play .mode__check {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 14px;
+  height: 14px;
+}
+
+.play .check-mark__disc {
+  fill: var(--nos);
+}
+
+.play .check-mark__tick {
+  stroke: var(--nos-fg);
+}
+
+.play .mode__table {
+  width: 40px;
+  height: 40px;
+}
+
+.mini-table__table {
+  fill: var(--bg);
+  stroke: var(--text-2);
+  stroke-width: 1.3;
+}
+
+.mini-table__us {
+  fill: var(--nos);
+}
+
+.mini-table__them {
+  fill: var(--eles);
+}
+
+.mini-table__open {
+  fill: none;
+  stroke: var(--text-2);
+  stroke-width: 1.3;
+  stroke-dasharray: 2.2 1.8;
+}
+
+.mini-table__you {
+  fill: none;
+  stroke: var(--nos);
+  stroke-width: 1.2;
+}
+
+/* Variant: a two option segmented switch, the chosen one filled with ink (like PT/EN). */
+.play .variant {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.play .variant__label {
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.play .segmented {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.play .segmented label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: var(--tap);
+  padding: 0 18px;
+  border-radius: 999px;
+  color: var(--text-2);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.play .segmented label:hover {
+  color: var(--text);
+}
+
+.play .segmented input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.play .segmented label.is-chosen {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.play .segmented label:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.play .variant__hint {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-2);
+  font-size: 0.88rem;
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+.play .variant__chips {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+}
+
+.play .variant__arrow {
+  width: 16px;
+  height: 10px;
+  color: var(--text-2);
+}
+
+.play .variant__chips .mini-card {
+  position: relative;
+  width: 28px;
+  height: 38px;
+  font-size: 1rem;
+}
+
+.play .mini-card--rank {
+  color: var(--suit-ink);
+}
+
+/* The manilha seal: an ochre quarter disc in the corner, as on the cards. */
+.play .mini-card--manilha::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 0 3px 0 100%;
+  background: var(--card-accent, #E3A72F);
+}
+
+html[data-deck="four"] .play .mini-card--manilha::after {
+  background: #E3A72F;
+  box-shadow: -1px 1px 0 var(--suit-ink);
+}
+
+/* ------------------------------------------------------------------ Opponents */
+
+/* Who you face: one quiet row between hairlines, with the picker folded inside. */
+.play .opponents {
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.play .opponents > summary {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 6px 0;
+  border-radius: var(--radius-s);
+  list-style: none;
+  cursor: pointer;
+}
+
+.play .opponents > summary::-webkit-details-marker {
+  display: none;
+}
+
+.play .opponents__stack {
+  display: inline-flex;
+}
+
+.play .opponents__stack .avatar {
+  width: 28px;
+  height: 28px;
+}
+
+.play .opponents__stack .avatar + .avatar {
+  margin-left: -6px;
+}
+
+.play .opponents__stack .avatar__art {
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.play .opponents__text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.play .opponents__label {
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.play .opponents__who {
+  font-family: var(--font-display);
+  font-size: 1.06rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.play .opponents__change {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.play .opponents > summary:hover .opponents__change {
+  border-color: var(--text-2);
+}
+
+.play .opponents__change svg {
+  width: 12px;
+  height: 12px;
+}
+
+.play .opponents[open] .opponents__change {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.play .opponents[open] .opponents__change svg {
+  rotate: 180deg;
+}
+
+.play .opponents__list {
+  min-width: 0;
+  margin: 0;
+  padding: 2px 0 16px;
+  border: 0;
+}
+
+.play .opponents__list legend {
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 750;
+}
+
+.play .opponents__list .play__note {
+  margin-top: 2px;
+}
+
+.play .characters {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.play .character {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  cursor: pointer;
+}
+
+.play .character:hover {
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.play .character.is-chosen {
+  background: var(--chosen);
+  box-shadow: inset 0 0 0 1.5px var(--nos);
+}
+
+/* Checkbox and radio drawn with a border and a clipped fill, so they survive forced colors. */
+.play .character input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 3px;
+  border: 2px solid var(--text-2);
+  border-radius: 50%;
+  background: transparent;
+  background-clip: content-box;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.play .character input[type="checkbox"] {
+  border-radius: 6px;
+}
+
+.play .character input:checked {
+  border-color: var(--nos);
+  background-color: var(--nos);
+}
+
+.play .character__text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.play .character__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.play .character__line {
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Difficulty as four rising bars; the level in words is the real cue. */
+.play .level {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.play .level i {
+  width: 4px;
+  border-radius: 1px;
+  background: var(--line);
+}
+
+.play .level i:nth-child(1) {
+  height: 5px;
+}
+
+.play .level i:nth-child(2) {
+  height: 8px;
+}
+
+.play .level i:nth-child(3) {
+  height: 11px;
+}
+
+.play .level i:nth-child(4) {
+  height: 14px;
+}
+
+.play .level i.is-on {
+  background: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ Room settings */
+
+.play .room-settings {
+  display: grid;
+  gap: 14px;
+}
+
+.play .room-settings__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 12px;
+}
+
+.play .room-settings select {
+  width: 100%;
+}
+
+.play .house-rules {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.play .house-rules > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: var(--tap);
+  font-weight: 750;
+  list-style: none;
+  cursor: pointer;
+}
+
+.play .house-rules > summary::-webkit-details-marker {
+  display: none;
+}
+
+.play .house-rules > summary svg {
+  width: 12px;
+  height: 12px;
+}
+
+.play .house-rules[open] > summary svg {
+  rotate: 180deg;
+}
+
+.play .house-rules__list {
+  display: grid;
+  gap: 4px;
+  padding: 0 0 8px;
+}
+
+.play .house-rules__list .field {
+  padding-top: 8px;
+}
+
+/* ------------------------------------------------------------------ The one button */
+
+.play .launch {
+  display: grid;
+  gap: 9px;
+  margin-top: 2px;
+}
+
+.play .launch__button {
+  width: 100%;
+  min-height: 58px;
+  gap: 10px;
+  padding: 0 28px;
+  border-radius: 14px;
+  font-size: var(--fs-btn-big);
+  font-weight: 800;
+}
+
+.play .launch__button .icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* An incomplete line up: the button looks inert and the note turns terracotta. Pressing it still
+   opens the picker, so it stays focusable (aria-disabled, never disabled). While a match is being
+   prepared it keeps its fill, dimmed by the base rule. */
+.play .launch__button.is-missing {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--text-2);
+  opacity: 1;
+  filter: none;
+}
+
+.play .launch__note {
+  color: var(--text-2);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.play .launch__button.is-missing + .launch__note {
+  color: var(--eles);
+}
+
+/* ------------------------------------------------------------------ Room with friends */
+
+.play .play__room {
+  display: grid;
+  gap: 14px;
+}
+
+.play .play__or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.play .play__or::before,
+.play .play__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line-soft);
+}
+
+.play .code-form {
+  display: grid;
+  gap: 4px;
+}
+
+.play .code-form__label {
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.play .code-form__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* Codes are set in Figtree: its Q has a crossing tail, so it never reads as the O the alphabet leaves out. */
+.play .code-form input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1.5px solid var(--text-2);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.play .code-form input::placeholder {
+  color: var(--text-2);
+  opacity: 0.7;
+}
+
+.play .code-form input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.play .code-form input[aria-invalid="true"] {
+  border-color: var(--eles);
+}
+
+/* Secondary call to action: a cobalt outline. */
+.play .code-form__submit {
+  min-height: 52px;
+  padding: 0 20px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.play .code-form__submit:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+/* The error line is a live region: it stays in the accessibility tree while empty, at no height. */
+.play .code-form__error {
+  color: var(--eles);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.play .room-sample {
+  display: grid;
+  gap: 12px;
+  margin: 4px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.play .room-sample figcaption {
+  display: grid;
+  gap: 2px;
+  color: var(--text-2);
+  font-size: 0.86rem;
+  font-weight: 550;
+}
+
+.play .room-sample figcaption b {
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 750;
+}
+
+.play .room-sample__table {
+  padding: 12px 14px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+
+.play .room-sample__top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.play .room-sample__code {
+  color: var(--text);
+  font-family: var(--font-text);
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.play .room-sample__top span:last-child {
+  margin-left: auto;
+}
+
+.play .room-sample__seats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.play .room-sample .seat-label {
+  column-gap: 10px;
+}
+
+.play .room-sample .seat-label__name {
+  white-space: normal;
+}
+
+/* ------------------------------------------------------------------ Links under the chooser */
+
+.play .play__links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
+  margin: -4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.play .play__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: var(--tap);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.play .play__links-q {
+  color: var(--text-2);
+  font-weight: 550;
+}
+
+.play .play__links b {
+  font-weight: 750;
+  text-decoration: underline;
+  text-decoration-color: var(--text-2);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+}
+
+.play .play__links a:hover b {
+  text-decoration-color: currentColor;
+}
+
+/* ------------------------------------------------------------------ "So far" (milestone 7) */
+
+.play__kicker {
+  color: var(--accent);
+  font-family: var(--font-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.play .live-strip {
+  display: grid;
+  gap: 8px;
+  padding: 26px 0 28px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.play .live-strip__numbers {
+  display: grid;
+  margin: 0;
+}
+
+.play .live-strip__item {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-height: 66px;
+  padding: 12px 7rem 12px 0;
+}
+
+.play .live-strip__item + .live-strip__item {
+  border-top: 1px solid var(--line-soft);
+}
+
+.play .live-strip dt {
+  font-size: 1rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.play .live-strip dd {
+  margin: 0;
+}
+
+.play .live-strip small {
+  display: block;
+  color: var(--text-2);
+  font-size: var(--fs-note);
+  font-weight: 550;
+  line-height: 1.3;
+}
+
+.play .live-strip b {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  translate: 0 -50%;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ How Zap learns */
+
+.play .lesson {
+  display: grid;
+  gap: 28px;
+  padding: 30px 0 36px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.play .lesson__text {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+
+.play .lesson h2 {
+  font-size: clamp(1.5rem, 6vw, 2.1rem);
+  letter-spacing: -0.025em;
+}
+
+.play .lesson p {
+  max-width: 46ch;
+  color: var(--text-2);
+}
+
+.play .lesson__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  color: var(--accent);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.play .lesson__link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.play .lesson__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.play .loop {
+  --loop: 46px;
+  --node: 46px;
+  position: relative;
+  margin: 0;
+  padding-top: var(--loop);
+}
+
+.play .loop__steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Forward line through the tiles, with a head at each column boundary. */
+.play .loop__steps::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--node) / 2);
+  right: 12.5%;
+  left: 12.5%;
+  height: 1.5px;
+  translate: 0 -50%;
+  background: var(--text-2);
+}
+
+.play .loop__step {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 10px;
+  text-align: center;
+}
+
+.play .loop__step + .loop__step::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--node) / 2);
+  left: 0;
+  translate: -30% -50%;
+  border: 5px solid transparent;
+  border-right: 0;
+  border-left: 7px solid var(--text-2);
+}
+
+/* Glazed tiles: the same cobalt as the main button in both themes. */
+.play .loop__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--node);
+  height: var(--node);
+  border-radius: 10px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+
+.play .loop__node svg {
+  width: 24px;
+  height: 24px;
+}
+
+.play .loop__step--duel .loop__node {
+  background: var(--ocre-fill);
+  color: var(--ocre-fg);
+}
+
+.play .loop__label {
+  max-width: 11ch;
+  font-size: var(--fs-note);
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+/* The way back, over the top: from the duel to the table, head pointing down at "You play". */
+.play .loop__back {
+  position: absolute;
+  top: 10px;
+  right: 12.5%;
+  left: 12.5%;
+  height: calc(var(--loop) - 10px);
+  border: 1.5px solid var(--text-2);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+}
+
+.play .loop__back::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -0.75px;
+  translate: -50% 0;
+  border: 5px solid transparent;
+  border-top: 7px solid var(--text-2);
+  border-bottom: 0;
+}
+
+.play .loop__back span {
+  position: absolute;
+  top: -0.75px;
+  left: 50%;
+  padding: 0 10px;
+  translate: -50% -50%;
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Very large text on a phone (the browser's font size at about twice the default): four steps in a
+   row no longer fit their words, so the loop becomes a list, one step a row, with the way back as
+   a line under it. Media query ems follow the browser's font size, so at the default size this
+   never applies, even at 320 px. */
+@media (width < 20em) {
+  .play .loop {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 0;
+  }
+
+  .play .loop__steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .play .loop__steps::before {
+    top: calc(var(--node) / 2);
+    bottom: calc(var(--node) / 2);
+    left: calc(var(--node) / 2);
+    right: auto;
+    width: 1.5px;
+    height: auto;
+    translate: -50% 0;
+  }
+
+  .play .loop__step {
+    grid-template-columns: var(--node) minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .play .loop__step + .loop__step::before {
+    display: none;
+  }
+
+  .play .loop__label {
+    max-width: none;
+  }
+
+  .play .loop__back {
+    position: static;
+    order: 1;
+    height: auto;
+    border: 0;
+  }
+
+  .play .loop__back::after {
+    display: none;
+  }
+
+  .play .loop__back span {
+    position: static;
+    padding: 0;
+    translate: none;
+    white-space: normal;
+  }
+}
+
+/* ------------------------------------------------------------------ Source code */
+
+.play .open-source {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  padding: 28px 0 40px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.play .open-source h2 {
+  font-size: 1.35rem;
+  letter-spacing: -0.015em;
+}
+
+.play .open-source p {
+  margin-top: 4px;
+  color: var(--text-2);
+}
+
+.play .open-source__link {
+  min-height: 48px;
+}
+
+.play .open-source__link .icon--arrow {
+  width: 12px;
+  height: 12px;
+  opacity: 0.65;
+}
+
+/* ------------------------------------------------------------------ Wider screens */
+
+/* Below the two column layout the chooser keeps a comfortable measure. */
+@media (max-width: 63.99em) {
+  .play__entry {
+    max-width: 40rem;
+  }
+}
+
+@media (min-width: 37.5em) {
+  .play .live-strip {
+    gap: 14px;
+    padding: 34px 0 40px;
+  }
+
+  .play .live-strip__numbers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .play .live-strip__item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 4px;
+    min-height: 0;
+    padding: 4px 24px;
+  }
+
+  .play .live-strip__item:first-child {
+    padding-left: 0;
+  }
+
+  .play .live-strip__item + .live-strip__item {
+    border-top: 0;
+    border-left: 1px solid var(--line-soft);
+  }
+
+  .play .live-strip dd {
+    display: grid;
+    gap: 4px;
+  }
+
+  .play .live-strip b {
+    position: static;
+    translate: none;
+    font-size: 2.6rem;
+  }
+
+  .play .characters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .play .open-source {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 32px;
+    padding: 36px 0 48px;
+  }
+}
+
+/* Two columns: the title, its line and the strip on the left, the chooser in a panel on the right. */
+@media (min-width: 64em) {
+  .play {
+    padding: 8px 32px 64px;
+  }
+
+  .play__entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+    align-items: center;
+    column-gap: 56px;
+    padding: 36px 0 52px;
+  }
+
+  .play__hero {
+    gap: 16px;
+    padding: 0;
+  }
+
+  /* With a room the chooser grows long: the title stays at the top, in view while it scrolls. */
+  .play__entry:has(.play__room) {
+    align-items: start;
+  }
+
+  .play__entry:has(.play__room) .play__hero {
+    position: sticky;
+    top: 32px;
+    padding-top: 40px;
+  }
+
+  .play__lead {
+    font-size: 1.15rem;
+  }
+
+  .play__strip {
+    --tile: 28px;
+    margin-top: 14px;
+  }
+
+  .play__chooser {
+    gap: 18px;
+    padding: 26px 28px 20px;
+    border-radius: var(--radius-l);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line-soft);
+  }
+
+  .play__chooser .mode {
+    background: var(--bg);
+  }
+
+  .play__chooser .mode.is-chosen {
+    background: var(--chosen);
+  }
+
+  .play__chooser .segmented {
+    background: var(--bg);
+  }
+
+  .play__chooser .opponents__stack .avatar__art {
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+
+  .play .characters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .play .lesson {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: center;
+    column-gap: 72px;
+    padding: 52px 0;
+  }
+
+  .play .loop {
+    --node: 54px;
+    --loop: 52px;
+  }
+
+  .play .loop__node svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .play .loop__label {
+    font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .play .opponents__change svg {
+    transition: rotate 0.18s ease;
+  }
+
+  .play .lesson__link svg {
+    transition: translate 0.15s ease;
+  }
+
+  .play .lesson__link:hover svg {
+    translate: 3px 0;
+  }
+}
+
+/* Forced colors: native controls back, and the chosen options keep a visible mark. */
+@media (forced-colors: active) {
+  .play .character input {
+    padding: 0;
+    border: 0;
+    appearance: auto;
+  }
+
+  .play .mode.is-chosen,
+  .play .segmented label.is-chosen {
+    outline: 3px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  .play .loop__node {
+    border: 1px solid CanvasText;
+  }
+
+  .play .loop__steps::before,
+  .play .loop__back {
+    border-color: CanvasText;
+  }
+}
