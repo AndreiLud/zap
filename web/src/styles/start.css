@@ -1,7 +1,7 @@
 /* The start page (CLIENT-SPEC 10.1, prototype azulejo-v2/home.css). A very short presentation: the
-   hook and one line, one picture, three buttons. Phone first: the page fills the first screen like
+   hook and one line, one picture, four buttons. Phone first: the page fills the first screen like
    a game's title screen (hook on top, the picture takes the free space, the buttons sit at the
-   thumb), so the three buttons are on the first screen also at 375 by 667. Wide screens and phones
+   thumb), so the four buttons are on the first screen also at 375 by 667. Wide screens and phones
    in landscape: the hook and the buttons on the left, the picture on the right.
    Every rule is scoped to .start, so no other page picks these up. */
 
@@ -156,7 +156,7 @@
   }
 }
 
-/* ------------------------------------------------------------------ The three buttons */
+/* ------------------------------------------------------------------ The four buttons */
 
 .start__actions {
   display: grid;
@@ -178,6 +178,31 @@
 .start .start__play .icon {
   width: 24px;
   height: 24px;
+}
+
+/* "Como funciona", the data page, under "Jogar": full width like it, outlined like the two links
+   below, so it reads as the second step and never as a second "Jogar". */
+.start .start__how {
+  width: 100%;
+  min-height: 52px;
+  gap: 8px;
+  padding: 0 16px;
+  border-color: var(--outline-quiet);
+  border-radius: 12px;
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.start .start__how:hover {
+  border-color: var(--text-2);
+  background: var(--surface);
+}
+
+.start .start__how .icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* Two outlined buttons side by side, second to "Jogar" by size and weight, not by a faint edge: the
@@ -238,7 +263,7 @@
   }
 }
 
-/* Short phones: a tighter column, so the three buttons stay on the first screen. */
+/* Short phones: a tighter column, so the four buttons stay on the first screen. */
 @media (max-height: 600px) and (orientation: portrait) {
   .start {
     gap: 12px;
@@ -282,6 +307,10 @@
 
   .start .start__play {
     min-height: 52px;
+  }
+
+  .start .start__how {
+    min-height: 46px;
   }
 
   .start .start__ext {

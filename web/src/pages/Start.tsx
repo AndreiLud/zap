@@ -1,7 +1,8 @@
 // The start page (/, /en/; CLIENT-SPEC 10.1, prototype azulejo-v2/index.html): a short opening
 // screen. The hook and one line, one picture (the medallion tile with your three cards dealt into a
-// fan) and exactly three buttons, all plain links: Jogar (the Play page), Código-fonte and Portfólio
-// (new tabs). The header does not repeat the two external links and the footer is the short one.
+// fan) and four buttons, all plain links: Jogar (the Play page), Como funciona (the data page) under
+// it, then Código-fonte and Portfólio (new tabs). The header does not repeat the two external links
+// and the footer is the short one.
 
 import { useState } from 'preact/hooks';
 import { Card } from '../deck/Card.tsx';
@@ -61,6 +62,10 @@ export function StartPage({ s }: { s: AppState }) {
         <Link to={{ name: 'play' }} class="btn btn--primary start__play" testid="home-play">
           <Icon name="play" />
           <span>{t('start.play')}</span>
+        </Link>
+        <Link to={{ name: 'data' }} class="btn btn--outline start__how" testid="home-how">
+          <Icon name="data" />
+          <span>{t('start.how')}</span>
         </Link>
         <div class="start__out">
           <ExternalLink href={SOURCE_URL} class="btn btn--outline start__ext" testid="home-source">

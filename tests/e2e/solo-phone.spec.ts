@@ -1,4 +1,4 @@
-// Quick play on a phone: the home page has three buttons and keeps Regras, Código-fonte and
+// Quick play on a phone: the home page has four buttons and keeps Regras, Código-fonte and
 // Portfólio behind the menu button; Jogar leads to the Play page, where "Jogar agora" asks for the
 // human check and opens a 2 against 2 table with an AI partner against two AIs; the language switch
 // in the middle of the match changes the text in place without closing the connection, and the
@@ -41,16 +41,20 @@ test('quick play on a phone, to the end, switching language mid-match without dr
   const [me] = await newPlayers(browser, [['Phone', PHONE]]);
   const page = me.page;
   try {
-    await test.step('home page on the phone: three buttons, and the links sit behind the menu button', async () => {
+    await test.step('home page on the phone: four buttons, and the links sit behind the menu button', async () => {
       await page.goto('/');
       await expect(page.getByTestId('home-play')).toBeVisible();
+      // Como funciona: the data page, in the same tab.
+      await expect(page.getByTestId('home-how')).toHaveAttribute('href', '/dados');
+      await expect(page.getByTestId('home-how')).not.toHaveAttribute('target', /./);
+      await expect(page.getByTestId('home-how')).toBeInViewport();
       await expect(page.getByTestId('home-source')).toHaveAttribute('href', 'https://github.com/AndreiLud/zap');
       await expect(page.getByTestId('home-portfolio')).toHaveAttribute('href', 'https://andreiludescher.com');
       for (const id of ['home-source', 'home-portfolio']) {
         await expect(page.getByTestId(id)).toHaveAttribute('target', '_blank');
         await expect(page.getByTestId(id)).toHaveAttribute('rel', 'noopener');
       }
-      await expect(page.locator('main a, main button')).toHaveCount(3);
+      await expect(page.locator('main a, main button')).toHaveCount(4);
       await expect(page.getByTestId('menu-button')).toBeVisible();
       for (const id of ['rules-button', 'link-source', 'link-portfolio']) await expect(page.getByTestId(id)).toBeHidden();
       await page.getByTestId('menu-button').click();
