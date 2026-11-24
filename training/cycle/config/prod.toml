@@ -42,7 +42,7 @@ seed_floor_every = 4
 fixed_args = ["--imitation-iters","0","--two-styles","0.5","--partner-swap","0.2","--switch-hands","1,6","--v1-model","ai/models/bootstrap/zap-v1.zapw","--v1-manifest","ai/models/bootstrap/manifest.json","--heuristic-params","ai/models/heuristic-tuned.json","--four-players","0.5","--mineiro","0.5","--random-options","0.25","--lr","0.0003","--entropy","0.02","--magnet-kl","0.05","--magnet-every","20","--no-stats-share","0.15","--league-every","10","--eval-every","20","--eval-pairs","150","--panel-every","60","--panel-pairs","100"]
 
 [gate]
-stats = "empty"                        # "live" only after AI_ADAPT goes on
+stats = "live"                         # AI_ADAPT is on (DEPLOY.md, 9.2): every network is measured as the rooms play it
 threads = 4
 p0 = 0.5
 p1 = 0.515

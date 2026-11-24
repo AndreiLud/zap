@@ -82,7 +82,7 @@ describe('no remote binding, no test variable in production', () => {
     expect(cfg.vars.ALERT_FROM).toMatch(/^$|^[^@\s]+@andreiludescher\.com$/);
     expect(JSON.stringify(cfg)).not.toContain('ALERT_EMAIL');
     expect(cfg.vars.AI_MODE).toBe('net');
-    expect(cfg.vars.AI_ADAPT).toBe('off');
+    expect(['off', 'on']).toContain(cfg.vars.AI_ADAPT);
     expect(cfg.triggers).toEqual({ crons: ['0 4 * * *'] });
   });
 });

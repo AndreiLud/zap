@@ -73,10 +73,11 @@
     // human check answers 500 misconfigured on https while it is.
     "TURNSTILE_HOSTNAMES": "zap.andreiludescher.com",
     "AI_MODE": "net",
-    // In-match adaptation of an adaptive model (features v2): "off" until the conditions of switching
-    // it on hold (project_docs/ai.md, "What ships"). The bundled models ignore it: v2 was trained
-    // without the statistics (features v2-empty) and v1 has none.
-    "AI_ADAPT": "off",
+    // In-match adaptation of an adaptive model (features v2), on since 2026-11-24 (DEPLOY.md, 9.2). Only
+    // a version whose file carries the reading reads (the cycle publishes such a file only after its
+    // explorer test passed); the bundled models ignore it: v2 was trained without the statistics
+    // (features v2-empty) and v1 has none. "off" stops the reading for every version (DEPLOY.md, 9.5).
+    "AI_ADAPT": "on",
     // Ads: structure only, switched off (DEPLOY.md, "How to enable ads"). The build reads
     // ADS_ENABLED too, for the content security policy it writes into _headers.
     "ADS_ENABLED": "false",
