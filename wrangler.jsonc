@@ -28,7 +28,7 @@
   // database_id: a placeholder of zeros until the remote database exists; DEPLOY.md, section 1.6,
   // puts its id here (the first build fails with the placeholder).
   "d1_databases": [
-    { "binding": "DB", "database_name": "zap", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "worker/migrations" }
+    { "binding": "DB", "database_name": "zap", "database_id": "7485dc3c-c78f-462c-b75a-3e31f715a013", "migrations_dir": "worker/migrations" }
   ],
   "r2_buckets": [
     // Match records, written by the rooms when a match ends (no person in them); the daily receipts.
@@ -64,7 +64,7 @@
     // with the real Turnstile site key before the first deploy (and turns on Always Use HTTPS for
     // the zone, which the Strict-Transport-Security header relies on). .dev.vars keeps the test key
     // for the local sites.
-    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAGPwDG-XL5mLpUz2",
     // Hostnames a Turnstile token may come from, comma separated. Never empty in production: the
     // human check answers 500 misconfigured on https while it is.
     "TURNSTILE_HOSTNAMES": "zap.andreiludescher.com",
