@@ -2,11 +2,13 @@
 
 Portuguese version: [README.pt-BR.md](README.pt-BR.md)
 
-![A hand of truco against Zap in the browser, with a truco call, then the data page](project_docs/media/zap-en.gif)
+![Zap: the wordmark with the line "Truco contra uma IA que aprende", beside a wall of azulejo tiles with the TRUCO! panel and a hand of three cards](project_docs/media/cover.png)
 
 **Play:** [zap.andreiludescher.com/en](https://zap.andreiludescher.com/en/) · **How the AI learns, with every number:** [the data page](https://zap.andreiludescher.com/en/data)
 
 Zap is a free truco game in the browser, in the paulista and mineiro variants, 1 against 1 or 2 against 2, where you play with and against an AI called Zap. The AI is a small neural network trained by self-play and served in TypeScript from a Cloudflare Worker: no language model plays, chooses or explains any move.
+
+![A hand of truco against Zap in the browser, with a truco call, then the data page](project_docs/media/zap-en.gif)
 
 ## Contents
 

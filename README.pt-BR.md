@@ -2,11 +2,13 @@
 
 Versão em inglês: [README.md](README.md)
 
-![Uma mão de truco contra o Zap no navegador, com pedido de truco, e depois a página de dados](project_docs/media/zap-pt.gif)
+![Zap: a marca com a frase "Truco contra uma IA que aprende", ao lado de uma parede de azulejos com o painel TRUCO! e uma mão de três cartas](project_docs/media/cover.png)
 
 **Jogar:** [zap.andreiludescher.com](https://zap.andreiludescher.com/) · **Como a IA aprende, com todos os números:** [a página de dados](https://zap.andreiludescher.com/dados)
 
 O Zap é um jogo de truco gratuito no navegador, nas variantes paulista e mineiro, 1 contra 1 ou 2 contra 2, em que você joga com e contra uma IA chamada Zap. A IA é uma rede neural pequena, treinada jogando contra si mesma e servida em TypeScript a partir de um Worker da Cloudflare: nenhum modelo de linguagem joga, escolhe ou explica qualquer jogada.
+
+![Uma mão de truco contra o Zap no navegador, com pedido de truco, e depois a página de dados](project_docs/media/zap-pt.gif)
 
 ## Conteúdo
 
