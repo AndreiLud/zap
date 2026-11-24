@@ -1,0 +1,204 @@
+/* The project cover (project_docs/media/cover.png): a fixed 1440 by 900 canvas in the light theme.
+   Values follow the TRUCO panel (truco.css), the header brand and the start page of the client. */
+
+html,
+body {
+  margin: 0;
+  width: 1440px;
+  height: 900px;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.cover {
+  position: relative;
+  width: 1440px;
+  height: 900px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-text);
+}
+
+/* ------------------------------------------------------------------ The wall */
+
+/* The grout is the wall's ground (var(--line), as .truco__wall); tiles sit on it with a 4 px joint. */
+.wall {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--line);
+}
+
+.wall__tile {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.wall__tile svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ------------------------------------------------------------------ TRUCO! (.truco__word, .truco__letter) */
+
+.word {
+  position: absolute;
+  box-sizing: content-box;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  padding: 10px;
+  translate: -10px -10px;
+  border-radius: 18px;
+  background: var(--line);
+  box-shadow: 0 2px 0 rgb(23 24 28 / 0.06), 0 26px 48px -18px rgb(10 20 60 / 0.55);
+}
+
+.letter {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 9px;
+  background: var(--l-bg);
+  color: var(--l-fg);
+  font-family: var(--font-display);
+  font-size: 162px;
+  font-weight: 800;
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.letter::before {
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: var(--l-mod);
+  opacity: 0.5;
+  content: "";
+  translate: var(--mx) var(--my);
+}
+
+.letter > span {
+  position: relative;
+  translate: 0 2%;
+}
+
+.letter--0 {
+  --l-bg: var(--nos);
+  --l-fg: var(--nos-fg);
+  --l-mod: color-mix(in srgb, var(--nos) 70%, white);
+  --mx: -55%;
+  --my: -55%;
+}
+
+.letter--1 {
+  --l-bg: var(--eles);
+  --l-fg: var(--eles-fg);
+  --l-mod: color-mix(in srgb, var(--eles) 70%, white);
+  --mx: 55%;
+  --my: -55%;
+}
+
+.letter--2 {
+  --l-bg: var(--ocre-fill);
+  --l-fg: var(--ocre-fg);
+  --l-mod: color-mix(in srgb, var(--ocre-fill) 60%, white);
+  --mx: 55%;
+  --my: 55%;
+}
+
+.letter--3 {
+  --l-bg: var(--text);
+  --l-fg: var(--bg);
+  --l-mod: color-mix(in srgb, var(--text) 75%, var(--bg));
+  --mx: -55%;
+  --my: 55%;
+}
+
+/* ------------------------------------------------------------------ The hand (as .og-fan) */
+
+.fan {
+  position: absolute;
+  top: 536px;
+  width: 192px;
+  aspect-ratio: 200 / 280;
+  translate: -50% 0;
+}
+
+.fan__card {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 130%;
+  filter: drop-shadow(0 2px 2px rgb(10 20 60 / 0.25)) drop-shadow(0 16px 20px rgb(10 20 60 / 0.38));
+}
+
+.fan__card:nth-child(1) {
+  rotate: -16deg;
+}
+
+.fan__card:nth-child(2) {
+  translate: 0 -6%;
+}
+
+.fan__card:nth-child(3) {
+  rotate: 16deg;
+}
+
+/* ------------------------------------------------------------------ The wordmark and the line */
+
+/* Placed on whole pixels (no centering by translate), so the clip of the mark lands on the pixel grid
+   and leaves no hairline. Wordmark 156 + 34 + two lines of 50: 290 px tall, centred near 460. */
+.brand-block {
+  position: absolute;
+  left: 88px;
+  top: 315px;
+  width: 420px;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-family: var(--font-display);
+  font-size: 156px;
+  font-weight: 800;
+  font-variation-settings: "opsz" 96;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+/* The mark's cal corners melt into the paper as in the header; a 2% overscan inside a clip hides
+   the hairline that antialiasing leaves along the square's outer edge; only the ochre corners are
+   rounded, so no curve is cut across the cal ones. */
+.wordmark__mark {
+  flex: none;
+  width: 108px;
+  height: 108px;
+  overflow: hidden;
+  border-radius: 0 12px;
+  translate: 0 -6px;
+}
+
+.wordmark__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  scale: 1.04;
+}
+
+.line {
+  margin: 34px 0 0;
+  color: var(--text-2);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.25;
+}

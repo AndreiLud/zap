@@ -19,5 +19,5 @@
     "jsxImportSource": "preact",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "scripts/**/*.ts", "og/**/*", "vite.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "scripts/**/*.ts", "og/**/*", "cover/**/*", "vite.config.ts"]
 }

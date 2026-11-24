@@ -424,7 +424,7 @@ It writes its metrics (`metrics.jsonl`), the checkpoint, the current model file 
 | `shared/` | formats and code shared by the Worker, the client and the cycle |
 | `locales/` | the site's texts in Portuguese and English |
 | `tests/` | integration, end to end, performance, screenshots and simulations |
-| `tools/` | generators for the data page, the shouts, the social images and the README numbers |
+| `tools/` | generators for the data page, the shouts, the social images, the project cover (`project_docs/media/cover.png`) and the README numbers |
 | `project_docs/` | how each part works, in English |
 | `docker/`, `docker-compose.yml` | the images and services everything runs in |
 | `facts.json` | every measured number, with its date and method |

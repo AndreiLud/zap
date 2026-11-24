@@ -424,7 +424,7 @@ Ele grava as métricas (`metrics.jsonl`), o checkpoint, o arquivo do modelo atua
 | `shared/` | formatos e código usados pelo Worker, pelo cliente e pelo ciclo |
 | `locales/` | os textos do site em português e inglês |
 | `tests/` | integração, ponta a ponta, desempenho, capturas de tela e simulações |
-| `tools/` | geradores da página de dados, dos gritos, das imagens de compartilhamento e dos números dos READMEs |
+| `tools/` | geradores da página de dados, dos gritos, das imagens de compartilhamento, da capa do projeto (`project_docs/media/cover.png`) e dos números dos READMEs |
 | `project_docs/` | como cada parte funciona, em inglês |
 | `docker/`, `docker-compose.yml` | as imagens e os serviços em que tudo roda |
 | `facts.json` | todo número medido, com data e método |
