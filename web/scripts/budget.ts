@@ -70,12 +70,13 @@ export const M8_BASE = { entryJs: 32_281 + 21_396 + 14_224, tableOwnJs: 19_321 }
  * the data texts. What loads only when the reader comes near it or asks for it (replays.json and
  * F23's viewer, the plan's four chapters with sim.json, parts/chapters-load.ts, and the personal
  * page's replay) is apart, as the spec sets replays.json apart; those rows keep the spec's limits.
- * Two more rows guard the pages scrolled to the end, at limits above the spec's that wait for the
- * owner's approval: the JavaScript at 82,500, the 82,000 the integration raised it to (M7 DEVIATIONS,
- * integration item 4) plus the review fixes of 2026-11-23 to the reading chapter (the network
- * without reading head to head against its twin, the explorer titles scoped to the explorers
- * measured, the control named by the file it trained against), which took it to 82,212; the CSS at
- * 11,500, since six smaller files gzip to more than one (review fixes, M7 DEVIATIONS).
+ * Two more rows guard the pages scrolled to the end, at limits above the spec's. The JavaScript at
+ * 82,500, approved by the owner on 2026-11-24: the 82,000 the integration raised it to (M7
+ * DEVIATIONS, integration item 4) plus the review fixes of 2026-11-23 to the reading chapter (the
+ * network without reading head to head against its twin, the explorer titles scoped to the explorers
+ * measured, the control named by the file it trained against), which took it to 82,212. The CSS at
+ * 11,500, which still waits for the owner's approval, since six smaller files gzip to more than one
+ * (review fixes, M7 DEVIATIONS).
  */
 export const M7_BUDGET = { entryGrowth: 2_000, tableGrowth: 500, data: 60_000, dataAll: 82_500, replays: 12_000, vs: 30_000, css: 8_000, cssAll: 11_500 } as const;
 
