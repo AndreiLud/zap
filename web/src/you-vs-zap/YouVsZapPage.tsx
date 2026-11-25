@@ -3,7 +3,8 @@
 // new is stored on the server and nothing is sent anywhere: the page reads /api/me/data,
 // /api/me/matches/:id and /api/me/reading (the person's own), and the two public answers every
 // visitor gets, /api/live (the version in play, whether it reads during the match) and
-// /api/summary (the anchors of versions the cycle promoted).
+// /api/summary (the anchors of versions the cycle promoted), past the browser's cache
+// (public-answers.ts).
 //
 // Loading (5.1): without a game credential the page asks the person to confirm it is them (the
 // human check, as the You page (/voce) does). Then /api/me/data; the records come from the device cache
@@ -15,8 +16,7 @@ import { ApiError, api, type MyData } from '../api.ts';
 import { noteVerifiedUntil, withCheck } from '../check.ts';
 import { Link } from '../components/common.tsx';
 import { ensureAdult, isAdult, isGateStop } from '../consent.ts';
-import { normalizeSummary } from '../../../shared/summary-view.ts';
-import type { AnySummary, SummaryV2 } from '../../../shared/cycle-formats.ts';
+import type { SummaryV2 } from '../../../shared/cycle-formats.ts';
 import facts from '../data/generated/facts-view.json';
 import { fmt } from '../data/format.ts';
 import { t } from '../i18n.ts';
@@ -32,6 +32,7 @@ import { History } from './parts/History.tsx';
 import { Rating } from './parts/Rating.tsx';
 import { Reading } from './parts/Reading.tsx';
 import { YourData } from './parts/YourData.tsx';
+import { fetchLive, fetchSummary, type Served } from './public-answers.ts';
 import { forgetRecords, openRecordsCache, type CachedRecord } from './records-cache.ts';
 
 type View = { k: 'gate' } | { k: 'loading' } | { k: 'failed' } | { k: 'empty' } | { k: 'ready'; data: MyData };
@@ -45,38 +46,7 @@ interface Records {
   failed: boolean;
 }
 
-interface Served {
-  version: string;
-  adapt: boolean;
-}
-
 const SERVED_FACTS = (facts as unknown as { served: { version: string; readsOpponents: boolean } }).served;
-
-/** The version on the AI seats and whether it reads during the match (zap-live/1), or null. */
-async function fetchLive(): Promise<Served | null> {
-  try {
-    const res = await fetch('/api/live', { credentials: 'same-origin' });
-    if (!res.ok) return null;
-    const j = (await res.json()) as { schema?: unknown; current?: unknown; adapt?: unknown };
-    if (j.schema !== 'zap-live/1' || typeof j.current !== 'string') return null;
-    return { version: j.current, adapt: j.adapt === true };
-  } catch {
-    return null;
-  }
-}
-
-/** summary.json as served (/api/summary), in its zap-summary/2 view; null when there is none. */
-async function fetchSummary(): Promise<SummaryV2 | null> {
-  try {
-    const res = await fetch('/api/summary', { credentials: 'same-origin' });
-    if (!res.ok) return null;
-    const j = (await res.json()) as AnySummary;
-    if (j?.schema !== 'zap-summary/1' && j?.schema !== 'zap-summary/2') return null;
-    return normalizeSummary(j);
-  } catch {
-    return null;
-  }
-}
 
 function usable(c: CachedRecord): PersonMatch | null {
   try {

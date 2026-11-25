@@ -224,9 +224,10 @@ export function summaryFrom(status: number, json: unknown): SummaryState {
   }
 }
 
+/** One request to /api/summary, past the browser's cache for the same reason as fetchLive (live.ts). */
 export async function fetchSummary(): Promise<SummaryState> {
   try {
-    const r = await fetch('/api/summary', { headers: { accept: 'application/json' } });
+    const r = await fetch('/api/summary', { headers: { accept: 'application/json' }, cache: 'no-cache' });
     return summaryFrom(r.status, r.status === 200 ? await r.json() : null);
   } catch {
     return { kind: 'unavailable' };

@@ -341,7 +341,7 @@ No table. The page `/voce-contra-o-zap` (`web/src/you-vs-zap/`) computes the his
 
 ## The data page's public answers
 
-Two answers without a credential and without anything about a person, read by the data page and the Play page (`worker/src/public-data.ts`, routed in `worker/src/cf/index.ts`). Each is limited per IP key like the other routes without a credential (`RL_API`) and cached per Cloudflare location with the Cache API for its period, so D1 and R2 are read at most once per period there; a local test site (`TEST_RECORDS`) skips the cache.
+Two answers without a credential and without anything about a person, read by the data page, the Play page (`/api/live` only) and "You against Zap" (`worker/src/public-data.ts`, routed in `worker/src/cf/index.ts`). Each is limited per IP key like the other routes without a credential (`RL_API`) and cached per Cloudflare location with the Cache API for its period, so D1 and R2 are read at most once per period there; a local test site (`TEST_RECORDS`) skips the cache. The zone's Browser Cache TTL rewrites the `cache-control` of an answer that cache returns, so the stored copy also holds the intended value in the internal header `x-zap-cache-control`, and the Worker sends a cached answer with that value and without that header (`DEPLOY.md` section 8, item 1, checks this on the live site). The site's pages ask both with `cache: 'no-cache'`, past the browser's own cache (`web/src/live.ts`, `web/src/data/load.ts`, `web/src/you-vs-zap/public-answers.ts`).
 
 ### `GET /api/live` (`zap-live/1`)
 

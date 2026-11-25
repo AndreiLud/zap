@@ -2,11 +2,15 @@
 // the data page follows its rules: one request at start, one a minute while the page is visible,
 // none while hidden (and one at once when visible again), a pause after 30 polls without any
 // interaction, the last numbers kept when a request fails. Without polling, a single request.
+// Every request to /api/live and /api/summary, from the data page, the Play page and "You against
+// Zap", goes past the browser's cache.
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import headline from '../src/data/generated/headline.json' with { type: 'json' };
+import { fetchSummary } from '../src/data/load.ts';
 import { LIVE_IDLE_POLLS, LIVE_PERIOD_MS, LivePoller, type LiveState, type PollEnv } from '../src/data/live-poll.ts';
-import { parseLive, type LiveCounters } from '../src/live.ts';
+import { fetchLive, parseLive, type LiveCounters } from '../src/live.ts';
+import * as vsAnswers from '../src/you-vs-zap/public-answers.ts';
 
 const answer = (over: Record<string, unknown> = {}) => ({
   schema: 'zap-live/1',
@@ -43,6 +47,32 @@ describe('parseLive', () => {
     for (const bad of [null, 'x', {}, answer({ schema: 'zap-live/2' }), answer({ matches: -1 }), answer({ decisions: 1.5 }), answer({ adapt: 'on' }), answer({ humansVsZap: { matches: 1 } })]) {
       expect(parseLive(bad)).toBeNull();
     }
+  });
+});
+
+describe('the requests', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('ask the network on every open, reload and poll, never a copy the browser kept', async () => {
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => new Response(JSON.stringify(url === '/api/live' ? answer() : { error: 'no_summary' }), { status: url === '/api/live' ? 200 : 404 }));
+    vi.stubGlobal('fetch', fetchMock);
+    expect((await fetchLive())?.humanMatches).toBe(12);
+    expect(await fetchSummary()).toEqual({ kind: 'none' });
+    expect(fetchMock.mock.calls.map(([url, init]) => [url, init?.cache])).toEqual([
+      ['/api/live', 'no-cache'],
+      ['/api/summary', 'no-cache'],
+    ]);
+  });
+
+  it('of "You against Zap" ask the network every time too', async () => {
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) => new Response(JSON.stringify(url === '/api/live' ? answer({ current: 'v3', adapt: true }) : { error: 'no_summary' }), { status: url === '/api/live' ? 200 : 404 }));
+    vi.stubGlobal('fetch', fetchMock);
+    expect(await vsAnswers.fetchLive()).toEqual({ version: 'v3', adapt: true });
+    expect(await vsAnswers.fetchSummary()).toBeNull();
+    expect(fetchMock.mock.calls.map(([url, init]) => [url, init?.cache, init?.credentials])).toEqual([
+      ['/api/live', 'no-cache', 'same-origin'],
+      ['/api/summary', 'no-cache', 'same-origin'],
+    ]);
   });
 });
 

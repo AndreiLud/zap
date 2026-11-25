@@ -2,7 +2,7 @@
 // (migration 0008_live.sql, privacy.ts liveCountStatement), on node:sqlite with the real
 // migrations: a match counts once with its people's moves however often its batch repeats, the
 // answers hold aggregates only, summary.json passes only when valid, and the cache keeps only
-// public answers.
+// public answers and gives a stored one back with the Worker's own cache-control.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -13,6 +13,7 @@ import { DEFAULT_COST_SOLO, LIVE_COUNTER_ROWS } from '../src/brake.ts';
 import { RECORD_PREFIX, flushPending, type PendingRecord, type RecordStore } from '../src/pending-records.ts';
 import { matchRowStatements, newPseudonym, type MatchRow } from '../src/privacy.ts';
 import {
+  INTENDED_CACHE_CONTROL,
   LIVE_MAX_AGE_S,
   LIVE_SCHEMA,
   SUMMARY_MAX_AGE_S,
@@ -189,6 +190,69 @@ describe('GET /api/live and GET /api/summary answers', () => {
     await throughCache(null, key, answer(publicCacheControl(SUMMARY_MAX_AGE_S)), (p) => kept.push(p));
     expect(made).toBe(4);
     expect(publicCacheControl(SUMMARY_MAX_AGE_S)).toBe('public, max-age=300');
+  });
+
+  it('a stored answer reaches the browser with the Worker\'s cache-control, not the zone\'s', async () => {
+    const stored = new Map<string, Response>();
+    // As measured on the live site: the zone's Browser Cache TTL rewrites what the Cache API returns
+    // (DEPLOY.md's checks after a release confirm that a hit then goes out with the Worker's value).
+    // In Workers the headers of a cached Response may be immutable, so these throw on any change: a
+    // hit edited in place instead of rebuilt would become a 500 there and fails here.
+    const cache: PublicCache = {
+      match: async (k) => {
+        const r = stored.get(k.url)?.clone();
+        if (!r) return undefined;
+        const h = new Headers(r.headers);
+        h.set('cache-control', 'public, max-age=14400');
+        h.set('cf-cache-status', 'HIT');
+        const hit = new Response(r.body, { status: r.status, headers: h });
+        const immutable = () => {
+          throw new TypeError("Can't modify immutable headers.");
+        };
+        Object.assign(hit.headers, { set: immutable, delete: immutable, append: immutable });
+        return hit;
+      },
+      put: async (k, r) => void stored.set(k.url, r),
+    };
+    const kept: Promise<unknown>[] = [];
+    let made = 0;
+    let fresh: Response | null = null;
+    const answer = (cc: string, status = 200) => async () => {
+      made++;
+      fresh = new Response(`{"n":${made}}`, { status, headers: { 'cache-control': cc, 'x-content-type-options': 'nosniff' } });
+      return fresh;
+    };
+    const live = new Request('https://zap.example/api/live');
+    const miss = await throughCache(cache, live, answer(publicCacheControl(LIVE_MAX_AGE_S)), (p) => kept.push(p));
+    await Promise.all(kept);
+    // The miss goes out as made; the stored copy keeps its own period for the location.
+    expect(miss).toBe(fresh);
+    expect([miss.headers.get('cache-control'), miss.headers.has(INTENDED_CACHE_CONTROL)]).toEqual(['public, max-age=60', false]);
+    expect(stored.get(live.url)!.headers.get('cache-control')).toBe('public, max-age=60');
+    expect(stored.get(live.url)!.headers.get(INTENDED_CACHE_CONTROL)).toBe('public, max-age=60');
+    // The fake hit really refuses a change, as the Cache API's may.
+    expect((await cache.match(live))!.headers.delete).toThrow(/immutable/);
+    const hit = await throughCache(cache, live, answer(publicCacheControl(LIVE_MAX_AGE_S)), (p) => kept.push(p));
+    expect([await hit.text(), made, hit.status]).toEqual(['{"n":1}', 1, 200]);
+    expect(hit.headers.get('cache-control')).toBe('public, max-age=60');
+    expect(hit.headers.has(INTENDED_CACHE_CONTROL)).toBe(false);
+    expect(hit.headers.get('cf-cache-status')).toBe('HIT');
+    expect(hit.headers.get('x-content-type-options')).toBe('nosniff');
+    // The 404 of a missing summary is public too, with its own period and status.
+    const summary = new Request('https://zap.example/api/summary');
+    await throughCache(cache, summary, answer(publicCacheControl(SUMMARY_MAX_AGE_S), 404), (p) => kept.push(p));
+    await Promise.all(kept);
+    const again = await throughCache(cache, summary, answer(publicCacheControl(SUMMARY_MAX_AGE_S), 404), (p) => kept.push(p));
+    expect([again.status, again.headers.get('cache-control'), again.headers.has(INTENDED_CACHE_CONTROL), made]).toEqual([404, 'public, max-age=300', false, 2]);
+    // A failure is never stored, so no copy of it can come back with a period.
+    const failing = new Request('https://zap.example/api/live?failing');
+    const failed = await throughCache(cache, failing, answer('no-store', 503), (p) => kept.push(p));
+    await Promise.all(kept);
+    expect([stored.has(failing.url), failed.headers.get('cache-control'), failed.headers.has(INTENDED_CACHE_CONTROL)]).toEqual([false, 'no-store', false]);
+    // A copy stored by a Worker without the internal header: the browser asks again each time.
+    stored.set(live.url, new Response('{"n":0}', { headers: { 'cache-control': 'public, max-age=60' } }));
+    const old = await throughCache(cache, live, answer(publicCacheControl(LIVE_MAX_AGE_S)), (p) => kept.push(p));
+    expect([await old.text(), old.headers.get('cache-control')]).toEqual(['{"n":0}', 'no-cache']);
   });
 
   it('a refused summary.json is logged once per file', () => {

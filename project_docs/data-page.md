@@ -115,7 +115,7 @@ All from `summary.json`, and only from groups of at least 20 people.
 
 "Last weekly training" is `summary.training.finishedAt`, the cycle's training with people; before the first summary it says there was none yet. The training of the version in play is in F3 and F19.
 
-`GET /api/live` (`zap-live/1`), cached 60 seconds: `matches` counts finished matches with at least one person, `decisions` the moves people made themselves (a move the room made for a person is not counted). The page asks at load and then every minute while it is visible; it stops while the tab is hidden, and after 30 polls without a pointer, key or scroll it pauses until "Atualizar". A failed request keeps the last numbers and greys the dot.
+`GET /api/live` (`zap-live/1`), cached 60 seconds: `matches` counts finished matches with at least one person, `decisions` the moves people made themselves (a move the room made for a person is not counted). The page asks at load and then every minute while it is visible, each time past the browser's own cache (`cache: 'no-cache'`), so a reload never shows an older copy kept by the browser; it stops while the tab is hidden, and after 30 polls without a pointer, key or scroll it pauses until "Atualizar". A failed request keeps the last numbers and greys the dot.
 
 ## Checks
 

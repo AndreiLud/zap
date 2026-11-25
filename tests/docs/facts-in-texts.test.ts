@@ -205,7 +205,7 @@ const DEPLOY: Allow[] = [
   { token: '36', why: 'hours before a cycle is stopped (prod.toml max_cycle_hours); also the plan\'s assumption of about 36 messages per solo match', is: () => prod('schedule', 'max_cycle_hours') },
   { token: '48', why: 'random bytes the command of section 3 draws for SESSION_SECRET', is: () => Number(/randomBytes\((\d+)\)/.exec(read('DEPLOY.md'))?.[1]) },
   { token: '50', why: 'the suggested WAF rule: 50 requests per 10 seconds; the US$ 50 ceiling, a row of worker/dev/brake-table.ts' },
-  { token: '60', why: 'RL_API\'s 60 a minute; the 60 seconds a browser may keep an /api/live answer (LIVE_MAX_AGE_S)', is: () => [rateLimit('RL_API'), constant('worker/src/public-data.ts', 'LIVE_MAX_AGE_S')] },
+  { token: '60', why: 'RL_API\'s 60 a minute; the 60 seconds a Cloudflare location may keep an /api/live answer (LIVE_MAX_AGE_S)', is: () => [rateLimit('RL_API'), constant('worker/src/public-data.ts', 'LIVE_MAX_AGE_S')] },
   { token: '95%', why: 'the one sided 95% bound of the explorer rule, a method constant' },
   { token: '100', why: 'the 100 solo matches a day row of the brake table' },
   { token: '200', why: 'HTTP status 200' },

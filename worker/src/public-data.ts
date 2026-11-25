@@ -6,7 +6,9 @@
 //   which refuses any number built from a group of fewer than MIN_PEOPLE people (cells, scoreboard
 //   rows, people counts, disagreements). humansVsZap, the owner's one exception, is a total.
 // Both are cached per location with the Cache API (worker/src/cf/index.ts), so the storage behind
-// them is read at most once per period; local test sites skip the cache.
+// them is read at most once per period; local test sites skip the cache. An answer from that cache
+// carries the Worker's own cache-control again (throughCache), and the pages ask with no-cache, so
+// a browser never shows numbers older than the location's copy.
 //
 // Pure over SqlDb, strings and a cache interface, so the unit tests run it on node:sqlite.
 
@@ -94,18 +96,44 @@ export interface PublicCache {
 }
 
 /**
+ * Internal header of a stored copy: the cache-control the Worker meant for browsers. The zone's
+ * Browser Cache TTL rewrites the cache-control of an answer the Cache API returns (measured: a hit
+ * of /api/live came back with max-age=14400, four hours, instead of 60 seconds), so a hit takes
+ * its value from here; the browser never sees this header. Whether the rewrite lands before the
+ * Worker sees the hit, as assumed here, only the live site shows: DEPLOY.md's checks after a
+ * release look at a hit's headers and say which zone setting to change if it lands after.
+ */
+export const INTENDED_CACHE_CONTROL = 'x-zap-cache-control';
+
+/** A copy of the response with the headers changed by `edit`; a Response's own headers may be immutable. */
+function withHeaders(res: Response, edit: (h: Headers) => void): Response {
+  const headers = new Headers(res.headers);
+  edit(headers);
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
+
+/**
  * An answer through the cache: a stored one when the location has it, else a fresh one, stored
- * for its own max-age (the response's cache-control) while it is sent. Without a cache (local test
- * sites) every request makes a fresh answer.
+ * for its own max-age (the response's cache-control) while it is sent. A stored one goes out with
+ * the cache-control the fresh answer had, so a browser keeps it no longer than the Worker meant.
+ * Without a cache (local test sites) every request makes a fresh answer.
  */
 export async function throughCache(cache: PublicCache | null, key: Request, make: () => Promise<Response>, keep: (p: Promise<unknown>) => void): Promise<Response> {
   if (cache) {
     const hit = await cache.match(key).catch(() => undefined);
-    if (hit) return hit;
+    // A copy stored before the internal header existed has no intended value: the browser then
+    // asks again each time rather than keep the zone's period.
+    if (hit)
+      return withHeaders(hit, (h) => {
+        h.set('cache-control', h.get(INTENDED_CACHE_CONTROL) ?? 'no-cache');
+        h.delete(INTENDED_CACHE_CONTROL);
+      });
   }
   const res = await make();
-  // Only a public answer is kept: a failure (no-store) is made again on the next request.
-  if (cache && (res.headers.get('cache-control') ?? '').startsWith('public')) keep(cache.put(key, res.clone()).catch(() => undefined));
+  const cc = res.headers.get('cache-control') ?? '';
+  // Only a public answer is kept: a failure (no-store) is made again on the next request. The
+  // stored copy keeps its cache-control, which sets how long the location keeps it.
+  if (cache && cc.startsWith('public')) keep(cache.put(key, withHeaders(res.clone(), (h) => h.set(INTENDED_CACHE_CONTROL, cc))).catch(() => undefined));
   return res;
 }
 

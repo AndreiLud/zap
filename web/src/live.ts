@@ -44,10 +44,14 @@ export function parseLive(json: unknown): LiveCounters | null {
   };
 }
 
-/** One request to /api/live; null when it fails or answers something else. */
+/**
+ * One request to /api/live; null when it fails or answers something else. no-cache: the browser
+ * asks the network every time (an open, a reload, a poll) and never shows a copy it kept, even one
+ * an older Worker sent with the zone's four hour cache-control; the location's cache still answers.
+ */
 export async function fetchLive(): Promise<LiveCounters | null> {
   try {
-    const r = await fetch('/api/live', { headers: { accept: 'application/json' } });
+    const r = await fetch('/api/live', { headers: { accept: 'application/json' }, cache: 'no-cache' });
     return r.ok ? parseLive(await r.json()) : null;
   } catch {
     return null;
