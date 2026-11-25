@@ -54,18 +54,18 @@ A força é medida em pares duplicados: cada distribuição é jogada duas vezes
 -->
 <!-- facts:snapshot -->
 
-Retrato de 23/11/2026.
+Retrato de 25/11/2026.
 
 | Medida | Valor | Medido em |
 | --- | --- | --- |
-| A IA em jogo | v2: 461 entradas, 2 camadas ocultas de 256, um arquivo de 194 KB com pesos int8 | 22/11/2026 |
-| v2 contra jogadas ao acaso | 96,0% (de 95,5% a 96,4%) | 22/11/2026 |
-| v2 contra o jogador de regras | 78,8% (de 78,0% a 79,6%) | 22/11/2026 |
-| v2 contra o jogador de regras ajustado | 87,5% (de 86,8% a 88,2%) | 22/11/2026 |
-| v2 contra a v1, frente a frente | 69,6% (de 68,7% a 70,4%) | 22/11/2026 |
-| Portão de promoção da v2 contra a v1 | passou em todas as regras ([detalhes](#o-portão-de-promoção)) | 22/11/2026 |
-| As personagens contra uma dupla do Zap (o Zap contra ele mesmo: 50,0%) | Otávio 26,6%, Bento 32,0%, Lia 31,8%, Ravi 30,3%, Iara 41,0% | 22/11/2026 |
-| Tempo de decisão da v2 | 0,22 ms por decisão na mediana, 0,33 ms no p99; 2,09 ms no p99 para tudo o que a IA faz antes da próxima vez de uma pessoa | 23/11/2026 |
+| A IA em jogo | v3: 461 entradas, 2 camadas ocultas de 256, um arquivo de 194 KB com pesos int8 | 25/11/2026 |
+| v3 contra jogadas ao acaso | 95,7% (de 95,4% a 95,9%) | 25/11/2026 |
+| v3 contra o jogador de regras | 79,6% (de 79,1% a 80,1%) | 25/11/2026 |
+| v3 contra o jogador de regras ajustado | 89,4% (de 89,0% a 89,8%) | 25/11/2026 |
+| v3 contra a v2, frente a frente | 52,7% (de 52,1% a 53,2%) | 25/11/2026 |
+| Portão de promoção da v3 contra a v2 | passou em todas as regras ([detalhes](#o-portão-de-promoção)) | 25/11/2026 |
+| As personagens contra uma dupla do Zap (o Zap contra ele mesmo: 48,8%) | Otávio 28,4%, Bento 28,5%, Lia 30,3%, Ravi 30,7%, Iara 41,6% | 25/11/2026 |
+| Tempo de decisão da v3 | 0,43 ms por decisão na mediana, 0,51 ms no p99; 3,51 ms no p99 para tudo o que a IA faz antes da próxima vez de uma pessoa | 23/11/2026 |
 | Motor de regras, um núcleo, jogadas legais ao acaso | de 92.894 a 115.410 mãos por segundo, conforme a variante e o tamanho da mesa | 23/11/2026 |
 | Carregamento no celular (4G lento, CPU limitada, cache vazio) | maior elemento visível (LCP) em 1.108 ms na mediana (limite de 2.500 ms); mesa desenhada em 1.858 ms | 23/11/2026 |
 | Código da mesa, comprimido | 89 KB de JavaScript e 20 KB de CSS (limites de 120 KB e 25 KB) | 23/11/2026 |
@@ -74,7 +74,7 @@ Retrato de 23/11/2026.
 | Capacidade do freio no Workers Free, calculada com os custos medidos no site local | 1.111 partidas sozinho por dia com a reserva padrão (483 se as partidas durarem três vezes mais) | 23/11/2026 |
 | Linhas que uma sala grava no seu Durable Object | no máximo 37 numa partida sozinho (limite de 60), 145 numa sala com quatro pessoas (limite de 320) | 22/11/2026 |
 
-A força é medida em pares duplicados: cada distribuição é jogada duas vezes com os lugares trocados, para a sorte das cartas se anular, e um par vale 1, 0,5 ou 0. Cada rival jogou 4.000 pares nos quatro segmentos (paulista e mineiro, 1 contra 1 e 2 contra 2); o valor é a pontuação média por partida, com o intervalo de 95%. Nas mesmas distribuições a v1 fez 93,0%, 74,5% e 79,6% contra os três primeiros rivais. As personagens foram medidas em distribuições novas do portão, 400 pares por segmento. Velocidades e tempos foram medidos numa máquina virtual ociosa e sem AVX, sem nenhum treino dividindo a CPU.
+A força é medida em pares duplicados: cada distribuição é jogada duas vezes com os lugares trocados, para a sorte das cartas se anular, e um par vale 1, 0,5 ou 0. Cada rival jogou 10.000 pares nos quatro segmentos (paulista e mineiro, 1 contra 1 e 2 contra 2); o valor é a pontuação média por partida, com o intervalo de 95%. Nas mesmas distribuições a v2 fez 95,5%, 79,2% e 87,7% contra os três primeiros rivais. As personagens foram medidas em distribuições novas do portão, 200 pares por segmento. Para a v3, os rivais e os pares são os do painel congelado do portão que a promoveu. O tempo de decisão da v3 foi medido no arquivo que o teste do explorador julgou: a mesma rede, com o nome anterior. Velocidades e tempos foram medidos numa máquina virtual ociosa e sem AVX, sem nenhum treino dividindo a CPU.
 
 <!-- /facts:snapshot -->
 
@@ -147,7 +147,7 @@ Cada regra sozinha deixa passar uma candidata pior que a sua margem em no máxim
 
 **A janela com pessoas.** Depois de uma promoção, por 14 dias, 30% das partidas sozinho mantêm a versão anterior em todos os lugares da IA (o grupo de controle). Nas outras partidas a versão nova só ocupa lugares de adversário, nunca de parceira de uma pessoa. Uma vez por dia o ciclo compara com que frequência as pessoas ganham de cada grupo, com cada pessoa como um bloco num bootstrap. Quando os dois grupos têm pelo menos 200 partidas de pelo menos 20 pessoas cada um, e um limite inferior cauteloso da queda passa de 2 pontos, o ciclo volta para a versão anterior sozinho, e a ficha do modelo diz por quê. Com menos pessoas a sorte de poucos jogadores poderia parecer uma queda, então a conferência não decide e a versão nova fica quando a janela termina. O dono também pode voltar uma versão a qualquer momento com um comando, e nenhuma versão nova é promovida com uma janela aberta.
 
-**Por onde a v2 passou.** A v2 enfrentou este portão contra a v1 em 22/11/2026, numa cópia local do ciclo com os tamanhos de produção, e passou em todas as regras. O teste sequencial aceitou depois de 400 pares (média de 70,3%). Por segmento, com 2.500 pares cada: 80,5% no paulista 1 contra 1, 67,5% no paulista 2 contra 2, 72,5% no mineiro 1 contra 1 e 60,8% no mineiro 2 contra 2. Contra o painel, com 10.000 pares por membro, o menor limite unilateral de uma diferença ficou 1,9 pontos acima de zero. Nenhuma janela com pessoas rodou ainda.
+**Por onde a v3 passou.** A v3 enfrentou este portão contra a v2 em 25/11/2026, no servidor de treino, com a leitura ativa, e passou em todas as regras. O teste sequencial aceitou depois de 800 pares (média de 52,6%). Por segmento, com 2.500 pares cada: 51,6% no paulista 1 contra 1, 54,7% no paulista 2 contra 2, 51,1% no mineiro 1 contra 1 e 52,0% no mineiro 2 contra 2. Contra o painel, com 10.000 pares por membro, o menor limite unilateral de uma diferença ficou 0,13 pontos abaixo de zero, dentro da margem de 1 ponto. A janela dela com pessoas vai até 09/12/2026.
 
 <!-- /facts:gate -->
 
@@ -160,7 +160,7 @@ As regras e suas taxas de erro estão explicadas em [`project_docs/cycle.md`](pr
 
 * **Modelo de comportamento humano**, uma rede que joga como as pessoas e entra no treino como adversária e como parceira: depois de {th.humanModelMatches:int} partidas válidas de pelo menos {th.humanModelDevices:int} aparelhos, e só quando prevê as decisões das pessoas melhor que uma referência simples.
 * **Gêmea sem dados humanos**: sempre que o modelo humano estiver no treino, o ciclo também treina uma gêmea com o mesmo ponto de partida, a mesma semente e o mesmo processamento, mas sem ele. A diferença entre as duas, lida contra a distância entre duas gêmeas que só mudam de semente, é como "os dados das pessoas deixaram a IA mais forte" vai ser medido. A página de dados vai mostrar onde os dados humanos somam força e onde não somam.
-* **Perfil de cada pessoa**: o painel "Como o Zap te lê", na página Você, compara as contagens da própria pessoa com valores da população, que passam a vir das pessoas quando {th.priorsPeople:int} delas têm observações suficientes de um número, e até lá vêm do jogo da própria IA. Usar o perfil para a IA se adaptar a uma pessoa de uma partida para outra exige {th.adaptDecisions:int} decisões dessa pessoa e ainda não foi construído.
+* **Perfil de cada pessoa**: o painel "Como o Zap te lê", na página Você, compara as contagens da própria pessoa com valores da população, que passam a vir das pessoas quando {th.priorsPeople:int} delas têm observações suficientes de um número, e até lá vêm do jogo da própria IA. O perfil serve só para a pessoa ver: a IA não o usa para se adaptar a uma pessoa de uma partida para outra, e isso não vai ser construído.
 * **Tipos de jogador**: a partir de {th.playerTypes:int} pessoas com leitura completa.
 * **Sétima personagem**, o modelo humano na mesa: depois que o modelo humano passar no teste dele e o Worker passar a servi-lo.
 * **Dados abertos** sob CC BY 4.0, nas releases deste repositório no GitHub: a partir de {th.openDataMatches:int} partidas humanas válidas, com cada célula cobrindo pelo menos {th.minCellPeople:int} pessoas.
@@ -168,11 +168,11 @@ As regras e suas taxas de erro estão explicadas em [`project_docs/cycle.md`](pr
 -->
 <!-- facts:human -->
 
-Nenhuma partida com pessoas foi contada ainda, e a v2 foi treinada só jogando contra si mesma. Então "uma IA treinada por quem joga" descreve o projeto; ainda não é um resultado medido. As camadas que aprendem com pessoas estão escritas e testadas, e cada uma liga sozinha quando o ciclo semanal encontra dados suficientes. Até lá o ciclo treina sem elas.
+Pessoas já jogaram contra uma versão do Zap numa janela de teste, mas nenhuma partida com pessoas treinou o Zap ainda: a v3 foi treinada só jogando contra si mesma. Então "uma IA treinada por quem joga" descreve o projeto; ainda não é um resultado medido. As camadas que aprendem com pessoas estão escritas e testadas, e cada uma liga sozinha quando o ciclo semanal encontra dados suficientes. Até lá o ciclo treina sem elas.
 
 * **Modelo de comportamento humano**, uma rede que joga como as pessoas e entra no treino como adversária e como parceira: depois de 500 partidas válidas de pelo menos 50 aparelhos, e só quando prevê as decisões das pessoas melhor que uma referência simples.
 * **Gêmea sem dados humanos**: sempre que o modelo humano estiver no treino, o ciclo também treina uma gêmea com o mesmo ponto de partida, a mesma semente e o mesmo processamento, mas sem ele. A diferença entre as duas, lida contra a distância entre duas gêmeas que só mudam de semente, é como "os dados das pessoas deixaram a IA mais forte" vai ser medido. A página de dados vai mostrar onde os dados humanos somam força e onde não somam.
-* **Perfil de cada pessoa**: o painel "Como o Zap te lê", na página Você, compara as contagens da própria pessoa com valores da população, que passam a vir das pessoas quando 100 delas têm observações suficientes de um número, e até lá vêm do jogo da própria IA. Usar o perfil para a IA se adaptar a uma pessoa de uma partida para outra exige 150 decisões dessa pessoa e ainda não foi construído.
+* **Perfil de cada pessoa**: o painel "Como o Zap te lê", na página Você, compara as contagens da própria pessoa com valores da população, que passam a vir das pessoas quando 100 delas têm observações suficientes de um número, e até lá vêm do jogo da própria IA. O perfil serve só para a pessoa ver: a IA não o usa para se adaptar a uma pessoa de uma partida para outra, e isso não vai ser construído.
 * **Tipos de jogador**: a partir de 200 pessoas com leitura completa.
 * **Sétima personagem**, o modelo humano na mesa: depois que o modelo humano passar no teste dele e o Worker passar a servi-lo.
 * **Dados abertos** sob CC BY 4.0, nas releases deste repositório no GitHub: a partir de 1.000 partidas humanas válidas, com cada célula cobrindo pelo menos 20 pessoas.
@@ -270,13 +270,15 @@ Essa rede sem leitura faz {reading.offH2h:pct1} (de {reading.offH2hLo:pct1} a {r
 -->
 <!-- facts:reading -->
 
-**Situação: pronta, fora do ar.** A versão em jogo, v2 (features `v2-empty`), não lê nada sobre ninguém, e `AI_ADAPT` está `off`. O teste do explorador passa no arquivo candidato (SHA-256 `7223c227`, rede de segurança Bmax 0,2, nHalf 1): os 9 exploradores medidos contra ele ficam dentro do limite de 1 ponto; o maior limite superior é de 0,77 pontos, do `neverRaises>bluffer@3/same`. Um explorador é um adversário feito para fingir um padrão e depois mudar, para a leitura se enganar com ele. A leitura só entra no ar se o dono adotar esse arquivo pelo ciclo de treino: ele vira a próxima versão, precisa passar pelo portão completo com a leitura ativa e depois joga contra pessoas por 14 dias, com 30% das partidas rápidas mantidas na versão anterior para comparar. É esse teste com pessoas que decide se ela fica. Veredito de 23/11/2026.
+**Situação: em teste com pessoas.** A versão em jogo, v3 (features `v2`), lê os fatos públicos da partida atual, e `AI_ADAPT` está `on`. Ela foi adotada pelo ciclo de treino em 25/11/2026, passou pelo portão completo com a leitura ativa e joga contra pessoas até 09/12/2026: 30% das partidas rápidas mantêm a v2 em todos os lugares da IA para comparar, e nas outras a v3 só ocupa lugares de adversário, nunca de parceira de uma pessoa. Uma vez por dia o ciclo compara com que frequência as pessoas ganham de cada versão. Quando cada grupo tem 20 pessoas, a página de dados mostra essa comparação, e o ciclo tira a v3 do ar sozinho se as pessoas ganharem dela claramente mais vezes. É esse teste que decide se a leitura fica.
 
-Para dar a escala: no mesmo arquivo candidato, a leitura soma 0,24 pontos à pontuação do Zap contra os estilos de adversário do teste (de 0,13 a 0,35).
+O teste do explorador passou para a rede da v3: ela tem os mesmos pesos do arquivo com SHA-256 `7223c227` (rede de segurança Bmax 0,2, nHalf 1), e os 9 exploradores medidos contra esse arquivo ficam dentro do limite de 1 ponto; o maior limite superior é de 0,77 pontos, do `neverRaises>bluffer@3/same`. Um explorador é um adversário feito para fingir um padrão e depois mudar, para a leitura se enganar com ele. Veredito de 23/11/2026.
+
+Para dar a escala: na rede da v3, a leitura soma 0,24 pontos à pontuação do Zap contra os estilos de adversário do teste (de 0,13 a 0,35).
 
 Duas medidas do mesmo arquivo pesam contra ele. No confronto direto com a sua gêmea, o mesmo treino sem as estatísticas, ele faz 49,1% (de 48,3% a 49,9%), então não é mais forte no geral. Por mais uma medida, a base dele é mais fácil de explorar: um explorador treinado contra ele por aprendizado por reforço tira dele 3,44 pontos a mais (de 2,60 a 4,29) do que um explorador de controle, treinado do mesmo jeito contra a v2, tira da gêmea. O controle foi medido contra a gêmea, não contra a v2 contra a qual treinou, então essa comparação é menos limpa que a anterior. O que esse explorador explora não é a leitura: ela custa 1,00 pontos a ele.
 
-Depois de uma adoção, uma mesa com "Não adaptar a mim" joga o mesmo arquivo sem leitura, que faz 48,5% (de 47,7% a 49,4%) no confronto direto com a gêmea: ele é mais fraco, então isso joga a favor dessa pessoa. Com o `AI_ADAPT` desligado toda mesa jogaria essa rede mais fraca, por isso a leitura então se desliga com a volta do ciclo para a versão anterior, e não com o `AI_ADAPT` desligado.
+Uma mesa com "Não adaptar a mim" joga com a v3 sem leitura. Essa rede faz 48,5% (de 47,7% a 49,4%) no confronto direto com a gêmea: é mais fraca, então isso joga a favor dessa pessoa. Com o `AI_ADAPT` desligado toda mesa jogaria com ela, por isso a leitura se desliga com a volta do ciclo para a versão anterior, e não com o `AI_ADAPT` desligado.
 
 <!-- /facts:reading -->
 
@@ -329,7 +331,7 @@ flowchart LR
 * **Sem contas.** Um segredo aleatório num cookie HttpOnly identifica o navegador, e o servidor guarda só o hash dele. Cada pessoa recebe um pseudônimo aleatório e pode escolher um apelido, que passa por um filtro. Nenhum email, nenhuma senha e nenhum endereço IP são guardados; os limites de requisição usam um hash do IP com uma chave que muda todo dia.
 * **Só para adultos, por autodeclaração.** Uma tela neutra pede o ano de nascimento numa lista. Só "adulto: sim" e o horário são guardados, e o ano nunca sai do navegador. Quem diz ser menor de idade pode ler as regras e a página de dados, mas não joga, e nada sobre essa pessoa chega ao servidor.
 * **Os registros das partidas não têm a pessoa.** Um registro no R2 leva só o id da partida e os números dos lugares. O vínculo entre uma pessoa e seus lugares fica no D1 e desaparece quando a pessoa apaga seus dados, ou depois de um ano sem jogar. A página "Você contra o Zap" guarda uma cópia dos registros da pessoa naquele navegador, até ela apagar seus dados ali ou usar "Esquecer as partidas guardadas neste aparelho".
-* **Apagar e baixar na hora,** na página Você, com um código de recuperação para levar o histórico a outro navegador. "Não adaptar a mim" apaga os contadores de estilo e não guarda novos.
+* **Apagar e baixar na hora,** na página Você, com um código de recuperação para levar o histórico a outro navegador. "Não adaptar a mim" apaga os contadores de estilo, não guarda novos e, a partir da partida seguinte, deixa a mesa dessa pessoa sem leitura.
 * **Nada escondido sai do servidor durante a partida.** A sala manda a cada lugar só o que aquele lugar pode ver: nenhuma mensagem leva carta escondida de outro jogador, cartas jogadas cobertas nunca são reveladas durante a partida, e a semente de cada mão só aparece depois que a partida termina. A IA recebe a mesma visão que uma pessoa tem no lugar dela.
 * **Números públicos e dados abertos têm piso.** Fora os totais do site (partidas jogadas, jogadas feitas, partidas que as pessoas ganharam do Zap), um número feito com dados de pessoas só é publicado para um grupo de pelo menos {th.minCellPeople:int} pessoas diferentes. As releases de dados abertos dão a cada partida um código aleatório novo, datas em semanas ISO e tempos de decisão em faixas, mostram números de estilo só em agregados e deixam de fora quem escolheu "Fora dos dados abertos" ou apagou seus dados. Uma release publicada não pode ser retirada, e o aviso diz isso.
 * **Onde os dados ficam.** As salas rodam no leste da América do Norte, e a Cloudflare pode guardar dados do D1 e do R2 fora do Brasil; as releases de dados abertos ficam no GitHub.
@@ -340,7 +342,7 @@ flowchart LR
 * **Sem contas.** Um segredo aleatório num cookie HttpOnly identifica o navegador, e o servidor guarda só o hash dele. Cada pessoa recebe um pseudônimo aleatório e pode escolher um apelido, que passa por um filtro. Nenhum email, nenhuma senha e nenhum endereço IP são guardados; os limites de requisição usam um hash do IP com uma chave que muda todo dia.
 * **Só para adultos, por autodeclaração.** Uma tela neutra pede o ano de nascimento numa lista. Só "adulto: sim" e o horário são guardados, e o ano nunca sai do navegador. Quem diz ser menor de idade pode ler as regras e a página de dados, mas não joga, e nada sobre essa pessoa chega ao servidor.
 * **Os registros das partidas não têm a pessoa.** Um registro no R2 leva só o id da partida e os números dos lugares. O vínculo entre uma pessoa e seus lugares fica no D1 e desaparece quando a pessoa apaga seus dados, ou depois de um ano sem jogar. A página "Você contra o Zap" guarda uma cópia dos registros da pessoa naquele navegador, até ela apagar seus dados ali ou usar "Esquecer as partidas guardadas neste aparelho".
-* **Apagar e baixar na hora,** na página Você, com um código de recuperação para levar o histórico a outro navegador. "Não adaptar a mim" apaga os contadores de estilo e não guarda novos.
+* **Apagar e baixar na hora,** na página Você, com um código de recuperação para levar o histórico a outro navegador. "Não adaptar a mim" apaga os contadores de estilo, não guarda novos e, a partir da partida seguinte, deixa a mesa dessa pessoa sem leitura.
 * **Nada escondido sai do servidor durante a partida.** A sala manda a cada lugar só o que aquele lugar pode ver: nenhuma mensagem leva carta escondida de outro jogador, cartas jogadas cobertas nunca são reveladas durante a partida, e a semente de cada mão só aparece depois que a partida termina. A IA recebe a mesma visão que uma pessoa tem no lugar dela.
 * **Números públicos e dados abertos têm piso.** Fora os totais do site (partidas jogadas, jogadas feitas, partidas que as pessoas ganharam do Zap), um número feito com dados de pessoas só é publicado para um grupo de pelo menos 20 pessoas diferentes. As releases de dados abertos dão a cada partida um código aleatório novo, datas em semanas ISO e tempos de decisão em faixas, mostram números de estilo só em agregados e deixam de fora quem escolheu "Fora dos dados abertos" ou apagou seus dados. Uma release publicada não pode ser retirada, e o aviso diz isso.
 * **Onde os dados ficam.** As salas rodam no leste da América do Norte, e a Cloudflare pode guardar dados do D1 e do R2 fora do Brasil; as releases de dados abertos ficam no GitHub.
@@ -363,10 +365,10 @@ Isto não é aconselhamento jurídico: é como um projeto pessoal pensa os seus 
 <!-- facts:limits -->
 
 * **As salas ficam no leste da América do Norte.** A Cloudflare não tem região de Durable Objects na América do Sul, então uma sala aberta do Brasil roda nos Estados Unidos, e cada jogada atravessa essa distância.
-* **A leitura está desligada** (veja [acima](#a-leitura-do-adversário-durante-a-partida)), então o Zap de hoje joga do mesmo jeito contra todo mundo.
-* **Os estilos das personagens se misturam.** Num teste que distingue duas personagens a partir de trechos do jogo delas, 3 de 15 pares chegam à acurácia alvo de 80% com o intervalo inteiro, e 10 ficam abaixo dela; a Iara é distinguida do Zap em 54,3% das vezes, pouco melhor que cara ou coroa. O Otávio é claramente o mais fácil e a Iara a mais difícil depois do Zap, enquanto Bento, Lia e Ravi são mais ou menos igualmente difíceis.
+* **A leitura ainda está no teste com pessoas** (veja [acima](#a-leitura-do-adversário-durante-a-partida)): ela ainda pode sair do ar, e 30% das partidas rápidas mantêm a v2 até 09/12/2026.
+* **Os estilos das personagens se misturam.** Num teste que distingue duas personagens a partir de trechos do jogo delas, medido na v2, 3 de 15 pares chegam à acurácia alvo de 80% com o intervalo inteiro, e 10 ficam abaixo dela; a Iara é distinguida do Zap em 54,3% das vezes, pouco melhor que cara ou coroa. O Otávio é claramente o mais fácil e a Iara a mais difícil depois do Zap, enquanto Bento, Lia e Ravi são mais ou menos igualmente difíceis.
 * **Workers Free e o freio.** O site roda no plano gratuito da Cloudflare, cujos limites diários são da conta inteira e divididos com os outros projetos do dono. Antes de uma partida começar, o Worker reserva o custo típico dela; uma partida que levaria algum limite além de 80% dele, menos uma reserva para os outros projetos (50% de cada limite por padrão), não começa, e a pessoa lê quando pode voltar. Com esses valores o freio admite 1.111 partidas sozinho por dia, ou 483 se as partidas reais durarem três vezes mais que as simuladas. Esses custos foram medidos no site local; em produção o gasto real substitui a estimativa conforme as partidas terminam.
-* **Ainda não há números de produção.** Todo número aqui vem de execuções locais. O portão da v2 rodou numa cópia local do ciclo de treino, a janela com pessoas nunca rodou, e ninguém de fora do projeto jogou.
+* **Números de programas.** Os números de força, do portão e das personagens vêm de jogos entre programas; como as pessoas se saem contra o Zap está na página de dados, onde um número feito com jogos de pessoas precisa de um grupo de pelo menos 20 pessoas.
 * **Duas variantes, um conjunto de regras da casa.** Paulista e mineiro com os padrões e as opções de sala de [`project_docs/rules.md`](project_docs/rules.md); muitas mesas jogam com outras regras da casa.
 
 <!-- /facts:limits -->

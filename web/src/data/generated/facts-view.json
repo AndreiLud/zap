@@ -2,14 +2,14 @@
   "provenance": {
     "script": "tools/data/facts-view.ts",
     "command": "docker compose run --rm -T node node tools/data/facts-view.ts",
-    "measuredAt": "2026-11-25T09:57:11.363Z",
+    "measuredAt": "2026-11-25T11:16:50.286Z",
     "node": "v24.22.2",
     "cpu": "QEMU Virtual CPU version 2.5+",
-    "commit": "926ca9245b8266b42dbab8ecda66158dc1ac6466",
+    "commit": "9010463388403385966a86b9580aadbb13bbad97",
     "inputs": [
       {"path":"ai/models/bootstrap/manifest-v2.json","sha256":"555a92c8f28cb31704d4761aa615b1929b65872d7bd19c269335673b07c6d3d4"},
       {"path":"ai/models/bootstrap/zap-v2.zapw","sha256":"afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632"},
-      {"path":"facts.json","sha256":"3cf3e0376fa2dca34e8f21f47510a96a83a4bc8a43127db69538fabc3e1bd19d"},
+      {"path":"facts.json","sha256":"b82b6fb62334c00e4b1c14e53d23d5c1112acedfc5215171cf7bfc8cc6c6b9ea"},
       {"path":"tools/data/facts-view.ts","sha256":"e2329f6bbaf0312c7cfe889082b94f1ca3eb8c76ec762fb5d774abdcf4ea72e7"},
       {"path":"tools/data/sources.json","sha256":"a05b953a29bed08b15797d44cbe17eecc7968a7a1817924018e1f6c9a3f738f5"},
       {"path":"wrangler.jsonc","sha256":"150014ba9dfbab48a2199770abe918f3cb89bb1c216d62a2aa1326347c05a97c"}
@@ -27,14 +27,14 @@
     "weights": 188176
   },
   "served": {
-    "version": "v2",
+    "version": "v3",
     "AI_ADAPT": "on",
-    "releaseAI_ADAPT": "off",
-    "readsOpponents": false,
+    "releaseAI_ADAPT": "on",
+    "readsOpponents": true,
     "explorerCriterionPass": true,
-    "carried": false,
+    "carried": true,
     "rolledBack": null,
-    "judged": null,
+    "judged": true,
     "criterionSha": "7223c227"
   },
   "derived": {"twinServed":false,"evidenceModel":"v1","headToHeadJudged":true,"controlJudged":true,"controlTrainedOnServed":true,"controlMeasuredOnOwn":false},
@@ -1058,6 +1058,67 @@
           "pairs": 4000
         },
         "adaptation": {"AI_ADAPT":"off"}
+      },
+      "v3": {
+        "date": "2026-11-25",
+        "version": "v3",
+        "file": "models/v3.zapw",
+        "sha256": "23b5a75e6e77f41fefdff6ac4c5b5a3d861b18452209cf1b7da1b6b8b0596c1c",
+        "features": "v2",
+        "gate": {
+          "stats": "live",
+          "pass": true,
+          "sprt": {"decision":"accept","pairs":800,"mean":0.52563},
+          "segments": {
+            "paulista-2": {"pairs":2500,"mean":0.5164},
+            "paulista-4": {"pairs":2500,"mean":0.547},
+            "mineiro-2": {"pairs":2500,"mean":0.511},
+            "mineiro-4": {"pairs":2500,"mean":0.5196}
+          },
+          "panel": [
+            {
+              "member": "random",
+              "pairs": 10000,
+              "candidate": {"mean":0.9565,"lo":0.9537,"hi":0.9593},
+              "current": {"mean":0.95475,"lo":0.9519,"hi":0.9576},
+              "diff": {"mean":0.00175,"lo95":-0.00128},
+              "pass": true
+            },
+            {
+              "member": "base",
+              "pairs": 10000,
+              "candidate": {"mean":0.7962,"lo":0.79113,"hi":0.80127},
+              "current": {"mean":0.79195,"lo":0.78689,"hi":0.79701},
+              "diff": {"mean":0.00425,"lo95":-0.00044},
+              "pass": true
+            },
+            {
+              "member": "tuned",
+              "pairs": 10000,
+              "candidate": {"mean":0.89435,"lo":0.89025,"hi":0.89845},
+              "current": {"mean":0.8774,"lo":0.87302,"hi":0.88178},
+              "diff": {"mean":0.01695,"lo95":0.01275},
+              "pass": true
+            },
+            {
+              "member": "v1",
+              "pairs": 10000,
+              "candidate": {"mean":0.70915,"lo":0.70345,"hi":0.71485},
+              "current": {"mean":0.6983,"lo":0.69263,"hi":0.70397},
+              "diff": {"mean":0.01085,"lo95":0.00564},
+              "pass": true
+            },
+            {
+              "member": "v2",
+              "pairs": 10000,
+              "candidate": {"mean":0.52665,"lo":0.52142,"hi":0.53188},
+              "current": {"mean":0.5001,"lo":0.49519,"hi":0.50501},
+              "diff": {"mean":0.02655,"lo95":0.02074},
+              "pass": true
+            }
+          ]
+        },
+        "adaptation": {"AI_ADAPT":"on"}
       }
     },
     "adaptation": {

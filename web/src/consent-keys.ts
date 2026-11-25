@@ -5,7 +5,7 @@
 export const ADULT_KEY = 'zap.adult';
 /** The version of the notice the person read ("Entendi"). A new version shows the notice again. */
 export const NOTICE_KEY = 'zap.notice';
-export const NOTICE_VERSION = '2026-11-22';
+export const NOTICE_VERSION = '2026-11-25';
 
 /**
  * The version of the notice to show: NOTICE_VERSION while ads are off, and its "+ads" form while

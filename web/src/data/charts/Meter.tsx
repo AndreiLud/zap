@@ -1,11 +1,7 @@
-// A threshold meter (DATA-SPEC F24, F25 empty, F26 empty, the personal adaptation meter): a lock
-// or a check, the part's name, its state in words, and a bar that fills with value / needed. A
-// count that is not public (null, under the privacy minimum) draws no fill and says so in words;
-// the bar carries the same words as its accessible name. Plain HTML, used inside a plain figure or
-// any block of a page.
-
-import type { Key } from '../../i18n.ts';
-import { t } from '../../i18n.ts';
+// A threshold meter (DATA-SPEC F24, F25 empty, F26 empty): a lock or a check, the part's name, its
+// state in words, and a bar that fills with value / needed. A count that is not public (null, under
+// the privacy minimum) draws no fill and says so in words; the bar carries the same words as its
+// accessible name. Plain HTML, used inside a plain figure or any block of a page.
 
 export interface MeterProps {
   /** The part's name ("Ranking contra o Zap"). */
@@ -63,9 +59,4 @@ export function Meter(p: MeterProps) {
       </div>
     </div>
   );
-}
-
-/** The two state words most meters use, from the data area: on or waiting. */
-export function meterState(on: boolean, keys: { on: Key; waiting: Key }): string {
-  return t(on ? keys.on : keys.waiting);
 }

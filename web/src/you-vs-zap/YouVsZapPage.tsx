@@ -262,7 +262,7 @@ export function YouVsZap({ s }: { s: AppState }) {
           ) : null}
           <History matches={records.list} />
           <Rating matches={records.list} complete={records.complete} version={served.version} summary={summary} />
-          <Reading inMatch={served.adapt} adaptOn={summary?.layers.adaptation.on === true} />
+          <Reading inMatch={served.adapt} />
           <Abandons abandons={data.device.abandons} total={data.matches.length} matches={records.list} />
           <BestHands matches={records.list} complete={records.complete} />
           <YourData onForget={() => forgetRecords()} />

@@ -191,16 +191,18 @@ describe('F18 and F19', () => {
     expect(find.twinTitle(null).key).toBe('data.f18.empty');
   });
 
-  it('builds the history from facts.json alone: v2 promoted and in play, v1 initial', () => {
-    const items = historyItems(FV, null, 'v2');
-    expect(items.map((i) => [i.version, i.result, i.inPlay])).toEqual([
-      ['v2', 'promoted', true],
-      ['v1', 'bootstrap', false],
-    ]);
-    expect(items[0].date).toBe(Date.parse(FV.ai.releases.v2!.date));
-    expect(items[1].date).toBe(Date.parse(FV.ai.bootstrapModel.previous!.createdAt));
-    expect(items.every((i) => i.data === null && i.tuned !== null)).toBe(true);
-    expect(plain(find.say(F.pt, find.historyTitle(items, F.pt)))).toBe('2 versões até hoje.');
+  it('builds the history from facts.json alone: every release, newest first, then v1 initial, the version in play marked', () => {
+    const inPlay = FV.served.version;
+    const items = historyItems(FV, null, inPlay);
+    const releases = Object.keys(FV.ai.releases).sort((a, b) => Number(b.slice(1)) - Number(a.slice(1)));
+    expect(releases).toContain('v2');
+    expect(items.map((i) => [i.version, i.result, i.inPlay])).toEqual([...releases.map((v) => [v, 'promoted', v === inPlay]), ['v1', 'bootstrap', false]]);
+    releases.forEach((v, i) => expect(items[i].date).toBe(Date.parse(FV.ai.releases[v]!.date)));
+    expect(items.at(-1)!.date).toBe(Date.parse(FV.ai.bootstrapModel.previous!.createdAt));
+    // The tuned rival's score comes from each version's strength table, when facts.json has one.
+    expect(items.every((i) => i.data === null && (i.tuned !== null) === (FV.ai.strengthByVersion[i.version] !== undefined))).toBe(true);
+    expect(items.filter((i) => i.tuned !== null).map((i) => i.version)).toEqual(expect.arrayContaining(['v2', 'v1']));
+    expect(plain(find.say(F.pt, find.historyTitle(items, F.pt)))).toBe(`${items.length} versões até hoje.`);
   });
 
   it('joins the summary: a newer version, its data and its window with people', () => {

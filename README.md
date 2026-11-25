@@ -54,18 +54,18 @@ Strength is measured in duplicate pairs: every deal is played twice with the sea
 -->
 <!-- facts:snapshot -->
 
-Snapshot of 23 Nov 2026.
+Snapshot of 25 Nov 2026.
 
 | Measure | Value | Measured |
 | --- | --- | --- |
-| The AI in play | v2: 461 inputs, 2 hidden layers of 256, a 194 KB file of int8 weights | 22 Nov 2026 |
-| v2 against random play | 96.0% (from 95.5% to 96.4%) | 22 Nov 2026 |
-| v2 against the rule-based player | 78.8% (from 78.0% to 79.6%) | 22 Nov 2026 |
-| v2 against the tuned rule-based player | 87.5% (from 86.8% to 88.2%) | 22 Nov 2026 |
-| v2 against v1, head to head | 69.6% (from 68.7% to 70.4%) | 22 Nov 2026 |
-| Promotion gate of v2 against v1 | passed every rule ([details](#the-promotion-gate)) | 22 Nov 2026 |
-| The characters against a team of Zap (Zap against itself: 50.0%) | Otávio 26.6%, Bento 32.0%, Lia 31.8%, Ravi 30.3%, Iara 41.0% | 22 Nov 2026 |
-| Decision time of v2 | 0.22 ms per decision at the median, 0.33 ms at p99; 2.09 ms at p99 for everything the AI does before a person's next turn | 23 Nov 2026 |
+| The AI in play | v3: 461 inputs, 2 hidden layers of 256, a 194 KB file of int8 weights | 25 Nov 2026 |
+| v3 against random play | 95.7% (from 95.4% to 95.9%) | 25 Nov 2026 |
+| v3 against the rule-based player | 79.6% (from 79.1% to 80.1%) | 25 Nov 2026 |
+| v3 against the tuned rule-based player | 89.4% (from 89.0% to 89.8%) | 25 Nov 2026 |
+| v3 against v2, head to head | 52.7% (from 52.1% to 53.2%) | 25 Nov 2026 |
+| Promotion gate of v3 against v2 | passed every rule ([details](#the-promotion-gate)) | 25 Nov 2026 |
+| The characters against a team of Zap (Zap against itself: 48.8%) | Otávio 28.4%, Bento 28.5%, Lia 30.3%, Ravi 30.7%, Iara 41.6% | 25 Nov 2026 |
+| Decision time of v3 | 0.43 ms per decision at the median, 0.51 ms at p99; 3.51 ms at p99 for everything the AI does before a person's next turn | 23 Nov 2026 |
 | Rules engine, one core, random legal moves | from 92,894 to 115,410 hands per second, by variant and table size | 23 Nov 2026 |
 | Page load on a phone (slow 4G, throttled CPU, empty cache) | largest contentful paint (LCP) 1,108 ms at the median (budget 2,500 ms); table drawn at 1,858 ms | 23 Nov 2026 |
 | Code of the table, compressed | 89 KB of JavaScript and 20 KB of CSS (budgets 120 KB and 25 KB) | 23 Nov 2026 |
@@ -74,7 +74,7 @@ Snapshot of 23 Nov 2026.
 | Brake capacity on Workers Free, computed from the costs measured on the local site | 1,111 solo matches a day with the default reserve (483 if matches last three times as long) | 23 Nov 2026 |
 | Rows a room writes in its Durable Object | at most 37 for a solo match (budget 60), 145 for a room of four people (budget 320) | 22 Nov 2026 |
 
-Strength is measured in duplicate pairs: every deal is played twice with the seats swapped, so the luck of the cards cancels out, and a pair scores 1, 0.5 or 0. Each rival played 4,000 pairs over the four segments (paulista and mineiro, 1 against 1 and 2 against 2); the value is the mean match score with its 95% interval. On the same deals v1 scored 93.0%, 74.5% and 79.6% against the first three rivals. The characters were measured on fresh deals of the gate, 400 pairs per segment. Speeds and times were measured on an idle virtual machine without AVX, with no training run sharing its CPU.
+Strength is measured in duplicate pairs: every deal is played twice with the seats swapped, so the luck of the cards cancels out, and a pair scores 1, 0.5 or 0. Each rival played 10,000 pairs over the four segments (paulista and mineiro, 1 against 1 and 2 against 2); the value is the mean match score with its 95% interval. On the same deals v2 scored 95.5%, 79.2% and 87.7% against the first three rivals. The characters were measured on fresh deals of the gate, 200 pairs per segment. For v3, the rivals and their pairs are the frozen panel of the gate that promoted it. The decision time of v3 was measured on the file the explorer test judged: the same network under its earlier name. Speeds and times were measured on an idle virtual machine without AVX, with no training run sharing its CPU.
 
 <!-- /facts:snapshot -->
 
@@ -147,7 +147,7 @@ Each rule alone lets through a candidate worse than its margin at most 5% of the
 
 **The window with people.** After a promotion, for 14 days, 30% of solo matches keep the previous version in every AI seat (the control arm). In the other matches the new version sits only in opponent seats, never as a person's partner. Once a day the cycle compares how often people beat each arm, with each person as one cluster in a bootstrap. When both arms have at least 200 matches from at least 20 people each, and a cautious lower bound of the drop is above 2 points, the cycle rolls the new version back on its own and the model card says why. With fewer people the luck of a few players could pass for a drop, so the check does not decide and the new version stays when the window ends. The owner can also roll back at any time with one command, and no new version is promoted while a window is open.
 
-**What v2 went through.** v2 met this gate against v1 on 22 Nov 2026, on a local copy of the cycle with the production sizes, and passed every rule. The sequential test accepted after 400 pairs (mean 70.3%). Per segment, on 2,500 pairs each: 80.5% in paulista 1 against 1, 67.5% in paulista 2 against 2, 72.5% in mineiro 1 against 1 and 60.8% in mineiro 2 against 2. Against the panel, 10,000 pairs per member, the lowest one-sided bound of a difference was 1.9 points above zero. No window with people has run yet.
+**What v3 went through.** v3 met this gate against v2 on 25 Nov 2026, on the training server, with the reading live, and passed every rule. The sequential test accepted after 800 pairs (mean 52.6%). Per segment, on 2,500 pairs each: 51.6% in paulista 1 against 1, 54.7% in paulista 2 against 2, 51.1% in mineiro 1 against 1 and 52.0% in mineiro 2 against 2. Against the panel, 10,000 pairs per member, the lowest one-sided bound of a difference was 0.13 points below zero, within the margin of 1 point. Its window with people runs until 9 Dec 2026.
 
 <!-- /facts:gate -->
 
@@ -160,7 +160,7 @@ The rules and their error rates are explained in [`project_docs/cycle.md`](proje
 
 * **Human behaviour model**, a network that plays like people and joins training as an opponent and as a partner: after {th.humanModelMatches:int} valid matches from at least {th.humanModelDevices:int} devices, and only when it predicts people's decisions better than a simple baseline.
 * **Twin without human data**: whenever the human model is in training, the cycle also trains a twin with the same start, seed and compute but without it. The difference between the two, read against how far two twins land apart by seed alone, is how "people's data made it stronger" will be measured. The data page will show where human data adds strength and where it does not.
-* **Per-player profile**: the "How Zap reads you" panel on the You page compares a person's own counts with population values, which come from people once {th.priorsPeople:int} people have enough observations of a number, and from the AI's own play until then. Using the profile to adapt the AI to a person across matches needs {th.adaptDecisions:int} decisions of that person and is not built yet.
+* **Per-player profile**: the "How Zap reads you" panel on the You page compares a person's own counts with population values, which come from people once {th.priorsPeople:int} people have enough observations of a number, and from the AI's own play until then. The profile is only there for the person to see: the AI does not use it to adapt to a person across matches, and that will not be built.
 * **Player types**: from {th.playerTypes:int} people with a full reading.
 * **Seventh character**, the human model at the table: after the human model passes its test and the Worker serves it.
 * **Open data** under CC BY 4.0, in this repository's GitHub releases: from {th.openDataMatches:int} valid human matches, with every cell covering at least {th.minCellPeople:int} people.
@@ -168,11 +168,11 @@ The rules and their error rates are explained in [`project_docs/cycle.md`](proje
 -->
 <!-- facts:human -->
 
-No match with people has been counted yet, and v2 was trained by self-play alone. So "an AI trained by the people who play" describes the design; it is not a measured result yet. The layers that learn from people are written and tested, and each one switches itself on when the weekly cycle finds enough data. Until then the cycle trains without them.
+People have played against a version of Zap in a test window, but no match with people has trained Zap yet: v3 was trained by self-play alone. So "an AI trained by the people who play" describes the design; it is not a measured result yet. The layers that learn from people are written and tested, and each one switches itself on when the weekly cycle finds enough data. Until then the cycle trains without them.
 
 * **Human behaviour model**, a network that plays like people and joins training as an opponent and as a partner: after 500 valid matches from at least 50 devices, and only when it predicts people's decisions better than a simple baseline.
 * **Twin without human data**: whenever the human model is in training, the cycle also trains a twin with the same start, seed and compute but without it. The difference between the two, read against how far two twins land apart by seed alone, is how "people's data made it stronger" will be measured. The data page will show where human data adds strength and where it does not.
-* **Per-player profile**: the "How Zap reads you" panel on the You page compares a person's own counts with population values, which come from people once 100 people have enough observations of a number, and from the AI's own play until then. Using the profile to adapt the AI to a person across matches needs 150 decisions of that person and is not built yet.
+* **Per-player profile**: the "How Zap reads you" panel on the You page compares a person's own counts with population values, which come from people once 100 people have enough observations of a number, and from the AI's own play until then. The profile is only there for the person to see: the AI does not use it to adapt to a person across matches, and that will not be built.
 * **Player types**: from 200 people with a full reading.
 * **Seventh character**, the human model at the table: after the human model passes its test and the Worker serves it.
 * **Open data** under CC BY 4.0, in this repository's GitHub releases: from 1,000 valid human matches, with every cell covering at least 20 people.
@@ -270,13 +270,15 @@ That network without reading scores {reading.offH2h:pct1} (from {reading.offH2hL
 -->
 <!-- facts:reading -->
 
-**Status: ready, not live.** The version in play, v2 (features `v2-empty`), reads nothing about anyone, and `AI_ADAPT` is `off`. The explorer test passes for the candidate file (SHA-256 `7223c227`, safety net Bmax 0.2, nHalf 1): all 9 explorers measured against it stay within the limit of 1 point; the largest upper bound is 0.77 points, for `neverRaises>bluffer@3/same`. An explorer is an opponent built to fake a pattern and then switch, so that the reading misjudges it. The reading goes live only if the owner adopts that file through the training cycle: it becomes the next version, must pass the full gate with the reading live, and then plays people for 14 days, with 30% of quick play matches kept on the previous version for comparison. That test with people decides whether it stays. Verdict of 23 Nov 2026.
+**Status: in a test with people.** The version in play, v3 (features `v2`), reads the public facts of the current match, and `AI_ADAPT` is `on`. It was adopted through the training cycle on 25 Nov 2026, passed the full gate with the reading live, and plays people until 9 Dec 2026: 30% of quick play matches keep v2 on every AI seat for comparison, and in the others v3 sits only in opponent seats, never as a person's partner. Once a day the cycle compares how often people beat each version. When each group has 20 people, the data page shows that comparison, and the cycle rolls v3 back on its own if people clearly beat it more often. This test decides whether the reading stays.
 
-For scale, on the same candidate file the reading adds 0.24 points to Zap's score against the opponent styles of the test (from 0.13 to 0.35).
+The explorer test passed for the network of v3: it has the same weights as the file with SHA-256 `7223c227` (safety net Bmax 0.2, nHalf 1), and all 9 explorers measured against that file stay within the limit of 1 point; the largest upper bound is 0.77 points, for `neverRaises>bluffer@3/same`. An explorer is an opponent built to fake a pattern and then switch, so that the reading misjudges it. Verdict of 23 Nov 2026.
+
+For scale, on the network of v3 the reading adds 0.24 points to Zap's score against the opponent styles of the test (from 0.13 to 0.35).
 
 Two measurements of the same file weigh against it. Head to head against its twin, the same training without the statistics, it scores 49.1% (from 48.3% to 49.9%), so it is not stronger overall. By one more measure its base is easier to exploit: an explorer trained against it by reinforcement learning takes 3.44 points more from it (from 2.60 to 4.29) than a control explorer, trained the same way against v2, takes from the twin. The control was measured against the twin, not against the v2 it trained against, so this comparison is less clean than the one above. The reading is not what that explorer exploits: it costs the explorer 1.00 points.
 
-After an adoption, a table with "Don't adapt to me" plays the same file without reading, which scores 48.5% (from 47.7% to 49.4%) head to head against its twin: it is weaker, so that works in that person's favour. With `AI_ADAPT` off every table would play that weaker network, so the reading is then switched off with the cycle's rollback to the previous version, not with `AI_ADAPT` off.
+A table with "Don't adapt to me" plays v3 without reading. That network scores 48.5% (from 47.7% to 49.4%) head to head against its twin: it is weaker, so that works in that person's favour. With `AI_ADAPT` off every table would play it, so the reading is switched off with the cycle's rollback to the previous version, not with `AI_ADAPT` off.
 
 <!-- /facts:reading -->
 
@@ -329,7 +331,7 @@ flowchart LR
 * **No accounts.** A random secret in an HttpOnly cookie identifies the browser and the server keeps only its hash. People get a random pseudonym and may choose a nickname, which passes a filter. No email, no password, and no IP address is stored; rate limits use a keyed hash of the IP that changes every day.
 * **Adults only, by self-declaration.** A neutral screen asks for the birth year from a list. Only "adult: yes" and its time are stored, and the year never leaves the browser. People who say they are under age can read the rules and the data page but cannot play, and nothing about them reaches the server.
 * **Match records hold no person.** A record in R2 carries the match id and seat numbers only. The link between a person and their seats lives in D1 and goes away when the person deletes their data, or after a year without playing. The "You against Zap" page keeps a copy of the person's own records in that browser, until they delete their data there or press "Forget the games stored on this device".
-* **Delete and download at once,** on the You page, with a recovery code to move a history to another browser. "Don't adapt to me" deletes the style counters and keeps no new ones.
+* **Delete and download at once,** on the You page, with a recovery code to move a history to another browser. "Don't adapt to me" deletes the style counters, keeps no new ones and, from the next match, leaves that person's table without reading.
 * **Nothing hidden leaves the server during a match.** The room sends each seat only what that seat may see: no message carries another player's hidden card, cards played face down are never revealed during the match, and the seed of each hand is shown only after the match ends. The AI receives the same view a person has at its seat.
 * **Public numbers and open data have floors.** Apart from site-wide totals (matches played, moves made, matches people won against Zap), a number built from people's data is published only for a group of at least {th.minCellPeople:int} distinct people. Open data releases give each match a new random code, dates as ISO weeks and decision times in bands, show style figures only as aggregates, and leave out anyone who chose "Keep me out of open data" or deleted their data. A published release cannot be withdrawn, and the notice says so.
 * **Where data lives.** Rooms run in eastern North America and Cloudflare may store D1 and R2 data outside Brazil; open data releases are hosted on GitHub.
@@ -340,7 +342,7 @@ flowchart LR
 * **No accounts.** A random secret in an HttpOnly cookie identifies the browser and the server keeps only its hash. People get a random pseudonym and may choose a nickname, which passes a filter. No email, no password, and no IP address is stored; rate limits use a keyed hash of the IP that changes every day.
 * **Adults only, by self-declaration.** A neutral screen asks for the birth year from a list. Only "adult: yes" and its time are stored, and the year never leaves the browser. People who say they are under age can read the rules and the data page but cannot play, and nothing about them reaches the server.
 * **Match records hold no person.** A record in R2 carries the match id and seat numbers only. The link between a person and their seats lives in D1 and goes away when the person deletes their data, or after a year without playing. The "You against Zap" page keeps a copy of the person's own records in that browser, until they delete their data there or press "Forget the games stored on this device".
-* **Delete and download at once,** on the You page, with a recovery code to move a history to another browser. "Don't adapt to me" deletes the style counters and keeps no new ones.
+* **Delete and download at once,** on the You page, with a recovery code to move a history to another browser. "Don't adapt to me" deletes the style counters, keeps no new ones and, from the next match, leaves that person's table without reading.
 * **Nothing hidden leaves the server during a match.** The room sends each seat only what that seat may see: no message carries another player's hidden card, cards played face down are never revealed during the match, and the seed of each hand is shown only after the match ends. The AI receives the same view a person has at its seat.
 * **Public numbers and open data have floors.** Apart from site-wide totals (matches played, moves made, matches people won against Zap), a number built from people's data is published only for a group of at least 20 distinct people. Open data releases give each match a new random code, dates as ISO weeks and decision times in bands, show style figures only as aggregates, and leave out anyone who chose "Keep me out of open data" or deleted their data. A published release cannot be withdrawn, and the notice says so.
 * **Where data lives.** Rooms run in eastern North America and Cloudflare may store D1 and R2 data outside Brazil; open data releases are hosted on GitHub.
@@ -363,10 +365,10 @@ Not legal advice: this is how a personal project reasons about its data, and no 
 <!-- facts:limits -->
 
 * **Rooms live in eastern North America.** Cloudflare has no Durable Object region in South America, so a room opened from Brazil runs in the United States and every move crosses that distance.
-* **The reading is off** (see [above](#reading-the-opponent-during-a-match)), so the Zap of today plays the same against everyone.
-* **The characters' styles overlap.** In a test that tells two characters apart from windows of their play, 3 of 15 pairs reach the target accuracy of 80% with their whole interval and 10 stay below it; Iara is told apart from Zap 54.3% of the time, little better than a coin toss. Otávio is clearly the easiest and Iara the hardest after Zap, while Bento, Lia and Ravi are about equally hard.
+* **The reading is still in its test with people** (see [above](#reading-the-opponent-during-a-match)): it may yet be rolled back, and 30% of quick play matches keep v2 until 9 Dec 2026.
+* **The characters' styles overlap.** In a test that tells two characters apart from windows of their play, measured on v2, 3 of 15 pairs reach the target accuracy of 80% with their whole interval and 10 stay below it; Iara is told apart from Zap 54.3% of the time, little better than a coin toss. Otávio is clearly the easiest and Iara the hardest after Zap, while Bento, Lia and Ravi are about equally hard.
 * **Workers Free and the brake.** The site runs on Cloudflare's free plan, whose daily limits belong to the whole account and are shared with the owner's other projects. Before a match starts, the Worker reserves its typical cost; a match that would take any limit past 80% of it, minus a reserve for the other projects (50% of each limit by default), does not start, and the person reads when to come back. With these settings the brake admits 1,111 solo matches a day, or 483 if real matches last three times as long as the simulated ones. Those costs were measured on the local site; in production the real spend replaces the estimate as matches end.
-* **No production numbers yet.** Every number here comes from local runs. The gate of v2 ran on a local copy of the training cycle, the window with people has never run, and nobody outside the project has played.
+* **Numbers from programs.** The strength, gate and character numbers here come from games between programs; how people fare against Zap is on the data page, where a number built from people's games needs a group of at least 20 people.
 * **Two variants, one set of house rules.** Paulista and mineiro with the defaults and room options of [`project_docs/rules.md`](project_docs/rules.md); many tables play other house rules.
 
 <!-- /facts:limits -->

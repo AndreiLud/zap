@@ -293,7 +293,7 @@
   "alert.training.missing": "O arquivo status/training.json não existe ou não pôde ser lido no bucket zap-models, mas o manifest.json está lá.\n\nO servidor de treino pode estar parado ou sem acesso ao bucket.",
   "reading.title": "Como o Zap te lê",
   "reading.lede": "A cada partida, o Zap soma alguns contadores do seu jeito de jogar: quantas vezes você pede truco, corre, aceita, blefa e quanto tempo leva para decidir. Esta é a leitura que sai deles.",
-  "reading.use": "Por enquanto, estes números só aparecem aqui. A IA ainda não usa nenhum deles para escolher as jogadas dela.",
+  "reading.use": "Estes números servem só para você ver. A IA não usa nenhum deles para escolher as jogadas dela.",
   "reading.loading": "Carregando a leitura.",
   "reading.failed": "Não deu para carregar a leitura.",
   "reading.summary": "Partidas contadas: {matches}. Decisões contadas: {decisions}.",

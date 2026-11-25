@@ -2,8 +2,10 @@
 // a 0% to 100% track. A number the server shows has its dot, its 80% bar and the reference it
 // started from; a hidden one has an empty track and says why (too few observations, or a margin
 // still wide). The client never computes a hidden value: the server leaves it out. Under the
-// figure, whether the in-match reading is on now (from /api/live) and the threshold of the
-// personal adaptation layer.
+// figure, that Zap does not play with these numbers (they are only for this page: adaptation
+// across matches is not built), and whether the in-match reading is on now: off at every table of
+// a person with "Don't adapt to me" on, else as /api/live says. That line waits for the reading
+// answer, which carries the switch, so it never says the AI reads someone who switched it off.
 
 import { useEffect, useState } from 'preact/hooks';
 import { MIN_SHOWN_N } from '../../../../shared/profile.ts';
@@ -12,18 +14,14 @@ import { navigate, urlFor } from '../../actions.ts';
 import { withCheck } from '../../check.ts';
 import { DotInterval, type DotRow } from '../../data/charts/DotInterval.tsx';
 import { Figure, READY } from '../../data/charts/Figure.tsx';
-import { Meter, meterState } from '../../data/charts/Meter.tsx';
 import { fmt, type Format } from '../../data/format.ts';
-import cycleRules from '../../data/generated/cycle-rules.json';
 import { td, tdText } from '../../data/i18n-data.ts';
 import { likely80 } from '../../data/words.ts';
 import { t, type Key } from '../../i18n.ts';
+import { inMatchLine } from '../text.ts';
 
 type Num = ReadingAnswer['numbers'][number];
 type View = { k: 'loading' } | { k: 'failed' } | { k: 'ready'; r: ReadingAnswer };
-
-/** Decisions of the person before the personal adaptation layer may use their numbers (prod.toml). */
-const ADAPT_DECISIONS = (cycleRules as { thresholds: { adapt_decisions: number } }).thresholds.adapt_decisions;
 
 /** A number as the page says it: a percent, or "x de 100" for the strength of the cards shown. */
 function valueText(f: Format, key: Num['key'], v: number): string {
@@ -46,11 +44,9 @@ function referenceText(f: Format, x: Num): string {
 export interface ReadingProps {
   /** The in-match reading is on for the version in play (/api/live adapt; the facts before it answers). */
   inMatch: boolean;
-  /** The personal adaptation layer is on (summary.layers.adaptation.on). */
-  adaptOn: boolean;
 }
 
-export function Reading({ inMatch, adaptOn }: ReadingProps) {
+export function Reading({ inMatch }: ReadingProps) {
   const f = fmt();
   const [view, setView] = useState<View>({ k: 'loading' });
   const load = async () => {
@@ -72,6 +68,7 @@ export function Reading({ inMatch, adaptOn }: ReadingProps) {
   const k = shownNums.length + (timeShown ? 1 : 0);
   const titleKey: Key = k > 0 ? 'data.vs.p3.h.some' : 'data.vs.p3.h.none';
   const title = t(titleKey, { k: f.int(k), n: f.int(total) });
+  const line = r ? inMatchLine(inMatch, r.noAdapt) : null;
 
   const rows: DotRow[] = r
     ? r.numbers.map((x) => {
@@ -148,32 +145,21 @@ export function Reading({ inMatch, adaptOn }: ReadingProps) {
           </div>
         </Figure>
       ) : null}
-      {r && !r.noAdapt ? <p class="hint">{t('reading.use')}</p> : null}
-      <p class="vs-inmatch" data-testid="vs-inmatch" data-on={String(inMatch)}>
-        {t(inMatch ? 'data.vs.p3.inmatch.on' : 'data.vs.p3.inmatch.off')}{' '}
-        <a
-          href={`${urlFor({ name: 'data' })}#leitura`}
-          onClick={(e) => {
-            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-            e.preventDefault();
-            navigate({ name: 'data' }, { hash: '#leitura' });
-          }}
-        >
-          {t('data.vs.p3.inmatch.link')}
-        </a>
-      </p>
-      {r && !r.noAdapt ? (
-        <div class="vs-meter">
-          <Meter
-            label={t('data.vs.p3.adapt.label')}
-            value={r.decisions}
-            needed={ADAPT_DECISIONS}
-            on={adaptOn}
-            state={meterState(adaptOn, { on: 'data.vs.meter.on', waiting: 'data.vs.meter.waiting' })}
-            text={t('data.vs.p3.adapt', { d: f.int(r.decisions), need: f.int(ADAPT_DECISIONS) })}
-          />
-          {!adaptOn ? <p class="hint">{t('data.vs.p3.adapt.more')}</p> : null}
-        </div>
+      {r && !r.noAdapt ? <p class="hint">{t('data.vs.p3.between')}</p> : null}
+      {line ? (
+        <p class="vs-inmatch" data-testid="vs-inmatch" data-on={String(line.on)}>
+          {t(line.key)}{' '}
+          <a
+            href={`${urlFor({ name: 'data' })}#leitura`}
+            onClick={(e) => {
+              if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+              e.preventDefault();
+              navigate({ name: 'data' }, { hash: '#leitura' });
+            }}
+          >
+            {t('data.vs.p3.inmatch.link')}
+          </a>
+        </p>
       ) : null}
     </section>
   );

@@ -80,7 +80,7 @@ A person here is a group token of the latest daily export: random, made again fo
 | Human behaviour model | 500 valid matches from at least 50 devices | a network that plays like people, in training only when it beats a baseline |
 | Twin without human data | when the human model is in training | the same training without it, to measure what people's data adds |
 | Open data | `OPEN_DATA_ENABLED=true` and 1,000 valid matches | the release package (zip); the first release by the owner's command, then one after every promotion |
-| Adaptation to each player | not in this milestone | waits for features with profile inputs |
+| Adaptation to each player | not built | a value test showed no measurable gain, so it will not be built; the stored counters only show each person their reading |
 | Ranking | not in this milestone | the rating comes later |
 
 ### Automation flags

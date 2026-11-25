@@ -293,7 +293,7 @@
   "alert.training.missing": "The file status/training.json is missing or unreadable in the zap-models bucket, while manifest.json is there.\n\nThe training server may be stopped or without access to the bucket.",
   "reading.title": "How Zap reads you",
   "reading.lede": "After each match, Zap adds up a few counters of your way of playing: how often you call truco, run, accept, bluff, and how long you take to decide. This is the reading they give.",
-  "reading.use": "For now these numbers only show here. The AI does not use any of them to choose its moves.",
+  "reading.use": "These numbers are only for you to see. The AI does not use any of them to choose its moves.",
   "reading.loading": "Loading the reading.",
   "reading.failed": "The reading could not be loaded.",
   "reading.summary": "Matches counted: {matches}. Decisions counted: {decisions}.",

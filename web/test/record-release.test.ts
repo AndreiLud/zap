@@ -2,7 +2,9 @@
 // tools/docs/releases.ts), and how the READMEs tell it (tools/docs/readme-facts.ts): the version in
 // play, the reading in a test with people, on after its window, rolled back, or carried with
 // AI_ADAPT off, and a network the explorer test never measured. Every case runs on a copy of
-// facts.json with records built from synthetic cards; nothing here reads the cycle's real state.
+// facts.json with records built from synthetic cards; nothing here reads the cycle's real state,
+// and the records of the real cycle that facts.json may hold (DEPLOY.md section 9.6) are taken
+// out of that copy first.
 
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -15,7 +17,17 @@ import { servedBlock } from '../../tools/data/facts-view.ts';
 import { networkSha256, servedReads, servedView } from '../../tools/docs/releases.ts';
 
 const DIR = join(ROOT, '.cache', 'tmp', 'record-release-test');
-const FACTS = JSON.parse(readFileSync(join(ROOT, 'facts.json'), 'utf8')) as Record<string, any>;
+/** facts.json as the repository holds it; no case below writes it. */
+const REPO_FACTS = readFileSync(join(ROOT, 'facts.json'), 'utf8');
+
+/** facts.json without what record-release.ts recorded from the real cycle: ai.inPlay and the cycle's releases. */
+function withoutRecords(text: string): Record<string, any> {
+  const f = JSON.parse(text) as Record<string, any>;
+  delete f.ai.inPlay;
+  for (const [v, rel] of Object.entries(f.ai.releases ?? {})) if ((rel as { origin?: unknown } | null)?.origin === 'cycle') delete f.ai.releases[v];
+  return f;
+}
+const FACTS = withoutRecords(REPO_FACTS);
 const V2 = new Uint8Array(readFileSync(join(ROOT, 'ai/models/bootstrap/zap-v2.zapw')));
 const sha = (b: Uint8Array) => createHash('sha256').update(b).digest('hex');
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
@@ -400,6 +412,6 @@ describe('the version in play and the READMEs', () => {
 
   it('leaves no file behind in the repository', () => {
     expect(existsSync(join(ROOT, 'facts.json'))).toBe(true);
-    expect(JSON.parse(readFileSync(join(ROOT, 'facts.json'), 'utf8')).ai.inPlay).toBeUndefined();
+    expect(readFileSync(join(ROOT, 'facts.json'), 'utf8')).toBe(REPO_FACTS);
   });
 });

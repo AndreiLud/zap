@@ -129,7 +129,7 @@ function DuelRules() {
       <ul>
         <li>{t('data.cycle.duel.1', { gain: f.per100(g.p1 - g.p0) })}</li>
         <li>{t('data.cycle.duel.2', { seg: f.per100(g.segment_margin), panel: f.per100(g.panel_margin) })}</li>
-        <li>{t('data.cycle.duel.3', { days: f.int(ab.days), share: f.pct(ab.share, 0), drop: f.per100(ab.rollback_drop) })}</li>
+        <li>{t('data.cycle.duel.3', { days: f.int(ab.days), share: f.pct(ab.share, 0), people: f.int(RULES.MIN_PEOPLE), drop: f.per100(ab.rollback_drop) })}</li>
         {seconds !== null ? <li>{t('data.cycle.duel.4', { time: f.int(Math.round(seconds / 60)) })}</li> : null}
         {detectable !== null ? <li>{t('data.cycle.duel.5', { d: f.per100(detectable) })}</li> : null}
       </ul>

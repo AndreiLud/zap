@@ -160,13 +160,21 @@ describe('readme-facts values', () => {
   });
 
   it('states the reading from facts.json: off unless the served file reads, and the explorer verdict', () => {
-    const v = readmeValues(facts, docs);
-    expect(['on', 'off-fails', 'off-passes', 'off-unmeasured']).toContain(v['reading.state']);
-    const pass = (facts as { ai: { adaptation: { explorer: { criterion: { pass: boolean } } } } }).ai.adaptation.explorer.criterion.pass;
-    if (v['reading.state'] !== 'on') expect(v['reading.state']).toBe(pass ? 'off-passes' : 'off-fails');
-    const off = JSON.parse(JSON.stringify(facts)) as { ai: { adaptation: { explorer: { criterion?: Record<string, unknown> } } } };
-    delete off.ai.adaptation.explorer.criterion;
-    expect(readmeValues(off as unknown as Record<string, unknown>, docs)['reading.state']).toBe('off-unmeasured');
+    // The rule for the bundled model, on facts.json without the records of the cycle
+    // (tools/docs/record-release.ts; web/test/record-release.test.ts covers each recorded state).
+    type Facts = { ai: { inPlay?: unknown; releases: Record<string, { origin?: unknown } | null>; adaptation: { explorer: { criterion?: { pass: boolean } } } } };
+    const bundled = JSON.parse(JSON.stringify(facts)) as Facts;
+    delete bundled.ai.inPlay;
+    for (const [k, rel] of Object.entries(bundled.ai.releases)) if (rel?.origin === 'cycle') delete bundled.ai.releases[k];
+    const v = readmeValues(bundled as unknown as Record<string, unknown>, docs);
+    const reads = ['on-bundled', 'noevidence'];
+    expect([...reads, 'off-fails', 'off-passes', 'off-unmeasured']).toContain(v['reading.state']);
+    const pass = bundled.ai.adaptation.explorer.criterion!.pass;
+    if (!reads.includes(String(v['reading.state']))) expect(v['reading.state']).toBe(pass ? 'off-passes' : 'off-fails');
+    delete bundled.ai.adaptation.explorer.criterion;
+    expect(readmeValues(bundled as unknown as Record<string, unknown>, docs)['reading.state']).toBe('off-unmeasured');
+    // facts.json as it stands, with or without records, gives one of the states the templates tell.
+    expect(['window', 'on', 'noevidence', 'rolled-back', 'on-bundled', 'off-fails', 'off-passes', 'off-unmeasured']).toContain(readmeValues(facts, docs)['reading.state']);
   });
 
   it('names every missing key at once', () => {

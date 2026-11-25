@@ -52,3 +52,14 @@ export function seatNames(m: PersonMatch): string[] {
 export function aloneWithAi(m: PersonMatch): boolean {
   return m.record.seats.every((s) => s.seat === m.yourSeat || s.kind === 'ai');
 }
+
+/**
+ * The line about the reading during a match, under "How Zap reads you". A person with "Don't adapt
+ * to me" on is never read: from their next match the room masks their whole table
+ * (worker/src/room-core.ts, ai/src/features.ts), whatever the version in play can do. For everyone
+ * else the line follows the version in play (/api/live adapt). `on` is the page's data-on.
+ */
+export function inMatchLine(inMatch: boolean, noAdapt: boolean): { on: boolean; key: Key } {
+  if (noAdapt) return { on: false, key: 'data.vs.p3.inmatch.noAdapt' };
+  return inMatch ? { on: true, key: 'data.vs.p3.inmatch.on' } : { on: false, key: 'data.vs.p3.inmatch.off' };
+}

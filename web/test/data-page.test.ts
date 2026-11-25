@@ -33,10 +33,14 @@ describe('the training lineage (F2, F3)', () => {
     expect(parts.map((p) => p.snapshotStep)).toEqual([150, 540]);
   });
 
-  it('the generated curve tells the served version from its lineage start', () => {
+  it('the generated curve tells the served version from its lineage start, or the newest curve while the served version has none', () => {
     const story = storyVersion(CURVE.rows, SERVED.version);
     const parts = storyRows(lineage(CURVE.rows, story));
-    expect(parts.at(-1)?.row.version).toBe(SERVED.version);
+    // A version the cycle promoted has no curve until tools/data/sources.json names its run; the
+    // chapter then tells the newest curve without naming a version in play (data.curve.read0).
+    const hasCurve = CURVE.rows.some((r) => r.version === SERVED.version);
+    expect(story).toBe(hasCurve ? SERVED.version : CURVE.rows.at(-1)?.version);
+    expect(parts.at(-1)?.row.version).toBe(story);
     const all = parts.flatMap((p) => p.points);
     // Steps grow along the lineage; the title is one of the curve variants.
     expect(all.every((p, i) => i === 0 || p.step > all[i - 1].step)).toBe(true);
@@ -134,13 +138,16 @@ describe('the reading section says what the facts support', () => {
   const c = ex.criterion!;
   const verdicts = allVerdicts(c);
 
-  it('the served version does not read today, so the titles speak of the test version', () => {
-    expect(SERVED.readsOpponents).toBe(false);
+  it('the titles speak of the test version exactly when the served version does not read', () => {
+    const reads = SERVED.readsOpponents;
+    const test = (key: string) => key.split('.').includes('test');
     const f = F.pt;
-    expect(evidenceTitle({ nHalf: READING.safetyNet!.nHalf, reads: SERVED.readsOpponents }, f).key).toMatch(/\.test/);
+    expect(test(evidenceTitle({ nHalf: READING.safetyNet!.nHalf, reads }, f).key)).toBe(!reads);
     const rows = readingByHand(READING.readingCurve!.styles);
-    expect(readingCurveTitle({ values: rows.map((r) => r.mean), decisions: rows.map((r) => r.decisions), reads: false }, f).key).toMatch(/\.test$/);
-    expect(gainTitle({ est: fv(READING.perStyle!.pooled.allStyles.gainVsAblated), reads: false }, f).key).toMatch(/\.test$/);
+    for (const r of [false, true]) {
+      expect(test(readingCurveTitle({ values: rows.map((x) => x.mean), decisions: rows.map((x) => x.decisions), reads: r }, f).key)).toBe(!r);
+      expect(test(gainTitle({ est: fv(READING.perStyle!.pooled.allStyles.gainVsAblated), reads: r }, f).key)).toBe(!r);
+    }
   });
 
   it('what reading adds is the same network with and without it (claim 5), not the gain over the twin', () => {

@@ -22173,6 +22173,255 @@
             }
           ]
         }
+      },
+      "v3": {
+        "date": "2026-11-25",
+        "version": "v3",
+        "origin": "cycle",
+        "parent": "v2",
+        "cycleId": "20261125-1022",
+        "file": "models/v3.zapw",
+        "sha256": "23b5a75e6e77f41fefdff6ac4c5b5a3d861b18452209cf1b7da1b6b8b0596c1c",
+        "bytes": 193536,
+        "features": "v2",
+        "inputs": 461,
+        "hidden": [
+          256,
+          256
+        ],
+        "adapt": {
+          "bmax": 0.2,
+          "nHalf": 1
+        },
+        "network": {
+          "sha256": "4751456e0ea37833df7b21e1eadfc4210ade2e45ac8f4c1c05d339432000361b",
+          "file": "training/cycle/data/prod/versions/v3/model.zapw"
+        },
+        "explorerTested": true,
+        "explorer": {
+          "pass": true,
+          "source": "reused",
+          "limit": 0.01,
+          "network": "86d5728145c65eb8342d5e90896e51a695432fbb062a6a644c66c3991fc86c1f",
+          "verdicts": 9,
+          "passing": 9,
+          "worst": {
+            "explorer": "neverRaises>bluffer@3/same",
+            "upper95": 0.00773
+          }
+        },
+        "card": {
+          "result": "promoted",
+          "resultAt": "2026-11-25T10:36:50.811Z",
+          "reason": "Passed the explorer test: 9 verdicts, reusing the verdict of facts.json ai.adaptation.explorer.criterion for the same network, the largest one-sided 95% upper bound of the adaptation part 0.77 points, limit 1.00. Passed every rule of the gate (SPRT 0.5 against 0.515, alpha 0.05, beta 0.05, rounds of 400 pairs up to 40000; segments: non-inferiority 1.5 points on 2500 pairs each; panel random, base (heuristic base), tuned (heuristic tuned), v1 (zap-v1.zapw, knobs zap), v2 (model.zapw, knobs zap): "
+        },
+        "gate": {
+          "stats": "live",
+          "pass": true,
+          "reasons": [],
+          "seconds": 621.5,
+          "seed": "70ff95e2ca17649636149a4feb0ab93a997b58c9d1a15a426290001feaa171bd",
+          "sprt": {
+            "decision": "accept",
+            "llr": 3.118590840011409,
+            "lower": -2.9444389791664403,
+            "upper": 2.9444389791664403,
+            "pairs": 800,
+            "mean": 0.525625,
+            "perSegment": {
+              "paulista-2": {
+                "pairs": 200,
+                "mean": 0.4975
+              },
+              "paulista-4": {
+                "pairs": 200,
+                "mean": 0.535
+              },
+              "mineiro-2": {
+                "pairs": 200,
+                "mean": 0.5175
+              },
+              "mineiro-4": {
+                "pairs": 200,
+                "mean": 0.5525
+              }
+            }
+          },
+          "segments": {
+            "paulista-2": {
+              "pairs": 2500,
+              "mean": 0.5164,
+              "lo95": 0.0077604685539178,
+              "pass": true
+            },
+            "paulista-4": {
+              "pairs": 2500,
+              "mean": 0.547,
+              "lo95": 0.037035715274138625,
+              "pass": true
+            },
+            "mineiro-2": {
+              "pairs": 2500,
+              "mean": 0.511,
+              "lo95": 0.003541086034212708,
+              "pass": true
+            },
+            "mineiro-4": {
+              "pairs": 2500,
+              "mean": 0.5196,
+              "lo95": 0.01042054749379192,
+              "pass": true
+            }
+          },
+          "panel": [
+            {
+              "member": "random",
+              "pairs": 10000,
+              "candidate": {
+                "mean": 0.9565,
+                "lo": 0.9536964602332905,
+                "hi": 0.9593035397667096
+              },
+              "current": {
+                "mean": 0.95475,
+                "lo": 0.9518975733096534,
+                "hi": 0.9576024266903466
+              },
+              "diff": {
+                "mean": 0.00175,
+                "lo95": -0.001279941773489224
+              },
+              "pass": true
+            },
+            {
+              "member": "base",
+              "pairs": 10000,
+              "candidate": {
+                "mean": 0.7962,
+                "lo": 0.791127716260319,
+                "hi": 0.8012722837396811
+              },
+              "current": {
+                "mean": 0.79195,
+                "lo": 0.7868900535005338,
+                "hi": 0.7970099464994663
+              },
+              "diff": {
+                "mean": 0.00425,
+                "lo95": -0.00043565780467372337
+              },
+              "pass": true
+            },
+            {
+              "member": "tuned",
+              "pairs": 10000,
+              "candidate": {
+                "mean": 0.89435,
+                "lo": 0.8902495481684427,
+                "hi": 0.8984504518315573
+              },
+              "current": {
+                "mean": 0.8774,
+                "lo": 0.8730184360042667,
+                "hi": 0.8817815639957333
+              },
+              "diff": {
+                "mean": 0.01695,
+                "lo95": 0.01275116043531656
+              },
+              "pass": true
+            },
+            {
+              "member": "v1",
+              "pairs": 10000,
+              "candidate": {
+                "mean": 0.70915,
+                "lo": 0.7034545313273846,
+                "hi": 0.7148454686726153
+              },
+              "current": {
+                "mean": 0.6983,
+                "lo": 0.6926266382733934,
+                "hi": 0.7039733617266066
+              },
+              "diff": {
+                "mean": 0.01085,
+                "lo95": 0.005641705345359287
+              },
+              "pass": true
+            },
+            {
+              "member": "v2",
+              "pairs": 10000,
+              "candidate": {
+                "mean": 0.52665,
+                "lo": 0.5214247751032209,
+                "hi": 0.531875224896779
+              },
+              "current": {
+                "mean": 0.5001,
+                "lo": 0.49519192124328576,
+                "hi": 0.5050080787567142
+              },
+              "diff": {
+                "mean": 0.02655,
+                "lo95": 0.020738577672009692
+              },
+              "pass": true
+            }
+          ],
+          "personas": {
+            "orderHolds": true,
+            "source": "training/cycle/work/prod/20261125-1022/gate/personas-order.json: Otávio minus the easiest of Bento, Lia and Ravi (bento): -0.1 points (se 1.4, 95% from -2.8 to 2.6); the hardest of them (ravi) minus Iara: -10.9 points (se 1.4, 95% from -13.8 to -8.1); reversed beyond noise above 1.645 se; 200 fresh pairs per segment."
+          },
+          "where": "server"
+        },
+        "personas": {
+          "pairsPerSegment": 200,
+          "orderHolds": true,
+          "vsZap": {
+            "otavio": 0.284375,
+            "bento": 0.285,
+            "lia": 0.30312500000000003,
+            "ravi": 0.306875,
+            "iara": 0.41625,
+            "zap": 0.4881249999999999
+          }
+        },
+        "training": {
+          "iterations": 590,
+          "humanModel": false
+        },
+        "data": null,
+        "window": {
+          "control": "v2",
+          "share": 0.3,
+          "from": "2026-11-25T10:36:50.811Z",
+          "until": "2026-12-09T10:36:50.000Z",
+          "result": null
+        },
+        "state": "window",
+        "rolledBack": null,
+        "adaptation": {
+          "AI_ADAPT": "on"
+        },
+        "recordedAt": "2026-11-25T10:50:58.291Z"
+      }
+    },
+    "inPlay": {
+      "version": "v3",
+      "control": "v2",
+      "controlShare": 0.3,
+      "controlUntil": "2026-12-09T10:36:50.000Z",
+      "AI_ADAPT": "on",
+      "recordedAt": "2026-11-25T10:50:58.291Z",
+      "cycle": {
+        "profile": "prod",
+        "mode": "r2"
+      },
+      "source": {
+        "status": "training/cycle/data/prod/status-now.json",
+        "cycleData": "training/cycle/data/prod"
       }
     }
   },

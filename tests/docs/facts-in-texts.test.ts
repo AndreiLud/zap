@@ -495,7 +495,7 @@ const LOCALES: LocaleAllow[] = [
   },
   { keys: ['legal.notice.share.text'], numbers: ['1000'], why: 'matches with people before open data', is: () => prod('thresholds', 'open_data_matches') },
   { keys: ['legal.terms.service.p2'], numbers: ['4.0'], why: 'license name: CC BY 4.0' },
-  { keys: ['legal.privacy.updated', 'legal.terms.updated'], numbers: ['21', '23', '2026'], why: 'the date of each text\'s version' },
+  { keys: ['legal.privacy.updated', 'legal.terms.updated'], numbers: ['21', '25', '2026'], why: 'the date of each text\'s version' },
   { keys: ['legal.terms.report.p2'], numbers: ['3'], why: 'an example seat number ("Player 3")' },
   { keys: ['legal.privacy.browser.p1', 'check.text'], numbers: ['2'], why: 'hours of the human check\'s pass', is: () => constant('worker/src/auth.ts', 'CRED_TTL_MS') / HOUR_MS },
   { keys: ['legal.verify.check.p3', 'legal.verify.seal.p1'], numbers: ['2', '10'], why: 'the pass lasts 2 hours or 10 matches (worker/src/allowance.ts)', is: () => constant('worker/src/auth.ts', 'CRED_TTL_MS') / HOUR_MS },

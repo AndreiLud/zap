@@ -71,7 +71,7 @@ test('a solo match shows on "You against Zap", which keeps its copies on the dev
       await expect(reading).toHaveAttribute('data-state', 'ready');
       await expect(reading.locator('#vs-numeros-t')).toBeVisible();
       await expect(page.getByTestId('vs-reading-time')).toHaveAttribute('data-shown', 'false');
-      await expect(page.getByTestId('vs-inmatch')).toHaveText(/^A leitura durante a partida está (desligada|ligada)\.|^Durante a partida/);
+      await expect(page.getByTestId('vs-inmatch')).toHaveText(/^A leitura durante a partida está (desligada|ligada)\.|^Durante a partida|^Com "Não adaptar a mim" ligado/);
       await expect(page.getByTestId('vs-abandons-line')).toHaveText('Você nunca abandonou uma partida.');
       await expect(page.getByTestId('vs-download')).toHaveAttribute('href', '/voce#baixar');
       await expect(page.getByTestId('vs-delete')).toHaveAttribute('href', '/voce#apagar');
