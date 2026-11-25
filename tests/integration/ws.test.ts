@@ -164,6 +164,17 @@ describe.skipIf(!BASE)('room WebSocket', () => {
       '{"t":"phrase","key":"palavrao"}',
       '{"t":"phrase"}',
       '{"t":"ACT","seq":1,"a":0}',
+      // M15: the switches of a rematch are booleans; the arrangement messages are well formed
+      // and, being for rooms with friends only, refused in quick play even when they are.
+      '{"t":"rematch","randomOpponents":"yes"}',
+      '{"t":"rematch","randomPartner":null}',
+      '{"t":"move","from":1,"to":1}',
+      '{"t":"move","from":0}',
+      '{"t":"plan","seat":3,"ai":"Lia"}',
+      '{"t":"plan","seat":3}',
+      '{"t":"lobby"}',
+      '{"t":"move","from":0,"to":1}',
+      '{"t":"plan","seat":1,"ai":"lia"}',
     ];
     for (const raw of bad) {
       c.send(raw);
@@ -214,6 +225,51 @@ describe.skipIf(!BASE)('room WebSocket', () => {
       await sleep(PACE);
     }
     c.close();
+  });
+
+  it('arranging a room with friends (M15): the owner only, in a lobby only; a free seat shows its planned character', async () => {
+    const a = await new Device().verified();
+    const b = await new Device().verified();
+    const code = await a.createRoom({ players: 4, variant: 'paulista', turnSeconds: 60 });
+    const ca = await a.connect(code);
+    const cb = await b.connect(code);
+    const rb = await cb.nextRoom((r) => r.you === 1);
+    // The default plan: Iara, Lia and Zap; B now sits on Iara's seat, which shows no character.
+    expect(rb.room).toMatchObject({ setup: 2, ownerAway: false });
+    expect(rb.room.seats.map((s) => [s.kind, s.persona])).toEqual([
+      ['human', null],
+      ['human', null],
+      ['empty', 'lia'],
+      ['empty', 'zap'],
+    ]);
+    const friend: [object, string][] = [
+      [{ t: 'move', from: 1, to: 2 }, 'not_owner'],
+      [{ t: 'plan', seat: 3, ai: 'lia' }, 'not_owner'],
+      [{ t: 'lobby' }, 'not_owner'],
+    ];
+    for (const [m, want] of friend) {
+      cb.send(JSON.stringify(m));
+      expect((await cb.nextError()).code, `friend ${JSON.stringify(m)}`).toBe(want);
+      await sleep(PACE);
+    }
+    ca.send({ t: 'lobby' });
+    expect((await ca.nextError()).code).toBe('not_ended');
+    await sleep(PACE);
+    ca.send({ t: 'start' });
+    await ca.nextGame();
+    await sleep(PACE);
+    const playing: [object, string][] = [
+      [{ t: 'move', from: 1, to: 2 }, 'not_in_lobby'],
+      [{ t: 'plan', seat: 3, ai: 'lia' }, 'not_in_lobby'],
+      [{ t: 'lobby' }, 'not_ended'],
+    ];
+    for (const [m, want] of playing) {
+      ca.send(JSON.stringify(m));
+      expect((await ca.nextError()).code, `owner during a match ${JSON.stringify(m)}`).toBe(want);
+      await sleep(PACE);
+    }
+    ca.close();
+    cb.close();
   });
 
   it('relays canned phrases, at most one every 5 seconds', async () => {

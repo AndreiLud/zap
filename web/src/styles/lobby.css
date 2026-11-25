@@ -105,6 +105,74 @@
   height: 52px;
 }
 
+/* The seats grouped by team (M17): the viewer's team first, headed "Nós" and "Eles" with the
+   scoreboard's chips and colours (table.css .score__side), each group a column on wide screens.
+   The name says the team; the colour, the rule under it and the chip's shape repeat it. */
+.lobby__teams {
+  display: grid;
+  gap: 20px 16px;
+}
+
+.lobby__team {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.lobby__team-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--line);
+}
+
+.lobby__team[data-side='us'] .lobby__team-head {
+  border-bottom-color: var(--nos);
+}
+
+.lobby__team[data-side='them'] .lobby__team-head {
+  border-bottom-color: var(--eles);
+}
+
+.lobby__team-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lobby__team[data-side='us'] .lobby__team-name {
+  color: var(--nos);
+}
+
+.lobby__team[data-side='them'] .lobby__team-name {
+  color: var(--eles);
+}
+
+.lobby__team-head .team-chip {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.lobby__team-seats {
+  color: var(--text-2);
+  font-family: var(--font-text);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+/* Without a seat nobody is "us": no chips, no "us" colour on the names, and the headings say
+   "Time 1" and "Time 2" ("Lado 1" and "Lado 2" in 1 against 1). */
+.lobby__teams--neutral .team-chip {
+  display: none;
+}
+
+.lobby__teams--neutral .seat-label[data-team='us'] .seat-label__name > span:first-child {
+  color: inherit;
+}
+
 .lobby__seats {
   display: grid;
   gap: 8px;
@@ -154,6 +222,40 @@
   font-weight: 800;
 }
 
+/* The owner's control of a seat (M15): the label "Quem senta na cadeira N" and its select, on a line
+   of their own under the seat's label, the select as wide as the row. */
+.lobby__who {
+  min-width: 0;
+}
+
+.lobby__seat--arrange {
+  flex-wrap: wrap;
+}
+
+.lobby__ctl {
+  display: grid;
+  flex: 1 1 100%;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lobby__ctl-label {
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+/* base.css gives every select the 44 px touch target (--tap). */
+.lobby .lobby__select {
+  width: 100%;
+  min-width: 0;
+}
+
+.lobby__moved {
+  color: var(--text);
+  font-weight: 650;
+}
+
 .lobby__note,
 .lobby__wait {
   color: var(--text-2);
@@ -191,8 +293,29 @@
 }
 
 @media (min-width: 37.5em) {
-  .lobby__seats--4 {
+  /* Nós on the left, Eles on the right. The heading and the seats of both teams share row tracks
+     (subgrid), so the seats line up across whatever each one shows. */
+  .lobby__teams {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 8px;
+  }
+
+  .lobby__team {
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+  }
+
+  .lobby__seats {
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+  }
+
+  .lobby__teams--2 .lobby__team {
+    grid-row: span 2;
+  }
+
+  .lobby__teams--2 .lobby__seats {
+    grid-row: span 1;
   }
 
   .lobby__actions {

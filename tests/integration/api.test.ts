@@ -297,6 +297,16 @@ describe.skipIf(!BASE)('HTTP API', () => {
       ['/api/play', { partner: 'nobody' }],
       ['/api/play', { options: { bestOf: 5 } }],
       ['/api/play', { options: { signals: 'loud' } }],
+      // A lineup is one different character per AI seat of the other team, and the partner is not one of them.
+      ['/api/play', { opponents: ['zap', 'zap'] }],
+      ['/api/play', { opponents: ['zap', 'iara'], partner: 'iara' }],
+      ['/api/play', { players: 4, opponents: ['zap'] }],
+      ['/api/play', { players: 2, opponents: ['zap', 'lia'] }],
+      // The random switches: booleans, the partner one only at four players, both only in quick play.
+      ['/api/play', { randomOpponents: 'yes' }],
+      ['/api/play', { randomPartner: null }],
+      ['/api/play', { players: 2, randomPartner: true }],
+      ['/api/rooms', { randomOpponents: true }],
       ['/api/rooms', { players: 5 }],
       ['/api/rooms', { turnSeconds: 0 }],
     ];
@@ -310,8 +320,24 @@ describe.skipIf(!BASE)('HTTP API', () => {
     expect(room.status).toBe(200);
     const info = await d.get(`/api/rooms/${room.body.code}`);
     expect(info.body.settings).toMatchObject({ mode: 'room', players: 2, turnSeconds: null });
-    // If the 13 refusals had counted, these would reach the limit of 10 matches per check.
+    // If the 21 refusals had counted, these would reach the limit of 10 matches per check.
     for (let i = 0; i < 8; i++) expect((await d.post('/api/play', { players: 2 })).status, `play ${i + 2}`).toBe(200);
+  });
+
+  it('fills a missing lineup with the defaults and never turns a random switch on by itself', async () => {
+    const d = await new Device().verified();
+    const settingsOf = async (path: string, body: Record<string, unknown>) => {
+      const r = await d.post(path, body);
+      expect(r.status, `${path} ${JSON.stringify(body)}`).toBe(200);
+      return (await d.get(`/api/rooms/${r.body.code}`)).body.settings;
+    };
+    const off = { randomOpponents: false, randomPartner: false };
+    expect(await settingsOf('/api/play', {})).toMatchObject({ players: 4, opponents: ['zap', 'iara'], partner: 'lia', ...off });
+    expect(await settingsOf('/api/play', { players: 2 })).toMatchObject({ players: 2, opponents: ['zap'], ...off });
+    // A missing partner is the first character the opponents leave free.
+    expect(await settingsOf('/api/play', { opponents: ['iara', 'lia'] })).toMatchObject({ opponents: ['iara', 'lia'], partner: 'ravi', ...off });
+    expect(await settingsOf('/api/rooms', {})).toMatchObject({ mode: 'room', players: 4, opponents: ['iara', 'zap'], partner: 'lia', ...off });
+    expect(await settingsOf('/api/rooms', { players: 2 })).toMatchObject({ mode: 'room', players: 2, opponents: ['zap'], ...off });
   });
 
   it('the room keeps its listing ahead of its own expiry, so its code keeps working while it is in use', async () => {

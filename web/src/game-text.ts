@@ -5,11 +5,13 @@ import { MINEIRO_MANILHAS, rankOf, suitOf } from '../../engine/src/cards.ts';
 import { SIGNALS, TIE, type GameEvent } from '../../engine/src/engine.ts';
 import { HIDDEN } from '../../engine/src/observe.ts';
 import type { PersonaId } from '../../ai/src/personas.ts';
+import { PERSONA_ORDER } from '../../shared/lineup.ts';
 import type { PhraseKey, PublicRoom, PublicSeat } from '../../shared/protocol.ts';
 import { t, tn, type Key } from './i18n.ts';
 import { UNKNOWN } from './table-view.ts';
 
-export const PERSONA_IDS: readonly PersonaId[] = ['otavio', 'bento', 'lia', 'ravi', 'iara', 'zap'];
+/** The six characters in picker order, one source with the server (shared/lineup.ts). */
+export const PERSONA_IDS: readonly PersonaId[] = PERSONA_ORDER;
 export const PERSONA_NAMES: Record<PersonaId, string> = { otavio: 'Otávio', bento: 'Bento', lia: 'Lia', ravi: 'Ravi', iara: 'Iara', zap: 'Zap' };
 
 export function isKnownCard(c: number): boolean {

@@ -511,6 +511,7 @@ const LOCALES: LocaleAllow[] = [
   { keys: ['play.room.err.short1'], numbers: ['5', '1'], why: 'characters of a room code, and one left to type', is: () => constant('shared/protocol.ts', 'CODE_LENGTH') },
   { keys: ['play.room.code.hint'], numbers: ['5', '0', '1'], why: 'characters of a room code, and the characters it never uses (0 and 1)', is: () => constant('shared/protocol.ts', 'CODE_LENGTH') },
   { keys: ['play.room.err.chars'], numbers: ['0', '1'], why: 'characters a room code never uses' },
+  { keys: ['play.arrange.teams.dupla'], numbers: ['1', '3', '2', '4'], why: 'the seats of each team in 2 against 2: 1 and 3 against 2 and 4 (web/src/play/arrange.ts teamsOf)' },
   { keys: ['alert.training.stale'], numbers: ['8'], why: 'days without news before the training alert', is: () => constant('shared/cycle-formats.ts', 'STALE_STATUS_MS') / DAY_MS },
   {
     keys: ['reading.rule'],

@@ -47,12 +47,20 @@ export interface RoomSettings {
   players: 2 | 4;
   variant: Variant;
   options: Partial<RuleOptions>;
-  /** Characters for the AI seats on the other team, in seat order. */
+  /**
+   * Characters for the AI seats on the other team, in seat order, all different, one per seat. In
+   * quick play: the ones the next match uses unless randomOpponents is on, and the ones the last
+   * match used (a drawn lineup is written here at the start).
+   */
   opponents: PersonaId[];
-  /** Character for an AI partner (2 against 2). */
+  /** Character for an AI partner (2 against 2), never one of the opponents. */
   partner: PersonaId;
   /** Seconds per move; null (no limit) only in rooms with people only. */
   turnSeconds: TurnSeconds;
+  /** Quick play only: draw the opponents again at every start (M15). Absent in rooms stored before M15. */
+  randomOpponents?: boolean;
+  /** Quick play, 2 against 2 only: draw the partner again at every start (M15). */
+  randomPartner?: boolean;
 }
 
 export interface PublicSeat {
@@ -60,6 +68,10 @@ export interface PublicSeat {
   kind: 'human' | 'ai' | 'empty';
   /** Nickname for people (filtered), character name for AIs. */
   name: string;
+  /**
+   * The character of an AI seat; in a room with friends also the one that plays a free seat if
+   * nobody sits there by the start. Always null for a person.
+   */
   persona: PersonaId | null;
   /** Person who passed the human check in the last 2 hours and is not flagged. */
   verified: boolean;
@@ -87,6 +99,19 @@ export interface PublicRoom {
   lastWinner: number;
   aiVersion: string;
   expiresAt: number;
+  /**
+   * What this room's code can do beyond M14, so a new page never offers what an older room would
+   * drop: 1, the lineup draw of quick play and the rematch switches; 2, also the arrangement of a
+   * room with friends (move, plan, lobby, ownerAway, the planned character on a free seat, only the
+   * owner leading after a match while connected). Absent from older room code and from the guided
+   * lesson's local table.
+   */
+  setup?: number;
+  /**
+   * Rooms with friends only: the owner has no seat with an open connection, so after a match
+   * anyone seated may start the next one. Says nothing about which seat is the owner's.
+   */
+  ownerAway?: boolean;
 }
 
 /** A game event plus when the client should show it, in ms after the message arrives. */
@@ -126,13 +151,23 @@ export type ClientMsg =
   | { t: 'start' }
   | { t: 'act'; seq: number; a: number; auto?: boolean }
   | { t: 'phrase'; key: PhraseKey }
-  | { t: 'rematch' }
+  /** Quick play: a switch the person set on the end screen, kept for this and the next matches; absent keeps the room's. */
+  | { t: 'rematch'; randomOpponents?: boolean; randomPartner?: boolean }
   | { t: 'leave' }
   /** Take the seat back from the AI after time outs ("Voltar a jogar"). */
   | { t: 'resume' }
   | { t: 'sync' }
   /** Quick play only: stop (on) or restart (off) the person's clock while an ad shows between hands. */
-  | { t: 'hold'; on: boolean };
+  | { t: 'hold'; on: boolean }
+  /** Room owner, after a match: back to the lobby to change the table ("Mudar a mesa"). */
+  | { t: 'lobby' }
+  /**
+   * Room owner, lobby: move the person on `from` to `to`, swapping with whatever is there; a planned
+   * character stays with its seat. seat_taken when `from` no longer holds a person.
+   */
+  | { t: 'move'; from: number; to: number }
+  /** Room owner, lobby: who sits in a seat without a connected person. ai null: open for a friend. */
+  | { t: 'plan'; seat: number; ai: string | null };
 
 export type ErrorCode =
   | 'bad_message'
@@ -175,11 +210,28 @@ export function parseClientMsg(raw: string): ClientMsg | null {
     case 'sit':
       return int(o.seat, 0, 3) ? { t: 'sit', seat: o.seat as number } : null;
     case 'start':
-    case 'rematch':
     case 'leave':
     case 'resume':
     case 'sync':
+    case 'lobby':
       return { t: o.t };
+    case 'move':
+      return int(o.from, 0, 3) && int(o.to, 0, 3) && o.from !== o.to ? { t: 'move', from: o.from as number, to: o.to as number } : null;
+    case 'plan':
+      // The room checks the id against the characters it knows; this file imports no AI code.
+      if (!int(o.seat, 0, 3) || !(o.ai === null || (typeof o.ai === 'string' && /^[a-z]{2,8}$/.test(o.ai)))) return null;
+      return { t: 'plan', seat: o.seat as number, ai: o.ai };
+    case 'rematch': {
+      // Old pages send no field; a field that is present must be a boolean.
+      const out: Extract<ClientMsg, { t: 'rematch' }> = { t: 'rematch' };
+      for (const k of ['randomOpponents', 'randomPartner'] as const) {
+        const v = o[k];
+        if (v === undefined) continue;
+        if (typeof v !== 'boolean') return null;
+        out[k] = v;
+      }
+      return out;
+    }
     case 'hold':
       return typeof o.on === 'boolean' ? { t: 'hold', on: o.on } : null;
     case 'act':

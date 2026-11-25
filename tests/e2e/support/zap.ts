@@ -350,6 +350,27 @@ export async function expectSeat(page: Page, seat: number, attrs: { kind?: strin
   if (attrs.aiPlaying !== undefined) await expect(el, `seat ${seat} AI playing`).toHaveAttribute('data-ai-playing', String(attrs.aiPlaying), { timeout });
 }
 
+/** The lobby's team groups in page order: "us:0,2" is the viewer's team holding seat indexes 0 and 2. */
+export function lobbyTeams(page: Page): Promise<string[]> {
+  return page
+    .locator('.lobby__teams > [role="group"]')
+    .evaluateAll((gs) => gs.map((g) => `${g.getAttribute('data-side')}:${[...g.querySelectorAll('[data-testid^="seat-"]')].map((x) => x.getAttribute('data-testid')!.slice(5)).join(',')}`));
+}
+
+/**
+ * The lobby groups the seats by team (M17): the viewer's team first ("Nós", or "Seu lado" in 1
+ * against 1), then the other ("Eles", or "Lado adversário"), each a group named by its heading with
+ * its seats in seat order ("Nós, cadeiras 1 e 3"). Seat indexes, pt-BR page.
+ */
+export async function expectTeams(page: Page, us: number[], them: number[], timeout = 10_000): Promise<void> {
+  await expect.poll(() => lobbyTeams(page), { timeout, message: 'lobby teams' }).toEqual([`us:${us.join(',')}`, `them:${them.join(',')}`]);
+  const seats = (s: number[]) => (s.length === 2 ? `cadeiras ${s[0] + 1} e ${s[1] + 1}` : `cadeira ${s[0] + 1}`);
+  const [a, b] = us.length === 2 ? ['Nós', 'Eles'] : ['Seu lado', 'Lado adversário'];
+  const groups = page.locator('.lobby__teams > [role="group"]');
+  await expect(groups.nth(0)).toHaveAccessibleName(new RegExp(`^${a}\\s*,\\s*${seats(us)}$`));
+  await expect(groups.nth(1)).toHaveAccessibleName(new RegExp(`^${b}\\s*,\\s*${seats(them)}$`));
+}
+
 /** Waits until this page shows the table of a running match with its own cards. */
 export async function expectTable(p: Player, timeout = 15_000): Promise<void> {
   await expect(p.page.getByTestId('turn-indicator')).toBeVisible({ timeout });
@@ -535,6 +556,8 @@ interface HandKnowledge {
   own: Map<string, Set<number>>;
   partner: Map<string, Set<number>>;
   faceUp: Map<string, { seat: number; card: number }[]>;
+  /** The seat this device played in each match: the owner may move people between matches (M15). */
+  seatIn: Map<number, number>;
 }
 
 const handKey = (matchNo: number, handIndex: number) => `${matchNo}:${handIndex}`;
@@ -551,7 +574,7 @@ function addTo<T>(m: Map<string, Set<T>>, key: string, xs: Iterable<T>): void {
  * and no signal it did not catch. Returns what the seat knew, for the checks across devices.
  */
 export function auditMessages(p: Player, problems: string[]): HandKnowledge {
-  const k: HandKnowledge = { own: new Map(), partner: new Map(), faceUp: new Map() };
+  const k: HandKnowledge = { own: new Map(), partner: new Map(), faceUp: new Map(), seatIn: new Map() };
   const youByPage = new Map<number, number | null>();
   for (const r of p.recs) {
     const m = r.msg;
@@ -568,6 +591,7 @@ export function auditMessages(p: Player, problems: string[]): HandKnowledge {
       continue;
     }
     if (o.seat !== you) problems.push(`${where}: observation for seat ${o.seat}, but this device sits at ${you}`);
+    if (!k.seatIn.has(m.matchNo)) k.seatIn.set(m.matchNo, o.seat);
     if (o.hand.length !== 3 || o.hand.some((c) => !(c === -1 || c === -2 || (c >= 0 && c < 40)))) problems.push(`${where}: odd hand ${JSON.stringify(o.hand)}`);
     const onzeTeam = o.players === 4 && o.kind === 'onze' && o.options.onzeSeesPartner && (you & 1) === o.onzeTeam && !o.over;
     if (o.partnerHand !== null && !onzeTeam) problems.push(`${where}: partner cards outside a mão de onze of this team`);
@@ -604,7 +628,11 @@ export function auditMessages(p: Player, problems: string[]): HandKnowledge {
 export function auditRoom(players: Player[]): { problems: string[]; hands: number; sharedHands: number } {
   const problems: string[] = [];
   const know = players.map((p) => auditMessages(p, problems));
-  const seats = players.map((p) => p.seat);
+  // Which device played a seat in the match of a hand key: the seat it had in that match, not its
+  // seat now, since the owner may move people between matches (M15). A device with no game message
+  // of that match holds no cards of it, so it is never the one to compare with.
+  const matchOf = (key: string) => Number(key.split(':')[0]);
+  const deviceAt = (key: string, seat: number): number => know.findIndex((k) => k.seatIn.get(matchOf(key)) === seat);
   const keys = new Set(know.flatMap((k) => [...k.own.keys()]));
   for (const key of keys) {
     for (let i = 0; i < players.length; i++) {
@@ -620,13 +648,14 @@ export function auditRoom(players: Player[]): { problems: string[]; hands: numbe
     }
     for (let i = 0; i < players.length; i++) {
       for (const play of know[i].faceUp.get(key) ?? []) {
-        const owner = seats.indexOf(play.seat);
+        const owner = deviceAt(key, play.seat);
         const ownerCards = owner >= 0 ? know[owner].own.get(key) : undefined;
         if (ownerCards && !ownerCards.has(play.card)) problems.push(`${key}: ${players[i].name} saw seat ${play.seat} play ${play.card}, not in that seat's hand`);
       }
       const partnerCards = know[i].partner.get(key);
       if (partnerCards) {
-        const partner = seats.indexOf((seats[i] + 2) % 4);
+        const mine = know[i].seatIn.get(matchOf(key));
+        const partner = mine === undefined ? -1 : deviceAt(key, (mine + 2) % 4);
         const real = partner >= 0 ? know[partner].own.get(key) : undefined;
         if (real) for (const c of partnerCards) if (!real.has(c)) problems.push(`${key}: ${players[i].name} was told partner card ${c}, not in the partner's hand`);
       }

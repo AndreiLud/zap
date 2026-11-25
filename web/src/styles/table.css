@@ -1439,9 +1439,12 @@
   inset: 0;
   z-index: 25;
   display: grid;
-  align-content: center;
+  /* safe: a result taller than a short play area (a phone held sideways, quick play's switches)
+     starts at its heading and scrolls inside, instead of spilling over the score bar. */
+  align-content: safe center;
   justify-items: center;
   gap: 12px;
+  overflow-y: auto;
   padding: 20px;
   border-radius: var(--radius-l);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
@@ -1460,8 +1463,47 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* A friend in a room with friends (M15): who decides the next match. */
+.match-result__wait {
+  max-width: 30rem;
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
 .match-result .button-row {
   justify-content: center;
+}
+
+/* Quick play's switches for the next match (M15), on a line of their own between "Jogar de novo" and
+   "Escolher outra mesa"; side by side (each label next to its switch), so the result stays short. */
+.match-result .draw {
+  display: flex;
+  flex: 1 0 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 28px;
+}
+
+.match-result .draw legend {
+  margin-inline: auto;
+  color: var(--text-2);
+  font-size: 0.88rem;
+}
+
+.match-result .draw .switch {
+  gap: 12px;
+  min-height: 44px;
+}
+
+/* Phones and tablets held upright: the hand area under the play area is empty once the match is
+   over, so the result may grow down over it instead of scrolling inside a box shorter than itself
+   (quick play's switches at 360 by 640). Held sideways it keeps its box and scrolls there. */
+@media (width < 64em) and (orientation: portrait) {
+  .match-result {
+    bottom: auto;
+    min-height: 100%;
+  }
 }
 
 /* ------------------------------------------------------------------ Tools */

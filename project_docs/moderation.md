@@ -1,6 +1,6 @@
 # Moderation
 
-How a person reviews reports. Reports come from "Denunciar" at the table (`POST /api/report`). Each one names a room, a seat and a fixed reason (`nickname`, `phrases`, `cheating` or `other`); there is no free text. The reporter and the reported person are pseudonyms (`reports.reporter`, `reports.target`), never device ids. `target` is null for an AI seat and after the reported person deleted their data.
+How a person reviews reports. Reports come from "Denunciar" at the table (`POST /api/report`). Each one names a room, a seat and a fixed reason (`nickname`, `phrases`, `cheating` or `other`); there is no free text. The reporter and the reported person are pseudonyms (`reports.reporter`, `reports.target`), never device ids. `target` is null for an AI seat and after the reported person deleted their data. The seat is the one the person held when the report was made: in a room with friends the owner may move people between matches, so after such a change it can differ from the seat that person had in the last match.
 
 What a nickname report does at once:
 

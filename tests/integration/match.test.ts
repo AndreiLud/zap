@@ -3,6 +3,7 @@
 // BASE=http://dev:8787.
 
 import { describe, expect, it } from 'vitest';
+import type { PublicRoom } from '../../shared/protocol.ts';
 import { BASE, Device, playToEnd, sleep, type Conn, type PlayResult } from './helpers.ts';
 import { ViewChecker, crossCheck } from './view-check.ts';
 
@@ -61,6 +62,31 @@ describe.skipIf(!BASE)('whole matches', () => {
     expectFinished(res, c);
     expect(res.final.obs.variant).toBe('mineiro');
     expect(res.final.obs.vira).toBe(-1);
+    expect(view.problems).toEqual([]);
+    c.close();
+  }, 120_000);
+
+  it('quick play with both random switches on: a valid drawn lineup, and a rematch with them off repeats it', async () => {
+    const d = await new Device().verified();
+    const code = await d.play({ players: 4, variant: 'paulista', opponents: ['zap', 'iara'], partner: 'lia', randomOpponents: true, randomPartner: true });
+    const c = await d.connect(code);
+    const view = watchWith(c, 'solo drawn');
+    const lineupOf = (room: PublicRoom) => ({ opponents: [room.seats[1].persona, room.seats[3].persona], partner: room.seats[2].persona });
+    const first = (await c.nextRoom()).room;
+    expect(first.setup).toBeGreaterThanOrEqual(1);
+    const drawn = lineupOf(first);
+    // Three different characters, and the settings name the ones at the table.
+    expect(new Set([...drawn.opponents, drawn.partner]).size).toBe(3);
+    expect(first.settings).toMatchObject({ randomOpponents: true, randomPartner: true, ...drawn });
+    const res = await playToEnd(c, { paceMs: 200, timeoutMs: 100_000 });
+    expectFinished(res, c);
+
+    await sleep(300);
+    c.send({ t: 'rematch', randomOpponents: false, randomPartner: false });
+    const next = (await c.nextRoom((r) => r.room.matchNo === res.final.matchNo + 1)).room;
+    expect(next.status).toBe('playing');
+    expect(lineupOf(next)).toEqual(drawn);
+    expect(next.settings).toMatchObject({ randomOpponents: false, randomPartner: false, ...drawn });
     expect(view.problems).toEqual([]);
     c.close();
   }, 120_000);
@@ -188,6 +214,120 @@ describe.skipIf(!BASE)('whole matches', () => {
     expect(crossCheck(va, vb, true)).toEqual([]);
     expect(crossCheck(vb, va, true)).toEqual([]);
     ca.close();
+    cb.close();
+  }, 120_000);
+
+  it('the owner arranges a 2 against 2 room, plays, changes the table after the match and lets a late friend in (M15)', async () => {
+    const a = await new Device().verified();
+    const b = await new Device().verified();
+    const c = await new Device().verified();
+    const code = await a.createRoom({ players: 4, variant: 'paulista', turnSeconds: 60 });
+    const ca = await a.connect(code);
+    expect((await ca.nextRoom()).owner).toBe(true);
+    const cb = await b.connect(code);
+    expect((await cb.nextRoom()).you).toBe(1);
+    const va = watchWith(ca, 'owner A');
+    const vb = watchWith(cb, 'friend B');
+
+    // A moves B to the seat in front (B's page learns it from the room message) and keeps Lia on seat 1.
+    await sleep(300);
+    ca.send({ t: 'move', from: 1, to: 2 });
+    await cb.nextRoom((r) => r.you === 2);
+    await sleep(300);
+    ca.send({ t: 'plan', seat: 1, ai: 'lia' });
+    const planned = await cb.nextRoom((r) => r.room.seats[1].kind === 'ai');
+    expect(planned.room.seats.map((s) => [s.kind, s.persona])).toEqual([
+      ['human', null],
+      ['ai', 'lia'],
+      ['human', null],
+      ['empty', 'zap'],
+    ]);
+
+    await sleep(300);
+    ca.send({ t: 'start' });
+    await ca.nextGame();
+    await cb.nextGame();
+    expect(ca.room!.room.seats.map((s) => [s.kind, s.persona])).toEqual([
+      ['human', null],
+      ['ai', 'lia'],
+      ['human', null],
+      ['ai', 'zap'],
+    ]);
+    const [pa, pb] = await Promise.all([playToEnd(ca, { timeoutMs: 105_000 }), playToEnd(cb, { timeoutMs: 105_000 })]);
+    expectFinished(pa, ca);
+    expectFinished(pb, cb);
+
+    // While the owner is here only the owner leads.
+    await sleep(300);
+    cb.send({ t: 'rematch' });
+    expect((await cb.nextError()).code).toBe('not_owner');
+
+    // "Mudar a mesa": back to the lobby; nobody gets a game message there, B keeps seat 2.
+    await sleep(300);
+    const mark = { a: ca.log.length, b: cb.log.length };
+    ca.send({ t: 'lobby' });
+    const back = await cb.nextRoom((r) => r.room.status === 'lobby');
+    expect(back.you).toBe(2);
+    expect(back.room.matchNo).toBe(pa.final.matchNo);
+    expect(back.room.seats.map((s) => s.kind)).toEqual(['human', 'ai', 'human', 'ai']);
+    await sleep(300);
+    // A opens seat 3 (Zap stays planned there), and C, who arrives late, lands on it.
+    ca.send({ t: 'plan', seat: 3, ai: null });
+    const open = await cb.nextRoom((r) => r.room.seats[3].kind === 'empty');
+    expect(open.room.seats[3].persona).toBe('zap');
+    const cc = await c.connect(code);
+    const rc = await cc.nextRoom();
+    expect(rc.you).toBe(3);
+    expect(rc.owner).toBe(false);
+    const sinceLobby = [...ca.log.slice(mark.a), ...cb.log.slice(mark.b), ...cc.log].map((r) => r.msg);
+    expect(sinceLobby.filter((m) => m.t === 'game')).toEqual([]);
+
+    await sleep(300);
+    ca.send({ t: 'start' });
+    const next = pa.final.matchNo + 1;
+    await cc.nextGame((g) => g.matchNo === next);
+    const room = await ca.nextRoom((r) => r.room.matchNo === next);
+    expect(room.room.status).toBe('playing');
+    expect(room.room.seats.map((s) => s.kind)).toEqual(['human', 'ai', 'human', 'human']);
+    expect(room.room.seats[1].persona).toBe('lia');
+    expect((await cb.nextGame((g) => g.matchNo === next)).obs.seat).toBe(2);
+    expect(va.problems).toEqual([]);
+    expect(vb.problems).toEqual([]);
+    for (const conn of [ca, cb, cc]) conn.close();
+  }, 120_000);
+
+  it('after a match, with the owner gone, a friend starts the next one and the AI plays the owner\'s seat (M15)', async () => {
+    const a = await new Device().verified();
+    const b = await new Device().verified();
+    const code = await a.createRoom({ players: 2, variant: 'paulista', turnSeconds: 60 });
+    const ca = await a.connect(code);
+    await ca.nextRoom();
+    const cb = await b.connect(code);
+    expect((await cb.nextRoom()).you).toBe(1);
+    await sleep(300);
+    ca.send({ t: 'start' });
+    await ca.nextGame();
+    await cb.nextGame();
+    const [pa, pb] = await Promise.all([playToEnd(ca, { timeoutMs: 105_000 }), playToEnd(cb, { timeoutMs: 105_000 })]);
+    expectFinished(pa, ca);
+    expectFinished(pb, cb);
+
+    await sleep(300);
+    ca.send({ t: 'lobby' });
+    await cb.nextRoom((r) => r.room.status === 'lobby');
+    ca.close();
+    const away = await cb.nextRoom((r) => r.room.ownerAway === true);
+    expect(away.room.seats[0]).toMatchObject({ kind: 'human', connected: false });
+    await sleep(300);
+    cb.send({ t: 'start' });
+    const next = pa.final.matchNo + 1;
+    // The room message comes before the game message of the same change.
+    const room = await cb.nextRoom((r) => r.room.matchNo === next);
+    expect(room.room.status).toBe('playing');
+    expect(room.room.seats[0]).toMatchObject({ kind: 'human', aiPlaying: true });
+    expect(room.room.ownerAway).toBe(true);
+    const g = await cb.nextGame((x) => x.matchNo === next);
+    expect(g.obs.over).toBe(false);
     cb.close();
   }, 120_000);
 });

@@ -217,7 +217,10 @@ export function TrucoPanel({ m, open, deadline, pos }: { m: Model; open: boolean
     const a = document.activeElement as HTMLElement | null;
     if (!a?.closest('.truco')) before.current = a;
     if (!inGame()) return;
-    const go = () => accept.current?.focus({ preventScroll: true });
+    // Checked again when it runs: with reduced motion it waits a beat, and the person may leave the game meanwhile.
+    const go = () => {
+      if (inGame()) accept.current?.focus({ preventScroll: true });
+    };
     if (reducedMotion) {
       const id = setTimeout(go, TRUCO_REDUCED_BEAT);
       return () => clearTimeout(id);
@@ -231,11 +234,15 @@ export function TrucoPanel({ m, open, deadline, pos }: { m: Model; open: boolean
     if (!closingKey) return;
     const id = setTimeout(
       () => {
-        const a = document.activeElement;
-        const hadFocus = !a || a === document.body || !!a.closest('.truco');
+        const panelHeld = () => {
+          const a = document.activeElement;
+          return !a || a === document.body || !!a.closest('.truco');
+        };
         setGone(closingKey);
-        if (!hadFocus) return;
+        if (!panelHeld()) return;
         requestAnimationFrame(() => {
+          // Focus left for the footer or the header during that frame: it stays there.
+          if (!panelHeld()) return;
           const back = before.current;
           if (back && back.isConnected && back !== document.body && !back.closest('.truco') && back.offsetParent !== null) back.focus({ preventScroll: true });
           else focusHand();

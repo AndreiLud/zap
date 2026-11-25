@@ -67,6 +67,8 @@
   "board.aiPlaying": "The AI is playing for you.",
   "board.rematch.wait": "Opening the table",
   "board.other": "Pick another table",
+  "board.random.legend": "Random for the next match",
+  "board.change": "Change the table",
   "board.raise.aria": "Call {call}",
   "board.signals": "Signal",
   "board.signals.panel": "Send a signal to your partner",

@@ -1,10 +1,14 @@
 // Keyboard play on the desktop, in English (CLIENT-SPEC 12, 19.4): a solo 1 against 1 match played
 // to the end with the keys only (1, 2 and 3 for the cards, T to raise, A to accept, C to run), never
 // the mouse; the quick rules open with R in the middle of the match without touching the room's
-// connection and give the focus back; the match ends with the focus on the result heading.
+// connection and give the focus back; the match ends with the focus on the result heading, and Tab
+// walks the result in the order of M15 spec 5.4. The random switch of the Play page and of the end
+// screen toggles with Space and keeps the focus. In a room with friends, the owner arranges the table
+// by keyboard: Tab walks the seat selects, the arrow keys change one, and the focus stays (M15 6.4),
+// also when the owner changes team and the two team groups swap, with and without moveBefore (M17).
 
 import { expect, test, type Page } from '@playwright/test';
-import { DESKTOP, auditRoom, expectTable, newPlayers, passHumanCheck, textContrast, waitForMove, type TableState } from './support/zap.ts';
+import { DESKTOP, auditRoom, createRoom, expectSeat, expectTable, expectTeams, newPlayers, passHumanCheck, textContrast, waitForMove, type TableState } from './support/zap.ts';
 
 /** The key for the first playable card: its place (1, 2 or 3) among the cards still in hand, left to right. */
 async function cardKey(page: Page): Promise<string | null> {
@@ -62,6 +66,17 @@ test('a whole solo match with the keyboard only, the quick rules on R, and the f
       await solo.focus();
       await page.keyboard.press('Space');
       await expect(solo).toBeChecked();
+      await expect(page.getByTestId('play-summary')).toHaveText('Paulista, 1 against 1: you against Zap.');
+      // The random switch (M15) toggles with Space and keeps the focus; turned off again, Zap stays.
+      const random = page.getByTestId('random-opponents');
+      await expect(page.getByTestId('random-partner')).toHaveCount(0);
+      await random.focus();
+      await page.keyboard.press('Space');
+      await expect(random).toBeChecked();
+      await expect(random).toBeFocused();
+      await expect(page.getByTestId('play-summary')).toHaveText('Paulista, 1 against 1: you against a random opponent.');
+      await page.keyboard.press('Space');
+      await expect(random).not.toBeChecked();
       await expect(page.getByTestId('play-summary')).toHaveText('Paulista, 1 against 1: you against Zap.');
       await page.getByTestId('play-now').focus();
       await page.keyboard.press('Enter');
@@ -129,6 +144,17 @@ test('a whole solo match with the keyboard only, the quick rules on R, and the f
       await expect(heading).toHaveText(room.lastWinner === (me.seat & 1) ? 'You won!' : 'Zap won.');
       await expect(heading).toBeFocused();
       await expect(page.getByTestId('rematch-button')).toHaveText('Play again');
+      // Tab from the heading: "Play again", the switch for the next match (1 against 1: the opponent
+      // only), "Pick another table", "You against Zap" (M15 spec 5.4). Space toggles the switch.
+      for (const id of ['rematch-button', 'rematch-random-opponents', 'home-button', 'link-vs']) {
+        await page.keyboard.press('Tab');
+        await expect(page.getByTestId(id)).toBeFocused();
+      }
+      await expect(page.getByTestId('rematch-random-partner')).toHaveCount(0);
+      await page.getByTestId('rematch-random-opponents').focus();
+      await page.keyboard.press('Space');
+      await expect(page.getByTestId('rematch-random-opponents')).toBeChecked();
+      await expect(page.getByTestId('rematch-random-opponents')).toBeFocused();
       console.log(`keys pressed: ${[...used].map(([k, n]) => `${k} ${n}`).join(', ')}`);
       console.log(`key hint contrast: ${[...hints].map(([k, r]) => `${k} ${r}`).join(', ')}`);
       expect(hints.has('bet'), 'the bet button showed up at least once').toBe(true);
@@ -139,5 +165,103 @@ test('a whole solo match with the keyboard only, the quick rules on R, and the f
     });
   } finally {
     await me.close();
+  }
+});
+
+test('the owner arranges the table by keyboard: Tab walks the seats, the arrows change one, the focus stays', async ({ browser }) => {
+  test.setTimeout(120_000);
+  const [ana] = await newPlayers(browser, [['Ana', DESKTOP]]);
+  const page = ana.page;
+  /** From the last link of the invite, Tab walks the seat selects in page order, then the start. */
+  const tabOrder = async (ids: string[]) => {
+    await page.getByTestId('whatsapp-invite').focus();
+    for (const id of [...ids, 'start-button']) {
+      await page.keyboard.press('Tab');
+      await expect(page.getByTestId(id)).toBeFocused();
+    }
+  };
+  try {
+    await createRoom(ana, { players: 4, turn: '30' });
+    // The seats come by team (M17): Nós (seats 1 and 3) then Eles (seats 2 and 4), so Tab reads
+    // Ana's team first.
+    await expectTeams(page, [0, 2], [1, 3]);
+    await tabOrder(['arrange-0', 'arrange-2', 'arrange-1', 'arrange-3']);
+    // Seat 3 is free with Lia planned: Down reserves Otávio in Lia's place, Up frees the seat again,
+    // which keeps Otávio as its plan; the select keeps the focus through both answers of the room.
+    const select = page.getByTestId('arrange-2');
+    await select.focus();
+    await expect(select).toHaveValue('open');
+    await page.keyboard.press('ArrowDown');
+    await expect(select).toHaveValue('ai:otavio');
+    await expectSeat(page, 2, { kind: 'ai' });
+    await expect(page.getByTestId('seat-2')).toContainText('Otávio');
+    await expect(select).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(select).toHaveValue('open');
+    await expectSeat(page, 2, { kind: 'empty' });
+    await expect(page.getByTestId('seat-2')).toContainText('se ficar vazia, joga o Otávio');
+    await expect(select).toBeFocused();
+    // The owner's own seat takes only people: the arrows find nothing else to choose.
+    const own = page.getByTestId('arrange-0');
+    await own.focus();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowUp');
+    await expect(own).toHaveValue('seat:0');
+    await expect(own).toBeFocused();
+    expect(ana.sent.filter((x) => x.data.includes('"t":"plan"')).map((x) => x.data)).toEqual(['{"t":"plan","seat":2,"ai":"otavio"}', '{"t":"plan","seat":2,"ai":null}']);
+    expect(ana.sent.some((x) => x.data.includes('"t":"move"'))).toBe(false);
+    // Ana sits herself on seat 2 from its select ("Você, na cadeira 1" is just above "Livre"): she
+    // changes team, the two groups swap places (Nós is now seats 2 and 4) and the select she used
+    // keeps the focus.
+    const other = page.getByTestId('arrange-1');
+    await other.focus();
+    await expect(other).toHaveValue('open');
+    await page.keyboard.press('ArrowUp');
+    await expectSeat(page, 1, { kind: 'human', connected: true });
+    await expectTeams(page, [1, 3], [0, 2]);
+    await expect(other).toHaveValue('seat:1');
+    await expect(other).toBeFocused();
+    await expect(page.getByTestId('lobby-said')).toContainText('Cadeira 2: Você.');
+    expect(ana.sent.filter((x) => x.data.includes('"t":"move"')).map((x) => x.data)).toEqual(['{"t":"move","from":0,"to":1}']);
+    await tabOrder(['arrange-1', 'arrange-3', 'arrange-0', 'arrange-2']);
+  } finally {
+    await ana.close();
+  }
+});
+
+test('without moveBefore (Safari, iOS) the select the owner used keeps the focus when the groups swap', async ({ browser }) => {
+  test.setTimeout(120_000);
+  const [ana] = await newPlayers(browser, [['Ana', DESKTOP]]);
+  const page = ana.page;
+  try {
+    // A browser without moveBefore: Preact moves the swapped team group with insertBefore, which
+    // drops the focus, and the Lobby gives it back to the control that had it (pages/Lobby.tsx).
+    await page.addInitScript(() => {
+      for (const proto of [Element.prototype, DocumentFragment.prototype, Document.prototype]) delete (proto as unknown as { moveBefore?: unknown }).moveBefore;
+    });
+    await createRoom(ana, { players: 4, turn: '30' });
+    expect(await page.evaluate(() => 'moveBefore' in document.body), 'moveBefore is gone').toBe(false);
+    await expectTeams(page, [0, 2], [1, 3]);
+    // Ana sits herself on seat 2 from its select, by keyboard: she changes team and the groups swap.
+    const other = page.getByTestId('arrange-1');
+    await other.focus();
+    await expect(other).toHaveValue('open');
+    await page.keyboard.press('ArrowUp');
+    await expectSeat(page, 1, { kind: 'human', connected: true });
+    await expectTeams(page, [1, 3], [0, 2]);
+    await expect(other).toHaveValue('seat:1');
+    await expect(other).toBeFocused();
+    await expect(page.getByTestId('lobby-said')).toContainText('Cadeira 2: Você.');
+    // And back to seat 1: the groups swap again, the focus stays on the select she used.
+    const own = page.getByTestId('arrange-0');
+    await own.focus();
+    await expect(own).toHaveValue('open');
+    await page.keyboard.press('ArrowUp');
+    await expectTeams(page, [0, 2], [1, 3]);
+    await expect(own).toHaveValue('seat:0');
+    await expect(own).toBeFocused();
+    expect(ana.sent.filter((x) => x.data.includes('"t":"move"')).map((x) => x.data)).toEqual(['{"t":"move","from":0,"to":1}', '{"t":"move","from":1,"to":0}']);
+  } finally {
+    await ana.close();
   }
 });

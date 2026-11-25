@@ -15,7 +15,7 @@ import { store } from '../store.ts';
 import type { PhraseKey } from '../../../shared/protocol.ts';
 import { OwnBubble } from './Bubbles.tsx';
 import { BackView, CardView } from './cards.tsx';
-import { focusHand, inGame } from './focus.ts';
+import { focusHand, focusLater, inGame } from './focus.ts';
 import { handSlots, isManilha, legalCardMask, type Model } from './model.ts';
 import { cacheRects, leaveHand, type Scene } from './motion.ts';
 import { ResumeBanner, TurnBar } from './Actions.tsx';
@@ -63,7 +63,7 @@ export function HandArea(props: {
     const first = slots.find((s) => mask & (1 << s));
     if (first !== undefined) {
       setRov(first);
-      requestAnimationFrame(() => list.current?.querySelector<HTMLElement>(`[data-slot="${first}"]`)?.focus({ preventScroll: true }));
+      focusLater(() => list.current?.querySelector<HTMLElement>(`[data-slot="${first}"]`));
     }
   }, [turnKey]);
   useEffect(() => {

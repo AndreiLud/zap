@@ -67,6 +67,8 @@
   "board.aiPlaying": "A IA está jogando por você.",
   "board.rematch.wait": "Abrindo a mesa",
   "board.other": "Escolher outra mesa",
+  "board.random.legend": "Sortear na próxima partida",
+  "board.change": "Mudar a mesa",
   "board.raise.aria": "Pedir {call}",
   "board.signals": "Sinal",
   "board.signals.panel": "Mandar um sinal para a sua dupla",

@@ -1,7 +1,8 @@
 /* The Play page (CLIENT-SPEC 10.2, prototype azulejo-v2/jogar.css and pagina.css). Phone first.
    One tile moment: a slim strip of tiles under the title. Everything else is type, white space and
    thin rules; the only boxes wrap things you can touch. Every rule is scoped to .play, so no other
-   page picks these up (the rules page has its own variant switch). */
+   page picks these up (the rules page has its own variant switch); only the random switches (.draw)
+   are not, since the end screen of quick play shares them. */
 
 .play {
   width: 100%;
@@ -285,6 +286,34 @@ html[data-deck="four"] .play .mini-card--manilha::after {
   box-shadow: -1px 1px 0 var(--suit-ink);
 }
 
+/* ------------------------------------------------------------------ Random switches */
+
+/* The random switches of quick play (M15): a plain group, its legend like the variant label, one
+   full width row per switch (the entry's .switch, 52px high). Not scoped to .play: the end screen of
+   quick play shows the same group below "Jogar de novo". */
+.draw {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.draw legend {
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.draw .switch b {
+  font-weight: 650;
+}
+
+.draw .switch input:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* ------------------------------------------------------------------ Opponents */
 
 /* Who you face: one quiet row between hairlines, with the picker folded inside. */
@@ -467,6 +496,28 @@ html[data-deck="four"] .play .mini-card--manilha::after {
   color: var(--text-2);
   font-size: 0.8rem;
   font-weight: 600;
+  line-height: 1.25;
+}
+
+/* A character the other side of the table holds (M15): a disabled option that keeps its line and
+   says why in words; only the art and the mark fade, so the reason stays readable. */
+.play .character.is-taken {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  cursor: not-allowed;
+}
+
+.play .character.is-taken input,
+.play .character.is-taken .avatar,
+.play .character.is-taken .level {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.play .character__taken {
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 750;
   line-height: 1.25;
 }
 

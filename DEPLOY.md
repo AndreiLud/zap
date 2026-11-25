@@ -723,6 +723,7 @@ Solo matches the paid mode admits in a 30 day month, with the other projects at 
 3. Rooms keep their old code for up to 24 hours after a deploy (`code_update_strategy` `deferred`), so open matches are not cut. During that time the new Worker may call a room that still runs the old `Room` class:
    * A release that adds or changes a `Room` method the Worker calls (`create`, `info`, `report`, `forget`, `rekey`, `setNoAdapt`, or the `X-Zap-*` headers of the WebSocket hand off) goes out with `"mode": "immediate"` for that one deploy, then back to `deferred`. Open matches reconnect once.
    * If that is skipped, nothing is lost silently: a deletion that cannot reach such a room deletes nothing and asks the person to try again, and a recovery keeps the call in `room_calls` until the room runs the new code or the daily job delivers it.
+   * M15 (lineups and room arrangement) deploys with the usual `deferred` strategy: `Room.create` keeps its signature, the settings only gain optional fields, and every new behaviour is gated by `PublicRoom.setup`, which only new room code sends.
 4. After the deploy, run section 8 again.
 5. Models are not part of a release: the training cycle publishes them to `zap-models`. A Worker release changes the bundled models (v2 by default, v1 behind it) only when `ai/models/bootstrap/` changes.
 6. On the server, after `git pull`: when `training/requirements.lock` or `training/Dockerfile` changed, rebuild the training image and then the cycle image (section 7.3); when only `training/cycle/requirements.lock` or `training/cycle/Dockerfile` changed, rebuild the cycle image. Code needs no rebuild: the folder is mounted. Restart the scheduler while no cycle runs (`training/cycle/SERVER.md`, "Updating the code").
@@ -799,7 +800,7 @@ Ads are off at launch, and the code holds only their structure. This section say
 
 * `ADS_ENABLED` is `"false"`. Then `/api/config` answers `"ads": null`, `/ads.txt` answers 404, the content security policy in `_headers` names no Google domain, and the page loads nothing from Google: no script, no consent dialog, no reserved space (`worker/src/ads.ts`, `web/src/ads/`).
 * When ads are on, the page asks once ("Aceitar anúncios" or "Jogar sem anúncios", equal buttons). Whoever says no plays the same, with no ads.
-* Ads are full screen only, never a reward, and appear only at pause points: when a room's match ends, at "Jogar de novo" after a solo match, between two hands of a solo match, and in a lobby after a few seconds of waiting. Never during a hand or while a clock runs: between solo hands the room holds the person's clock while the ad shows, and gives back the time that was left.
+* Ads are full screen only, never a reward, and appear only at pause points: when a room's match ends, at "Jogar de novo" after a solo match, between two hands of a solo match, and in a room's lobby before its first match, after a few seconds of waiting. Never during a hand or while a clock runs: between solo hands the room holds the person's clock while the ad shows, and gives back the time that was left.
 * A failed or blocked ad shows nothing and the game goes on. Ad events never enter training, and the time an ad holds never counts as decision time.
 * The loader asks Google for non-personalized ads for everyone (`requestNonPersonalizedAds = 1`, `web/src/ads/loader.ts`).
 

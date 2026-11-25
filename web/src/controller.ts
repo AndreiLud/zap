@@ -8,13 +8,21 @@
 import type { PhraseKey } from '../../shared/protocol.ts';
 import type { Key } from './i18n.ts';
 
+/** Quick play's switches for the next match (M15 spec 5.4): on draws that side again, off repeats it. */
+export interface RematchChoice {
+  randomOpponents: boolean;
+  randomPartner: boolean;
+}
+
 export interface TableController {
   readonly kind: 'room' | 'local';
   /** One engine action (card slot, cover, bet, answer, signal). `auto` marks a move made for the person when time ran out. */
   act(a: number, auto?: boolean): void;
   phrase(key: PhraseKey): void;
-  /** "Jogar de novo" after the match ended. */
-  rematch(): void;
+  /** "Jogar de novo" after the match ended, with the end screen's random switches in quick play. */
+  rematch(next?: RematchChoice): void;
+  /** "Mudar a mesa" after a match in a room with friends: the owner goes back to the lobby. Rooms only. */
+  changeTable?(): void;
   /** "Voltar a jogar" while the AI plays the person's seat. */
   resume(): void;
   /** "Leave match": leaves the table and goes to the Play page. */

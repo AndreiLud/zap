@@ -1,23 +1,23 @@
 // The app shell: skip link, header (with the phone menu sheet), the page of the current route,
 // footer, and the dialogs every page shares (age gate, notice, human check, quick rules). Routes
 // come from routes.ts; every page outside the table path loads on demand (lazy.tsx), and so do the
-// table itself, the quick rules dialog, the age gate and the legal texts (CLIENT-SPEC 18).
+// table itself, the room lobby (room-chunks.tsx), the quick rules dialog, the age gate and the legal
+// texts (CLIENT-SPEC 18).
 
 import type { ComponentChildren } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { openRules } from './actions.ts';
 import { AdsRoot } from './ads/index.ts';
-import { ConnStatus } from './components/common.tsx';
 import { HumanCheck } from './components/Dialogs.tsx';
 import { Footer } from './components/Footer.tsx';
 import { Header } from './components/Header.tsx';
 import { legalReady, loadData, loadLegal, t, type Key } from './i18n.ts';
 import { lazyComponent } from './lazy.tsx';
 import { limitText } from './limit.ts';
-import { Lobby } from './pages/Lobby.tsx';
 import { PlayPage } from './pages/Play.tsx';
 import { RoomProblemPage } from './pages/RoomProblem.tsx';
 import { StartPage } from './pages/Start.tsx';
+import { Lobby, RoomLoading } from './room-chunks.tsx';
 import { INDEXED, isLegalRoute, type PathRoute, type Route } from './routes.ts';
 import { store, useStore, type AppState } from './store.ts';
 
@@ -119,16 +119,6 @@ function RoomPage({ s }: { s: AppState }) {
   if ((status === 'playing' || status === 'ended') && s.view) return <Table s={s} />;
   // Opening: the table's stage with the deck on the medallion (CLIENT-SPEC 10.4), from the table chunk.
   return <TableOpening s={s} />;
-}
-
-/** While the table's code loads: the room's name and the connection badge. */
-function RoomLoading({ s }: { s: AppState }) {
-  return (
-    <main id="main" class="page loading" aria-busy="true">
-      <h1>{s.route.name === 'room' ? t('room.loading', { code: s.route.code ?? '' }) : ''}</h1>
-      <ConnStatus s={s} />
-    </main>
-  );
 }
 
 function setMeta(name: string, content: string | null): void {

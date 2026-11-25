@@ -1,6 +1,7 @@
 // The logic of one room, without any Cloudflare API: seats, matches, AI in empty seats, turn
-// deadlines, drops and returns, abandonment, rematch and expiry. The Durable Object (room.ts)
-// stores the state, owns the WebSockets and the alarm, and calls these methods.
+// deadlines, drops and returns, abandonment, rematch, the owner's arrangement of a room with
+// friends (the seat plan, move, plan, lobby) and expiry. The Durable Object (room.ts) stores the
+// state, owns the WebSockets and the alarm, and calls these methods.
 //
 // Everything that leaves the room for a seat goes through gameMessage(), which uses observe()
 // and eventsFor() from the engine, so hidden information never leaves the server.
@@ -24,6 +25,7 @@ import { HeuristicAgent } from '../../ai/src/heuristic.ts';
 import type { PersonaId } from '../../ai/src/personas.ts';
 import { PERSONAS } from '../../ai/src/personas.ts';
 import type { ClientMsg, ErrorCode, PhraseKey, PublicRoom, PublicSeat, RoomSettings, ServerMsg, TimedEvent } from '../../shared/protocol.ts';
+import { drawLineup, firstFree, isPersonaId, lineupProblem } from '../../shared/lineup.ts';
 import { seatVersion, type MoveInfo, type RecordSeat, type RecordedMatch } from '../../shared/match-record.ts';
 import type { MatchAi } from '../../shared/cycle-formats.ts';
 import type { RoomBrake } from './brake.ts';
@@ -41,6 +43,13 @@ export const AUTO_SLACK_MS = 1_500;
 export const MAX_AI_MOVES_PER_EVENT = 12;
 /** A hold (an ad between solo hands) longer than this counts the rest as decision time. */
 export const HOLD_FREE_MS = 150_000;
+/**
+ * PublicRoom.setup: what this room code can do beyond M14, so a newer page offers only what the
+ * room will keep. 1: the quick play lineup draw and the rematch switches. 2: also the owner's
+ * arrangement of a room with friends (move, plan, lobby), ownerAway and the owner rule after a
+ * match, and the planned character on a free seat.
+ */
+export const ROOM_SETUP = 2;
 
 /** D1's open_rooms expiry is written this far ahead of the room's own, so an active room rewrites it about once an hour. */
 export const LISTING_AHEAD_MS = 3600_000;
@@ -68,6 +77,13 @@ export interface StoredSeat {
   kind: 'human' | 'ai' | 'empty';
   device: string | null;
   name: string;
+  /**
+   * Quick play: the character of an AI seat, null for the person. Rooms with friends hold a plan
+   * on every seat, all different (invariant P1): the character of an AI seat; on a free seat the
+   * AI that plays it if nobody sits there by the start (published); on a person's seat a hidden
+   * fallback, used only if the seat goes to an AI at a start (never published, never recorded).
+   * The plan belongs to the seat position: people move without it, an AI moves with it.
+   */
   persona: PersonaId | null;
   verified: boolean;
   /** Until when the "humano verificado" seal holds (the credential's expiry). */
@@ -80,6 +96,13 @@ export interface StoredSeat {
   takeover: boolean;
   /** The person switched on "Don't adapt to me": the AIs read no statistics about this seat (from the next match on). */
   noAdapt: boolean;
+  /**
+   * The person was not connected when this match started (from a lobby after a match, or a
+   * rematch): the AI plays the seat from the deal and the match never counts them as abandoning
+   * it. Cleared when they connect; from then on the usual grace and abandonment apply. Absent:
+   * false (rooms stored before M15).
+   */
+  carried?: boolean;
 }
 
 /**
@@ -204,16 +227,24 @@ export interface Sender {
 const OK: OpResult = { ok: true };
 const fail = (code: ErrorCode): OpResult => ({ ok: false, code });
 
+/**
+ * Settings for tests and for the Worker's defaults. The lineup follows the table size (one opponent
+ * with two players), a missing partner is the first character not among the opponents, and the
+ * random switches stay off unless asked for: API callers, sims and tests stay deterministic.
+ */
 export function defaultSettings(over: Partial<RoomSettings> = {}): RoomSettings {
+  const opponents = over.opponents ?? (over.players === 2 ? ['zap'] : ['zap', 'lia']);
   return {
     mode: 'solo',
     players: 4,
     variant: 'paulista',
     options: {},
-    opponents: ['zap', 'lia'],
-    partner: 'iara',
     turnSeconds: 30,
     ...over,
+    opponents,
+    partner: over.partner ?? firstFree(opponents),
+    randomOpponents: over.randomOpponents ?? false,
+    randomPartner: over.randomPartner ?? false,
   };
 }
 
@@ -225,9 +256,10 @@ export function validateSettings(s: RoomSettings): string | null {
   } catch {
     return 'options';
   }
-  const ids = PERSONAS.map((p) => p.id) as string[];
-  if (!Array.isArray(s.opponents) || s.opponents.length < 1 || s.opponents.length > 2 || !s.opponents.every((p) => ids.includes(p))) return 'opponents';
-  if (!ids.includes(s.partner)) return 'partner';
+  // One different character per AI seat of the other team, a partner who is not one of them, and
+  // the random switches only where they mean something (quick play; the partner at 4 players).
+  const lineup = lineupProblem(s);
+  if (lineup) return lineup;
   if (![15, 30, 60, null].includes(s.turnSeconds)) return 'turnSeconds';
   if (s.turnSeconds === null && s.mode === 'solo') return 'turnSeconds';
   return null;
@@ -288,6 +320,12 @@ export class RoomCore {
     if (this.k <= 0) throw new Error('timeScale must be positive');
     // Seats stored before the "Don't adapt to me" flag existed.
     for (const seat of stored.seats) seat.noAdapt ??= false;
+    // Rooms stored before the random switches (M15) never draw. The settings are not validated
+    // again on load, so an older room with a lineup the new rules refuse still loads and plays.
+    stored.settings.randomOpponents ??= false;
+    stored.settings.randomPartner ??= false;
+    // Rooms with friends stored before the seat plan (M15) get one.
+    upgradePlan(stored);
     if (stored.match) {
       upgradeMatch(stored);
       this.ms = replay(stored.match.config, stored.match.seed, stored.match.log);
@@ -309,12 +347,21 @@ export class RoomCore {
     if (err) throw new Error(`bad settings: ${err}`);
     const now = deps.now();
     const seats = Array.from({ length: settings.players }, emptySeat);
+    if (settings.mode === 'room') {
+      // The plan of a new room: the lineup on the seats where today's start would put it when only
+      // the owner sits (seat 0), and a free character as the owner's hidden fallback. The owner
+      // moves people and changes characters in the lobby (move, plan).
+      const o = settings.opponents;
+      const plan = settings.players === 4 ? [firstFree([...o, settings.partner]), o[0], settings.partner, o[1]] : [firstFree(o), o[0]];
+      seats.forEach((s, i) => (s.persona = plan[i]));
+    }
     const r: StoredRoom = {
       v: 1,
       code,
       createdAt: now,
       lastActivity: now,
-      settings,
+      // A copy: the room writes the drawn lineup and the switches into its own settings.
+      settings: { ...settings, randomOpponents: settings.randomOpponents === true, randomPartner: settings.randomPartner === true },
       owner,
       seats,
       status: 'lobby',
@@ -371,14 +418,41 @@ export class RoomCore {
       for (const s of people) {
         if (s.connected || s.awaySince === null) continue;
         if (!s.takeover) times.push(s.awaySince + RECONNECT_GRACE_MS * this.k);
-        if (!s.abandoned && !everyoneAway) times.push(s.awaySince + ABANDON_AFTER_MS * this.k);
+        // A person carried into this match is never marked as abandoning it: nothing to wake for.
+        if (!s.abandoned && !s.carried && !everyoneAway) times.push(s.awaySince + ABANDON_AFTER_MS * this.k);
       }
     }
     return Math.min(...times);
   }
 
+  /** Rooms with friends: the owner has no seat with an open connection (left, away, or forgotten). */
+  ownerAway(): boolean {
+    const i = this.seatOf(this.r.owner);
+    return this.r.owner === '' || i < 0 || !this.r.seats[i].connected;
+  }
+
+  /**
+   * After a match in a room, the friends wait for an owner the room counts as connected (D6). Only
+   * then does the Durable Object check that the owner's connection is really alive (presence.ts).
+   */
+  waitsForOwner(): boolean {
+    const r = this.r;
+    return r.settings.mode === 'room' && !r.closed && r.matchNo > 0 && (r.status === 'ended' || r.status === 'lobby') && !this.ownerAway();
+  }
+
+  /**
+   * Who may start the next match (start, rematch): the owner always; after a match, while the
+   * owner is away, any seated person, so a room never gets stuck waiting for someone who left.
+   * The first lobby stays the owner's. Quick play has only its one person.
+   */
+  private mayLead(device: string): boolean {
+    if (this.r.settings.mode !== 'room' || this.isOwner(device)) return true;
+    return this.r.matchNo > 0 && this.seatOf(device) >= 0 && this.ownerAway();
+  }
+
   publicRoom(): PublicRoom {
     const ms = this.ms;
+    const room = this.r.settings.mode === 'room';
     return {
       code: this.r.code,
       status: this.r.status,
@@ -387,7 +461,9 @@ export class RoomCore {
         seat: i,
         kind: s.kind,
         name: s.kind === 'ai' ? (PERSONAS.find((p) => p.id === s.persona)?.name ?? 'IA') : s.name,
-        persona: s.kind === 'ai' ? s.persona : null,
+        // A free seat of a room shows the AI that plays it if nobody sits there; a person's
+        // fallback stays hidden.
+        persona: s.kind === 'ai' || (room && s.kind === 'empty') ? s.persona : null,
         verified: s.kind === 'human' && s.verified && s.verifiedUntil > this.deps.now(),
         connected: s.kind === 'ai' || s.connected,
         aiPlaying: s.kind === 'human' && s.takeover,
@@ -399,6 +475,8 @@ export class RoomCore {
       aiVersion: this.r.aiVersion,
       // To the hour: the exact time would follow every move and tell when something happened.
       expiresAt: Math.floor(this.expiresAt() / 3600_000) * 3600_000,
+      setup: ROOM_SETUP,
+      ...(room ? { ownerAway: this.ownerAway() } : {}),
     };
   }
 
@@ -410,7 +488,9 @@ export class RoomCore {
   /** The game snapshot for one seat, with the last operation's events filtered for that seat. */
   gameMessage(seat: number, events: readonly TimedEvent[] = this.pending): ServerMsg | null {
     const ms = this.ms;
-    if (!ms || seat < 0 || seat >= ms.n) return null;
+    // A lobby after a match keeps the finished match in memory (score, games), but sends no game:
+    // after a move a person would get the last hand of the seat they were moved into.
+    if (!ms || this.r.status === 'lobby' || seat < 0 || seat >= ms.n) return null;
     const filtered: TimedEvent[] = [];
     for (const te of events) {
       const [e] = eventsFor([te.e], seat, ms.config.options);
@@ -492,7 +572,8 @@ export class RoomCore {
 
   private seatHuman(seat: number, device: string, verified: boolean, verifiedUntil: number, name: string, noAdapt = false): void {
     const s = this.r.seats[seat];
-    Object.assign(s, emptySeat());
+    // The seat's plan stays with it, hidden while a person sits there.
+    Object.assign(s, emptySeat(), { persona: s.persona });
     s.kind = 'human';
     s.device = device;
     s.noAdapt = noAdapt;
@@ -501,6 +582,12 @@ export class RoomCore {
     s.name = name;
     s.verified = verified;
     s.verifiedUntil = verifiedUntil;
+    delete this.r.phraseAt[String(seat)];
+  }
+
+  /** Frees a seat for a friend; its planned character stays with it (P1 holds). */
+  private vacate(seat: number): void {
+    this.r.seats[seat] = { ...emptySeat(), persona: this.r.seats[seat].persona };
     delete this.r.phraseAt[String(seat)];
   }
 
@@ -562,8 +649,10 @@ export class RoomCore {
     const opening = ms !== null && this.r.status === 'playing' && s.awaySince === null && ms.handIndex === 0 && this.r.match !== null && this.r.match.log.length === 0;
     s.connected = true;
     s.awaySince = null;
-    // The AI gives the seat back; an abandonment stays recorded.
+    // The AI gives the seat back; an abandonment stays recorded. Someone carried into this match
+    // is from now on like anyone else at the table: a later drop counts as usual.
     s.takeover = false;
+    delete s.carried;
     // The clock never stopped (a person who drops and comes back cannot freeze it); only the
     // decision time starts again, since the time away is not decision time.
     const d = this.r.deadline;
@@ -588,8 +677,11 @@ export class RoomCore {
     const d = this.r.deadline;
     // A held clock already counted the time spent before the hold.
     if (d && d.seat === seat && !d.held) d.spent = (d.spent ?? 0) + Math.max(0, now - d.since);
-    if (this.r.status === 'lobby' && this.r.settings.mode === 'room' && device !== this.r.owner) {
-      this.r.seats[seat] = emptySeat();
+    // A friend who drops from the first lobby lets the seat go. After a match they keep it, as
+    // during a match: a reload keeps the arranged place, and the owner can free it (plan) or
+    // start with the AI playing it (carried).
+    if (this.r.status === 'lobby' && this.r.settings.mode === 'room' && device !== this.r.owner && this.r.matchNo === 0) {
+      this.vacate(seat);
     }
     this.r.seq++;
   }
@@ -607,10 +699,7 @@ export class RoomCore {
     this.notify = null;
     this.opStart = this.pending.length;
     if (this.r.status === 'lobby') {
-      if (seat >= 0) {
-        this.r.seats[seat] = emptySeat();
-        delete this.r.phraseAt[String(seat)];
-      }
+      if (seat >= 0) this.vacate(seat);
       if (owner) this.r.closed = true;
     } else if (seat >= 0) {
       Object.assign(this.r.seats[seat], { device: null, name: '', verified: false, verifiedUntil: 0, connected: false, awaySince: null, takeover: true });
@@ -656,13 +745,13 @@ export class RoomCore {
       case 'sit':
         return this.sit(device, msg.seat);
       case 'start':
-        return device === this.r.owner ? this.start(device, sender, true) : fail('not_owner');
+        return this.mayLead(device) ? this.start(device, sender, true) : fail('not_owner');
       case 'act':
         return this.act(device, msg.a, msg.seq, msg.auto === true);
       case 'phrase':
         return this.phrase(device, msg.key);
       case 'rematch':
-        return this.rematch(device, sender);
+        return this.rematch(device, sender, msg);
       case 'leave':
         return this.leave(device);
       case 'resume':
@@ -671,6 +760,12 @@ export class RoomCore {
         return OK;
       case 'hold':
         return this.hold(device, msg.on);
+      case 'lobby':
+        return this.toLobby(device);
+      case 'move':
+        return this.move(device, msg.from, msg.to);
+      case 'plan':
+        return this.plan(device, msg.seat, msg.ai);
     }
   }
 
@@ -715,20 +810,27 @@ export class RoomCore {
    * room asks first, so a refused message never takes a match from the person's allowance.
    */
   preStart(device: string, kind: 'start' | 'rematch'): OpResult {
+    // The same order as handle(): start asks who leads first, rematch last.
     if (kind === 'start') {
-      if (device !== this.r.owner) return fail('not_owner');
+      if (!this.mayLead(device)) return fail('not_owner');
       if (this.r.status !== 'lobby' || this.r.closed) return fail('not_in_lobby');
-    } else if (this.r.status !== 'ended') {
-      return fail('not_ended');
+      if (this.seatOf(device) < 0) return fail('not_seated');
+      if (this.needsPeople()) return fail('needs_people');
+      return OK;
     }
+    if (this.r.status !== 'ended') return fail('not_ended');
     if (this.seatOf(device) < 0) return fail('not_seated');
-    if (kind === 'start' && this.needsPeople()) return fail('needs_people');
+    if (!this.mayLead(device)) return fail('not_owner');
+    if (this.needsPeople()) return fail('needs_people');
     return OK;
   }
 
-  /** No time limit only when every seat is a person. */
+  /**
+   * No time limit only when every seat is a person. A seat whose person deleted their data during
+   * the match (no device) would go to an AI at the next start, so it does not count as a person.
+   */
   private needsPeople(): boolean {
-    return this.r.settings.turnSeconds === null && this.r.seats.some((s) => s.kind !== 'human');
+    return this.r.settings.turnSeconds === null && this.r.seats.some((s) => !(s.kind === 'human' && s.device));
   }
 
   /** "Voltar a jogar": the person takes the seat back from the AI. */
@@ -752,9 +854,103 @@ export class RoomCore {
     const from = this.seatOf(device);
     if (from < 0) return fail('not_seated');
     if (this.r.seats[seat].kind !== 'empty') return fail('seat_taken');
-    this.r.seats[seat] = this.r.seats[from];
-    this.r.seats[from] = emptySeat();
+    // The person moves; each seat keeps its planned character.
+    this.r.seats[seat] = { ...this.r.seats[from], persona: this.r.seats[seat].persona };
+    this.vacate(from);
+    this.touch();
+    this.r.seq++;
+    return OK;
+  }
+
+  /** Who may arrange the table now: the owner of a room with friends, in a lobby. */
+  private arrangeError(device: string): ErrorCode | null {
+    if (this.r.settings.mode !== 'room') return 'bad_message';
+    if (!this.isOwner(device)) return 'not_owner';
+    if (this.r.status !== 'lobby' || this.r.closed) return 'not_in_lobby';
+    return null;
+  }
+
+  /** The owner's device; nobody once the owner's data is gone (owner ''). */
+  private isOwner(device: string): boolean {
+    return this.r.owner !== '' && device === this.r.owner;
+  }
+
+  /** "Mudar a mesa": the owner takes a room that just finished a match back to the lobby. */
+  private toLobby(device: string): OpResult {
+    if (this.r.settings.mode !== 'room') return fail('bad_message');
+    if (!this.isOwner(device)) return fail('not_owner');
+    if (this.r.status !== 'ended') return fail('not_ended');
+    this.r.status = 'lobby';
+    this.r.deadline = null;
+    this.r.resumeAt = null;
+    this.r.seats.forEach((s, i) => {
+      if (s.kind !== 'human') return;
+      if (!s.device) {
+        // A seat whose person deleted their data during the match has nobody left: it is free again.
+        this.vacate(i);
+        return;
+      }
+      // Nobody plays in a lobby: someone away is away from the table, not played by the AI.
+      // start() sets these again.
+      s.takeover = false;
+      s.timeouts = 0;
+    });
+    this.touch();
+    this.r.seq++;
+    return OK;
+  }
+
+  /**
+   * The owner moves the person on `from` to `to`, swapping with whatever is there. People move
+   * without the planned characters (each position keeps its own); an AI on `to` moves with its
+   * character. The page only ever asks to move a person, so a `from` that no longer holds one means
+   * the owner chose from an older view (a friend sat elsewhere meanwhile, or an earlier move of the
+   * same batch changed the seat): seat_taken, and the page shows the room's values again.
+   */
+  private move(device: string, from: number, to: number): OpResult {
+    const err = this.arrangeError(device);
+    if (err) return fail(err);
+    const n = this.r.seats.length;
+    if (from === to || from < 0 || to < 0 || from >= n || to >= n) return fail('bad_message');
+    const a = this.r.seats[from];
+    const b = this.r.seats[to];
+    if (a.kind !== 'human') return fail('seat_taken');
+    if (b.kind === 'ai') {
+      this.r.seats[from] = b;
+      this.r.seats[to] = a;
+    } else {
+      this.r.seats[from] = { ...b, persona: a.persona };
+      this.r.seats[to] = { ...a, persona: b.persona };
+    }
     delete this.r.phraseAt[String(from)];
+    delete this.r.phraseAt[String(to)];
+    this.touch();
+    this.r.seq++;
+    return OK;
+  }
+
+  /**
+   * The owner decides who sits in a seat without a connected person: an AI character, or nobody
+   * yet (ai null: free for a friend, the seat keeps its character). A character already planned
+   * on another seat swaps with this seat's, so every seat keeps a different one. Someone away
+   * after a match can be taken out of their seat; a connected person or the owner cannot.
+   */
+  private plan(device: string, seat: number, ai: string | null): OpResult {
+    const err = this.arrangeError(device);
+    if (err) return fail(err);
+    if (seat < 0 || seat >= this.r.seats.length) return fail('bad_message');
+    if (ai !== null && !isPersonaId(ai)) return fail('bad_message');
+    const s = this.r.seats[seat];
+    if (s.kind === 'human' && (s.device === this.r.owner || s.connected)) return fail('seat_taken');
+    if (ai === null ? s.kind === 'empty' : s.kind === 'ai' && s.persona === ai) return OK;
+    if (s.kind === 'human') this.vacate(seat);
+    if (ai === null) {
+      this.r.seats[seat] = { ...emptySeat(), persona: this.r.seats[seat].persona };
+    } else {
+      const j = this.r.seats.findIndex((x, i) => i !== seat && x.persona === ai);
+      if (j >= 0) this.r.seats[j].persona = this.r.seats[seat].persona;
+      this.r.seats[seat] = { ...emptySeat(), kind: 'ai', persona: ai, name: personaName(ai), connected: true };
+    }
     this.touch();
     this.r.seq++;
     return OK;
@@ -767,15 +963,53 @@ export class RoomCore {
     if (!sender.mayStartMatch) return fail('check_needed');
     const n = this.r.settings.players;
     if (this.needsPeople()) return fail('needs_people');
-    // The partner character goes with the owner's team (the starter's, after the owner left).
-    const lead = this.seatOf(this.r.owner);
-    const ownerTeam = (lead >= 0 ? lead : this.seatOf(device)) & 1;
-    let opp = 0;
-    for (let i = 0; i < n; i++) {
-      const s = this.r.seats[i];
-      if (s.kind === 'human' && s.device) continue;
-      const persona = (i & 1) === ownerTeam ? this.r.settings.partner : this.r.settings.opponents[opp++ % this.r.settings.opponents.length];
-      this.r.seats[i] = { ...emptySeat(), kind: 'ai', persona, name: PERSONAS.find((p) => p.id === persona)?.name ?? 'IA', connected: true };
+    // Nothing below fails, so a refused start never leaves a half drawn lineup or a reset seat.
+    if (this.r.matchNo > 0) {
+      // A new match after another (a rematch, or a start from the lobby after a match): people who
+      // are away are played by the AI from the deal and never counted as abandoning it (carried).
+      // Never at the first start: a quick play person is not connected yet when the room is made.
+      for (const s of this.r.seats) {
+        if (s.kind !== 'human') continue;
+        s.timeouts = 0;
+        s.abandoned = false;
+        s.takeover = !s.connected;
+        if (s.connected) delete s.carried;
+        else s.carried = true;
+      }
+    }
+    const set = this.r.settings;
+    if (set.mode === 'solo' && (set.randomOpponents || set.randomPartner)) {
+      // Quick play's switches: drawn with deps.rand, never with the generator of the A/B arm
+      // (pickAi) or of the deal (randomSeed), so the lineup tells nothing about either. Written
+      // into the settings, so the end screen, a reload and a rematch with the switch off all
+      // read the lineup that played.
+      const drawn = drawLineup(n, set.opponents, set.partner, { opponents: set.randomOpponents === true, partner: set.randomPartner === true }, this.deps.rand);
+      set.opponents = drawn.opponents;
+      set.partner = drawn.partner;
+    }
+    if (set.mode === 'solo') {
+      // Quick play: the person sits at seat 0 with the partner across, the opponents in seat order.
+      const lead = this.seatOf(this.r.owner);
+      const ownerTeam = (lead >= 0 ? lead : this.seatOf(device)) & 1;
+      let opp = 0;
+      for (let i = 0; i < n; i++) {
+        const s = this.r.seats[i];
+        if (s.kind === 'human' && s.device) continue;
+        const persona = (i & 1) === ownerTeam ? set.partner : set.opponents[opp++ % set.opponents.length];
+        this.r.seats[i] = { ...emptySeat(), kind: 'ai', persona, name: personaName(persona), connected: true };
+      }
+    } else {
+      // A room plays the plan: every seat without a person (free, reserved, or whose person's data
+      // is gone) goes to its own character. The guard only matters for a room stored before the
+      // plan whose AIs shared a character; under P1 it never changes anything.
+      const used = new Set(this.r.seats.flatMap((s) => (s.kind === 'human' && s.device && s.persona ? [s.persona] : [])));
+      for (let i = 0; i < n; i++) {
+        const s = this.r.seats[i];
+        if (s.kind === 'human' && s.device) continue;
+        const persona = s.persona && !used.has(s.persona) ? s.persona : firstFree([...used, ...this.r.seats.map((x) => x.persona)]);
+        used.add(persona);
+        this.r.seats[i] = { ...emptySeat(), kind: 'ai', persona, name: personaName(persona), connected: true };
+      }
     }
     const config = makeConfig(this.r.settings.variant, n, this.r.settings.options);
     const seed = this.deps.randomSeed();
@@ -866,21 +1100,27 @@ export class RoomCore {
     return OK;
   }
 
-  private rematch(device: string, sender: Sender): OpResult {
+  private rematch(device: string, sender: Sender, msg: Extract<ClientMsg, { t: 'rematch' }>): OpResult {
     if (this.r.status !== 'ended') return fail('not_ended');
     if (this.seatOf(device) < 0) return fail('not_seated');
+    // In a room only the owner leads while connected; anyone seated once the owner is away.
+    if (!this.mayLead(device)) return fail('not_owner');
     if (!sender.mayStartMatch) return fail('check_needed');
-    // People who left are replaced by AIs; everyone else keeps their seat.
-    for (const s of this.r.seats) {
-      if (s.kind === 'human') {
-        s.timeouts = 0;
-        s.takeover = !s.connected;
-        s.abandoned = false;
-      }
+    // Quick play: the switches of the end screen hold from this match on; a field left out keeps
+    // the room's value (old pages send none). Rooms have no switches and ignore them.
+    const set = this.r.settings;
+    const flags = { randomOpponents: set.randomOpponents, randomPartner: set.randomPartner };
+    if (set.mode === 'solo') {
+      if (msg.randomOpponents !== undefined) set.randomOpponents = msg.randomOpponents;
+      if (msg.randomPartner !== undefined) set.randomPartner = msg.randomPartner && set.players === 4;
     }
+    // Everyone keeps their seat; start() gives the seats of people who are away to the AI.
     this.r.status = 'lobby';
     const res = this.start(device, sender, true);
-    if (!res.ok) this.r.status = 'ended';
+    if (!res.ok) {
+      this.r.status = 'ended';
+      Object.assign(set, flags);
+    }
     return res;
   }
 
@@ -895,8 +1135,7 @@ export class RoomCore {
         this.r.seq++;
         return OK;
       }
-      this.r.seats[seat] = emptySeat();
-      delete this.r.phraseAt[String(seat)];
+      this.vacate(seat);
     } else if (this.r.status === 'playing') {
       this.markAbandoned(seat);
       this.r.seats[seat].takeover = true;
@@ -931,7 +1170,7 @@ export class RoomCore {
         s.takeover = true;
         changed = true;
       }
-      if (!s.abandoned && !everyoneAway && now >= s.awaySince + ABANDON_AFTER_MS * this.k) {
+      if (!s.abandoned && !s.carried && !everyoneAway && now >= s.awaySince + ABANDON_AFTER_MS * this.k) {
         this.markAbandoned(i);
         changed = true;
       }
@@ -1126,6 +1365,37 @@ export class RoomCore {
 
 /** The AI that moves when a seat's agent answers an action that is not legal. */
 const FALLBACK_AGENT = new HeuristicAgent(undefined, 'heuristic:fallback');
+
+/** The name an AI seat shows. */
+function personaName(id: PersonaId): string {
+  return PERSONAS.find((p) => p.id === id)?.name ?? 'IA';
+}
+
+/**
+ * A room with friends stored before the seat plan (M15) gets one on load. AI seats keep their
+ * characters (a running or finished match never changes); free seats, in seat order, get what the
+ * old start() would have given them (the owner's team the partner, the other team the opponents in
+ * order, cycling), or the first free character when that one is already placed; people get the
+ * first free character as their hidden fallback. Every seat then differs (P1), except two AI seats
+ * that older code gave the same character: they keep it until the next start, whose guard fixes it.
+ */
+function upgradePlan(r: StoredRoom): void {
+  const seats = r.seats;
+  if (r.settings.mode !== 'room' || seats.every((s) => s.persona !== null)) return;
+  const set = r.settings;
+  const lead = r.owner === '' ? -1 : seats.findIndex((s) => s.kind === 'human' && s.device === r.owner);
+  const ownerTeam = (lead >= 0 ? lead : 0) & 1;
+  const placed = () => seats.map((s) => s.persona);
+  let opp = 0;
+  seats.forEach((s, i) => {
+    // The old start() gave a character to every seat without a person's device, in seat order.
+    if (s.kind === 'human' && s.device) return;
+    const old: PersonaId | undefined = (i & 1) === ownerTeam ? set.partner : set.opponents[opp++ % Math.max(1, set.opponents.length)];
+    if (s.kind !== 'empty' || s.persona !== null) return;
+    s.persona = old && !placed().includes(old) ? old : firstFree(placed());
+  });
+  for (const s of seats) if (s.kind === 'human' && s.persona === null) s.persona = firstFree(placed());
+}
 
 /** Whether action is one of the legal actions of the mask. */
 function legalIn(legal: number, action: number): boolean {

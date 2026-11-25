@@ -31,9 +31,11 @@ export interface Model {
   /** The match is over on screen (the playback reached the end). */
   ended: boolean;
   muted: boolean;
+  /** This device created the room (the room message's owner): it leads and arranges after a match. */
+  owner: boolean;
 }
 
-export function makeModel(v: TableView, room: PublicRoom, o: { sending: boolean; cover: boolean; playing: boolean; muted: boolean; online?: boolean }): Model {
+export function makeModel(v: TableView, room: PublicRoom, o: { sending: boolean; cover: boolean; playing: boolean; muted: boolean; online?: boolean; owner?: boolean }): Model {
   // Reconnecting or offline: nothing can be sent, so every card and button is aria-disabled.
   const legal = o.sending || o.online === false ? 0 : v.legal;
   const coverLegal = (legal & COVER_MASK) !== 0;
@@ -50,6 +52,7 @@ export function makeModel(v: TableView, room: PublicRoom, o: { sending: boolean;
     // The room says "ended" as soon as the server finishes; the table shows it when the playback gets there.
     ended: v.over || (room.status === 'ended' && !o.playing),
     muted: o.muted,
+    owner: o.owner === true,
   };
 }
 

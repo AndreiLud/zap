@@ -13,7 +13,7 @@ const DECK = 40;
 
 const GAME_KEYS = ['t', 'now', 'seq', 'matchNo', 'obs', 'events', 'deadline'];
 const ROOM_MSG_KEYS = ['t', 'now', 'you', 'owner', 'room'];
-const ROOM_KEYS = ['code', 'status', 'settings', 'seats', 'matchNo', 'score', 'games', 'lastWinner', 'aiVersion', 'expiresAt'];
+const ROOM_KEYS = ['code', 'status', 'settings', 'seats', 'matchNo', 'score', 'games', 'lastWinner', 'aiVersion', 'expiresAt', 'setup', 'ownerAway'];
 const SEAT_KEYS = ['seat', 'kind', 'name', 'persona', 'verified', 'connected', 'aiPlaying'];
 const OBS_KEYS = [
   'seat', 'players', 'variant', 'options', 'score', 'games', 'handIndex', 'dealer', 'mao', 'vira', 'manilhaRank', 'kind',

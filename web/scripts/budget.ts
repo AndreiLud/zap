@@ -8,6 +8,9 @@
 // (its locale file and the generated JSON included) and scrolled to the end (replays.json apart);
 // replays.json; the personal page beyond the entry and the chunks it shares with the data page;
 // and the CSS of both pages, as they open and scrolled to the end.
+//
+// Milestone 15 loads the room lobby on demand (web/src/room-chunks.tsx) and guards it with two rows
+// of its own: the lobby's JavaScript and CSS beyond the entry as it opens (its report dialog included).
 
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -45,12 +48,14 @@ export interface BudgetReport {
   ok: boolean;
 }
 
-/** One budget row of DATA-SPEC 1.3: what it measures, the gzip -9 bytes, and its limit. */
+/** One budget row of DATA-SPEC 1.3 (or of a later milestone): what it measures, the gzip -9 bytes, and its limit. */
 export interface M7Row {
   name: string;
   gzip: number;
   limit: number;
   files: string[];
+  /** The milestone that set the row, printed before its name; M7 when absent. */
+  milestone?: string;
 }
 
 /**
@@ -79,6 +84,14 @@ export const M8_BASE = { entryJs: 32_281 + 21_396 + 14_224, tableOwnJs: 19_321 }
  * (review fixes, M7 DEVIATIONS).
  */
 export const M7_BUDGET = { entryGrowth: 2_000, tableGrowth: 500, data: 60_000, dataAll: 82_500, replays: 12_000, vs: 30_000, css: 8_000, cssAll: 11_500 } as const;
+
+/**
+ * M15 (spec 6.2 and 11): the room lobby left the entry for a chunk of its own, with the report
+ * dialog it shares with the table's lazy "Denunciar". New guards, not raises: about 1.8 KB of
+ * JavaScript and 1.9 KB of CSS when it was split off, room for the owner's controls of M15.
+ */
+export const M15_BUDGET = { lobbyJs: 6_000, lobbyCss: 3_000 } as const;
+export const LOBBY_ENTRY = 'src/pages/Lobby.tsx';
 
 export const DATA_ENTRY = 'src/pages/Data.tsx';
 export const VS_ENTRY = 'src/pages/YouVsZap.tsx';
@@ -143,6 +156,11 @@ export function m7Rows(dist: string, manifest: Manifest): M7Row[] {
   if (manifest[TABLE_ENTRY]) {
     rows.push(row('table chunks beyond the entry, growth over M8', beyond(staticClosure(manifest, [TABLE_ENTRY])), M7_BUDGET.tableGrowth, M8_BASE.tableOwnJs));
   }
+  if (manifest[LOBBY_ENTRY]) {
+    const lobbyKeys = staticClosure(manifest, [LOBBY_ENTRY]);
+    rows.push({ ...row('room lobby beyond the entry, JavaScript', beyond(lobbyKeys), M15_BUDGET.lobbyJs), milestone: 'M15' });
+    rows.push({ ...row('room lobby beyond the entry, CSS', cssOf(lobbyKeys).filter((f) => !entryCss.has(f)), M15_BUDGET.lobbyCss), milestone: 'M15' });
+  }
   // The data page: what it loads as it opens beyond the entry, its larger locale file included;
   // then everything it can load as the reader scrolls, replays.json apart (its own row).
   const replays = new Set(Object.keys(manifest).filter((k) => k === REPLAYS));
@@ -206,7 +224,7 @@ export function formatReport(r: BudgetReport): string {
     ...r.js.files.map(line),
     `table path CSS: ${r.css.gzip} bytes gzip -9 (budget ${r.css.budget})`,
     ...r.css.files.map(line),
-    ...r.m7.map((m) => `M7 ${m.name}: ${m.gzip} bytes gzip -9 (budget ${m.limit})${m.gzip > m.limit ? ' OVER' : ''}`),
+    ...r.m7.map((m) => `${m.milestone ?? 'M7'} ${m.name}: ${m.gzip} bytes gzip -9 (budget ${m.limit})${m.gzip > m.limit ? ' OVER' : ''}`),
     r.ok ? 'budget: ok' : 'budget: OVER',
   ].join('\n');
 }

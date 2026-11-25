@@ -80,7 +80,7 @@ function TableBody({ title }: { title?: string }) {
   useSheetGroup(group, !desktop);
 
   if (!sl.view || !sl.room) return null;
-  const m = makeModel(sl.view, sl.room.room, { sending: sl.sending, cover: sl.cover, playing: sl.playing, muted: sl.muted, online: sl.online });
+  const m = makeModel(sl.view, sl.room.room, { sending: sl.sending, cover: sl.cover, playing: sl.playing, muted: sl.muted, online: sl.online, owner: sl.room.owner });
   const panel = !m.ended && answeringRaise(m);
   const resume = !!m.room.seats[m.you]?.aiPlaying && !m.ended;
   const clock = turnClock(m, sl.deadline, sl.playing);

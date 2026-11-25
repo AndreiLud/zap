@@ -210,7 +210,9 @@ class Browser {
     const players = rand() < 0.5 ? 2 : 4;
     const variant = rand() < 0.5 ? 'paulista' : 'mineiro';
     const names = ['zap', 'otavio', 'bento', 'lia', 'ravi', 'iara'];
-    const opponents = players === 2 ? [names[Math.floor(rand() * names.length)]] : [names[Math.floor(rand() * 6)], names[Math.floor(rand() * 6)]];
+    // Two different opponents (the site refuses a repeated one), with as many draws as before.
+    const first = names[Math.floor(rand() * 6)];
+    const opponents = players === 2 ? [first] : [first, names.filter((x) => x !== first)[Math.floor(rand() * 5)]];
     for (let attempt = 0; attempt < 6; attempt++) {
       const res = await this.api('POST', '/api/play', { players, variant, opponents });
       if (res.status === 200) return res.body.code as string;

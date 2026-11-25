@@ -74,7 +74,7 @@ export type { Reading };
 export type ReportReason = 'nickname' | 'phrases' | 'cheating' | 'other';
 
 /** What the client may ask for when it creates a match; the server validates every field. */
-export type NewMatch = Partial<Pick<RoomSettings, 'players' | 'variant' | 'options' | 'opponents' | 'partner' | 'turnSeconds'>>;
+export type NewMatch = Partial<Pick<RoomSettings, 'players' | 'variant' | 'options' | 'opponents' | 'partner' | 'turnSeconds' | 'randomOpponents' | 'randomPartner'>>;
 
 async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
   let res: Response;

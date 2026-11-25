@@ -9,6 +9,7 @@ import { adsSettings, adsTxt } from '../ads.ts';
 import { isMatchId } from '../../../shared/match-record.ts';
 import { LIMITS, SUMMARY_KEY } from '../../../shared/cycle-formats.ts';
 import { cleanOptions, defaultSettings, validateSettings } from '../room-core.ts';
+import { DEFAULT_OPPONENTS, DEFAULT_ROOM_OPPONENTS, firstFree } from '../../../shared/lineup.ts';
 import { MATCHES_PER_CHECK, admitMatch, refundAdmission, refundMatch, type Admission } from '../allowance.ts';
 import {
   REFUSAL_FROM_WORKER,
@@ -322,14 +323,23 @@ function createRoom(
 
 function readSettings(body: unknown, mode: 'solo' | 'room'): RoomSettings | null {
   const b = (body && typeof body === 'object' ? body : {}) as Partial<RoomSettings>;
+  // A switch that is sent must be a boolean: null is not "left out".
+  if ([b.randomOpponents, b.randomPartner].some((x) => x !== undefined && typeof x !== 'boolean')) return null;
+  // The Play page sends a whole lineup; these defaults serve API callers, which never get a
+  // switch turned on for them. A room's default puts Iara on seat 1, where the first friend to
+  // join sits, and Zap on the last seat.
+  const opponents = b.opponents ?? [...(mode === 'solo' ? DEFAULT_OPPONENTS : DEFAULT_ROOM_OPPONENTS)[b.players === 2 ? 2 : 4]];
   const s = defaultSettings({
     mode,
     players: b.players ?? 4,
     variant: b.variant ?? 'paulista',
     options: cleanOptions(b.options),
-    opponents: b.opponents ?? (b.players === 2 ? ['zap'] : ['zap', 'lia']),
-    partner: b.partner ?? 'iara',
+    opponents,
+    // The first character the opponents leave free (a fixed one could be among them).
+    partner: b.partner ?? (Array.isArray(opponents) ? firstFree(opponents) : 'iara'),
     turnSeconds: b.turnSeconds === undefined ? 30 : b.turnSeconds,
+    randomOpponents: b.randomOpponents ?? false,
+    randomPartner: b.randomPartner ?? false,
   });
   return validateSettings(s) ? null : s;
 }

@@ -1,7 +1,7 @@
 // The table chooser of the Play page (CLIENT-SPEC 10.2, prototype jogar.html and jogar.js): the
-// three mode tiles, the variant switch with its manilha hint, and the opponents picker. Native
-// radios and checkboxes inside labels, so arrow keys, Space and screen readers work as usual; the
-// testids sit on the labels.
+// three mode tiles, the variant switch with its manilha hint, and the character pickers (the
+// opponents and, in 2 against 2, your partner). Native radios and checkboxes inside labels, so
+// arrow keys, Space and screen readers work as usual; the testids sit on the labels.
 
 import type { PersonaId } from '../../../ai/src/personas.ts';
 import type { Variant } from '../../../engine/src/config.ts';
@@ -105,14 +105,25 @@ function styleLine(id: PersonaId): string {
 }
 
 /**
- * Who you face: a quiet summary row (avatars, names, "Trocar") that folds out the six characters.
- * One opponent uses radios; two use checkboxes, first in first out. `label` names the row
- * ("Opponents", or "AI in empty seats" for a room).
+ * One side of the table: a quiet summary row (avatars, label, names, "Trocar") that folds out the
+ * six characters. One character uses radios; two use checkboxes, first in first out. The same
+ * picker serves the opponents and, in 2 against 2, your partner. A character the other side holds
+ * is a disabled option that says why ("joga contra você"), so the reason is read with the option.
  */
-export function OpponentPicker(props: {
+export function CharacterPicker(props: {
+  /** Input name: play-opponents or play-partner (the page focuses the first free one by it). */
+  name: string;
+  /** Testid prefix of each option (opponent-<id>, partner-<id>). */
+  testid: string;
+  /** Testid of the summary row (opponents-toggle, partner-toggle). */
+  toggle: string;
   list: readonly PersonaId[];
   size: 1 | 2;
   label: Key;
+  legend: Key;
+  /** Characters the other side holds, disabled here with `reason`. */
+  taken: readonly PersonaId[];
+  reason: Key;
   open: boolean;
   onOpen(open: boolean): void;
   onPick(id: PersonaId, checked: boolean): void;
@@ -120,7 +131,7 @@ export function OpponentPicker(props: {
   const { list, size } = props;
   return (
     <details class="opponents" open={props.open} onToggle={(e) => props.onOpen((e.currentTarget as HTMLDetailsElement).open)}>
-      <summary data-testid="opponents-toggle">
+      <summary data-testid={props.toggle}>
         <span class="opponents__stack">
           {list.map((id) => (
             <Avatar key={id} persona={id} />
@@ -138,33 +149,38 @@ export function OpponentPicker(props: {
         </span>
       </summary>
       <fieldset class="opponents__list">
-        <legend>{t(size === 1 ? 'play.opp.legend1' : 'play.opp.legend2')}</legend>
+        <legend>{t(props.legend)}</legend>
         {size === 2 ? <p class="play__note">{t('play.opp.fifo')}</p> : null}
         <div class="characters">
-          {PERSONA_IDS.map((id) => (
-            <label key={id} class={`character${list.includes(id) ? ' is-chosen' : ''}`} data-testid={`opponent-${id}`}>
-              <input
-                type={size === 1 ? 'radio' : 'checkbox'}
-                name="play-opponents"
-                value={id}
-                checked={list.includes(id)}
-                onChange={(e) => props.onPick(id, e.currentTarget.checked)}
-              />
-              <Avatar persona={id} />
-              <span class="character__text">
-                <span class="character__name">
-                  <span>{PERSONA_NAMES[id]}</span>
-                  <AiMark />
+          {PERSONA_IDS.map((id) => {
+            const taken = props.taken.includes(id);
+            return (
+              <label key={id} class={`character${list.includes(id) ? ' is-chosen' : ''}${taken ? ' is-taken' : ''}`} data-testid={`${props.testid}-${id}`}>
+                <input
+                  type={size === 1 ? 'radio' : 'checkbox'}
+                  name={props.name}
+                  value={id}
+                  checked={list.includes(id)}
+                  disabled={taken}
+                  onChange={(e) => props.onPick(id, e.currentTarget.checked)}
+                />
+                <Avatar persona={id} />
+                <span class="character__text">
+                  <span class="character__name">
+                    <span>{PERSONA_NAMES[id]}</span>
+                    <AiMark />
+                  </span>
+                  <span class="character__line">{styleLine(id)}</span>
+                  {taken ? <span class="character__taken">{t(props.reason)}</span> : null}
                 </span>
-                <span class="character__line">{styleLine(id)}</span>
-              </span>
-              <span class="level" aria-hidden="true">
-                {[1, 2, 3, 4].map((k) => (
-                  <i key={k} class={k <= LEVEL_BARS[id] ? 'is-on' : undefined} />
-                ))}
-              </span>
-            </label>
-          ))}
+                <span class="level" aria-hidden="true">
+                  {[1, 2, 3, 4].map((k) => (
+                    <i key={k} class={k <= LEVEL_BARS[id] ? 'is-on' : undefined} />
+                  ))}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </fieldset>
     </details>

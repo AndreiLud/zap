@@ -1,6 +1,6 @@
 // Four devices in one 2 against 2 room: create, join by code, sit, play to the end by clicking,
 // check that each page only ever had its own hand and that the four scores agree, then "Jogar de
-// novo" starts a new match in the same room for everyone.
+// novo", which only the owner has while she is there, starts a new match in the same room for everyone.
 
 import { expect, test } from '@playwright/test';
 import {
@@ -12,6 +12,7 @@ import {
   createRoom,
   expectSeat,
   expectTable,
+  expectTeams,
   joinByCode,
   newPlayers,
   playLoop,
@@ -60,6 +61,9 @@ test('four devices play a 2 against 2 room to the end and start a new match', as
         for (const f of FORBIDDEN) expect(text, `${p.name} lobby text`).not.toContain(f);
       }
       expect(players.map((p) => p.seat)).toEqual([0, 2, 1, 3]);
+      // Each page groups the seats by team from its own seat (M17): Ana and Beto, partners, are Nós
+      // on their pages and Eles on Caio's and Duda's.
+      for (const p of players) await expectTeams(p.page, p.seat & 1 ? [1, 3] : [0, 2], p.seat & 1 ? [0, 2] : [1, 3]);
       await ana.shot('room4-lobby-desktop');
       await duda.shot('room4-lobby-phone');
     });
@@ -105,6 +109,12 @@ test('four devices play a 2 against 2 room to the end and start a new match', as
 
     await test.step('"Play again" (result.rematch) starts a new match in the same room for everyone', async () => {
       const seats = players.map((p) => p.seat);
+      // Only the owner plays again while connected (M15); the friends read that they wait for her.
+      for (const p of [beto, caio, duda]) {
+        await expect(p.page.getByTestId('rematch-button')).toHaveCount(0);
+        await expect(p.page.getByTestId('wait-owner')).toHaveText('Esperando quem criou a sala começar.');
+      }
+      await expect(ana.page.getByTestId('wait-owner')).toHaveCount(0);
       await expect(ana.page.getByTestId('rematch-button')).toHaveText('Jogar de novo');
       await ana.page.getByTestId('rematch-button').click();
       for (const p of players) {

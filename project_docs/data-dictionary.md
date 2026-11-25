@@ -404,7 +404,7 @@ Everything D1 keeps about the device, without the device id, the secret or the r
 | `zap-lang` | localStorage (`web/src/i18n.ts`) | `pt` or `en`, the language the person chose. | No. |
 | `zap.adult` | localStorage (`web/src/consent.ts`) | `1` once the person declared being 18 or older. Removed by "Apagar meus dados" in that browser. | No (the server only gets `adult: true` once). |
 | `zap.notice` | localStorage (`web/src/consent.ts`) | The version of the notice the person accepted with "Entendi": `NOTICE_VERSION`, or its `+ads` form while ads are on. A different version shows the notice again. Removed by "Apagar meus dados" in that browser. | No. |
-| `zap-jogar` | localStorage (`web/src/play/state.ts`) | The Play page's last choice: `{ modo, variante, contra: { dupla, solo } }`, the mode, the variant and the opponents of each line up. | No. The server gets only the settings of a match when it starts. |
+| `zap-jogar` | localStorage (`web/src/play/state.ts`) | The Play page's last choice: `{ modo, variante }`, the mode and the variant. The line up is not kept (M15): the page starts from the defaults at every visit and rewrites an older value that still holds `contra`. | No. The server gets only the settings of a match when it starts. |
 | `zap-mute-phrases` | localStorage (`web/src/store.ts`) | `1` or `0`: "Silenciar frases e sinais dos outros". | No. |
 | `zap-four-color` | localStorage (`web/src/prefs.ts`) | `1` or `0`: the four-color deck, off unless `1`. | No. |
 | `zap-sound` | localStorage (`web/src/prefs.ts`) | `1` or `0`: sound and vibration, on unless `0`. | No. |

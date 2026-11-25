@@ -1,6 +1,8 @@
 // One Durable Object per room: the authoritative server for its matches. It keeps the room in
 // SQLite storage (one key), accepts WebSockets with the hibernation API (idle rooms cost
-// nothing), uses one alarm for deadlines, returns and expiry, and never uses timers.
+// nothing), uses one alarm for deadlines, returns and expiry, and never uses timers. While friends
+// wait for the owner after a match, the same alarm looks at the owner's connection about once a
+// minute (presence.ts), so a connection that died without a close never keeps them waiting.
 //
 // The AI model versions come from R2 through ai-runtime.ts: the room reads the manifest (cached
 // for 5 minutes) before each match start and pins the versions for the whole match; after a wake
@@ -60,6 +62,7 @@ import { cleanNickname } from '../nickname.ts';
 import { roomListingStatements, roomMemberStatement, type SqlDb } from '../privacy.ts';
 import type { SeatProfile } from '../profiles.ts';
 import { RECORD_PREFIX, RECORD_RETRY_MS, flushPending, moveRecordSeats, pendingCount, type PendingRecord } from '../pending-records.ts';
+import { checkOwner, nextOwnerCheck } from '../presence.ts';
 import { settleWaitingCalls } from '../room-calls.ts';
 import { ROOM_TTL_MS, RoomCore, listingUpdate, memberUntil, type OpResult, type RoomDeps } from '../room-core.ts';
 import { aiRuntime, type AiRuntime } from './ai-runtime.ts';
@@ -74,7 +77,10 @@ interface Attachment {
   matchesLeft: number;
   /** Token bucket for flood control: refills 4 per second up to 10. */
   tokens: number;
+  /** The last message (or the connection, before any), for the bucket and for presence.ts. */
   at: number;
+  /** When the connection opened (presence.ts: a room that restarted gives the owner time to come back). */
+  opened: number;
 }
 
 const BUCKET = 10;
@@ -682,7 +688,7 @@ export class Room extends DurableObject<Env> {
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     this.ctx.acceptWebSocket(server, [device]);
-    const att: Attachment = { device, verified: who.verified, verifiedUntil: who.verifiedUntil, matchesLeft: who.matchesLeft, tokens: BUCKET, at: now };
+    const att: Attachment = { device, verified: who.verified, verifiedUntil: who.verifiedUntil, matchesLeft: who.matchesLeft, tokens: BUCKET, at: now, opened: now };
     server.serializeAttachment(att);
     core.connect(device);
     this.takeRecord();
@@ -741,6 +747,8 @@ export class Room extends DurableObject<Env> {
     // socket is only a first filter: other sockets and quick play spend the same allowance.
     let admitted: Extract<Admission, { ok: true }> | null = null;
     if (msg.t === 'start' || msg.t === 'rematch') {
+      // A friend asks to lead after a match: is the owner really still there (D6, presence.ts)?
+      if (att.device !== this.core.r.owner) this.checkPresence();
       const pre = this.core.preStart(att.device, msg.t);
       if (!pre.ok) {
         this.send(ws, { t: 'error', code: pre.code });
@@ -769,8 +777,13 @@ export class Room extends DurableObject<Env> {
       ws.close(CLOSE_POLICY, 'gone');
       return;
     }
-    // Every other message, the solo hold included ({ t: 'hold' }, CLIENT-SPEC 16.5), goes to the
-    // room's rules; a change bumps the sequence and is stored and sent below.
+    // "Mudar a mesa" leaves the finished match behind: its record was taken in the event that
+    // ended it, and this belt makes sure it is never lost with the 'ended' status it needs.
+    const recordsBefore = this.pendingRecords;
+    if (msg.t === 'lobby') this.takeRecord();
+    // Every other message, the solo hold included ({ t: 'hold' }, CLIENT-SPEC 16.5), and the
+    // owner's arrangement (lobby, move, plan) go to the room's rules; a change bumps the sequence
+    // and is stored and sent below.
     const before = { seq: core.r.seq, pending: core.pending.length, phrases: core.phrases.length };
     let res: OpResult;
     this.reservedFor = admitted ? att.device : null;
@@ -793,6 +806,11 @@ export class Room extends DurableObject<Env> {
     if (!res.ok) {
       this.send(ws, { t: 'error', code: res.code });
       if (res.code === 'stale' || res.code === 'not_your_turn') this.sendState(ws, att.device);
+      if (this.pendingRecords !== recordsBefore) {
+        // The belt above took a record: the room is stored with it marked as taken, and it goes out.
+        this.save();
+        await this.flushRecords();
+      }
       return;
     }
     if (msg.t === 'leave') ws.close(1000, 'left');
@@ -844,6 +862,7 @@ export class Room extends DurableObject<Env> {
       this.pendingRecords = 0;
       return;
     }
+    const seq = this.core.r.seq;
     if (this.core.alarm() === 'expired') {
       const code = this.core.r.code;
       const closed = this.core.r.closed;
@@ -876,6 +895,8 @@ export class Room extends DurableObject<Env> {
       }
       return;
     }
+    // Friends waiting after a match: the owner's connection checked for real (presence.ts).
+    checkOwner(this.ctx, this.core, Date.now());
     this.takeRecord();
     // Forget flood blocks that ran out.
     const now = Date.now();
@@ -883,9 +904,20 @@ export class Room extends DurableObject<Env> {
       if ((until as number) <= now) this.kv.delete(key);
     }
     this.save();
-    this.broadcast();
+    // Between matches, an alarm that changed nothing (a check that found the owner there, about
+    // once a minute) sends nothing; during a match every alarm sends, as it always did.
+    const quiet = this.core.r.status !== 'playing' && this.core.r.seq === seq && this.core.pending.length === 0 && this.core.phrases.length === 0;
+    if (!quiet) this.broadcast();
     this.schedule();
     await this.flushRecords();
+  }
+
+  /** D6: the owner's connection checked for real (presence.ts); the owner found gone is stored and everyone told. */
+  private checkPresence(): void {
+    const core = this.core;
+    if (!core || !checkOwner(this.ctx, core, Date.now())) return;
+    this.save();
+    this.broadcast(true);
   }
 
   // -------------------------------------------------------------------------------------------
@@ -987,6 +1019,9 @@ export class Room extends DurableObject<Env> {
   private schedule(): void {
     let next = this.core?.nextAlarm() ?? null;
     if (this.retryRecords && this.pendingRecords > 0) next = Math.min(next ?? Infinity, Date.now() + RECORD_RETRY_MS);
+    // While friends wait after a match, the room looks at the owner's connection again (presence.ts).
+    const check = this.core ? nextOwnerCheck(this.ctx, this.core, Date.now()) : null;
+    if (check !== null) next = Math.min(next ?? Infinity, check);
     if (next === null) return;
     // Never closer than 250 ms: a safety net against any loop of alarms.
     const t = Math.max(next, Date.now() + 250);

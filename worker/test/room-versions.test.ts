@@ -178,4 +178,74 @@ describe('versions per match in a room', () => {
     expect(seen.has('candidate') || seen.has('control')).toBe(true);
     expect(seen.has('room')).toBe(true);
   });
+
+  it('a drawn partner plays the partners version in both arms: the candidate never sits next to the person', async () => {
+    const clock = { t: T0 };
+    const rt = isolate(bucketWithTest(), clock);
+    await rt.refresh(clock.t);
+    const draw = mulberry32(91);
+    const arms = new Set<string>();
+    const partners = new Set<string>();
+    for (let i = 0; i < 50; i++) {
+      const calls: Call[] = [];
+      // "Time" always on; "Adversários" on every other match, so both draws meet both arms.
+      const settings = defaultSettings({ opponents: ['zap', 'iara'], partner: 'lia', randomPartner: true, randomOpponents: i % 2 === 1 });
+      const core = RoomCore.create('VRSDP', settings, 'dev-a', true, rt.label, deps(rt, clock, calls, 100 + i, draw));
+      core.connect('dev-a');
+      const ai = core.r.match!.ai;
+      arms.add(ai.arm ?? 'none');
+      const s = core.r.settings;
+      partners.add(s.partner);
+      expect(s.opponents).not.toContain(s.partner);
+      expect(core.r.seats.map((x) => x.persona)).toEqual([null, s.opponents[0], s.partner, s.opponents[1]]);
+      expect(core.r.match!.seats.map((x) => x.aiVersion)).toEqual([null, ai.opponents, 'v2', ai.opponents]);
+      play(core, clock, 'dev-a', 200 + i, 8);
+      expect(calls.some((c) => c.seat === 2)).toBe(true);
+      for (const c of calls) if (c.seat === 2 || c.seat === 0 || c.partnerHuman) expect(c.version, `seat ${c.seat} in ${ai.arm}`).toBe('v2');
+      expect(calls.some((c) => c.version === 'v3')).toBe(ai.arm === 'candidate');
+    }
+    expect(arms).toEqual(new Set(['candidate', 'control']));
+    expect(partners.size).toBeGreaterThan(2);
+  });
+
+  it('rooms arranged by the owner: in each of the 6 placements of two people, only the partners version sits next to a person', async () => {
+    const clock = { t: T0 };
+    const rt = isolate(bucketWithTest(), clock);
+    await rt.refresh(clock.t);
+    const placements = [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 2],
+      [1, 3],
+      [2, 3],
+    ];
+    for (const [i, [p, q]] of placements.entries()) {
+      const calls: Call[] = [];
+      const core = RoomCore.create('VRSMV', defaultSettings({ mode: 'room', players: 4 }), 'dev-a', true, rt.label, deps(rt, clock, calls, 300 + i, () => 0.9));
+      core.join('dev-b', true);
+      core.connect('dev-a');
+      core.connect('dev-b');
+      // The owner arranges the two people with move (a swap with whoever sits there).
+      if (core.seatOf('dev-a') !== p) expect(core.handle('dev-a', { t: 'move', from: core.seatOf('dev-a'), to: p }).ok).toBe(true);
+      if (core.seatOf('dev-b') !== q) expect(core.handle('dev-a', { t: 'move', from: core.seatOf('dev-b'), to: q }).ok).toBe(true);
+      expect([core.seatOf('dev-a'), core.seatOf('dev-b')]).toEqual([p, q]);
+      expect(core.handle('dev-a', { t: 'start' }).ok).toBe(true);
+      const ai = core.r.match!.ai;
+      // Rooms have no test arm: the current version faces people, the partners version sits next to them.
+      expect(ai.arm).toBeNull();
+      for (const s of core.r.match!.seats) {
+        if (s.kind === 'human') continue;
+        expect(s.aiVersion, `seat ${s.seat} with people on ${p} and ${q}`).toBe(core.r.seats[s.seat ^ 2].kind === 'human' ? 'v2' : ai.opponents);
+      }
+      // B never moves: the AI plays for B at each time out, with the partners version.
+      play(core, clock, 'dev-a', 400 + i, 30);
+      expect(calls.some((c) => c.seat === q)).toBe(true);
+      for (const c of calls) {
+        const human = core.r.seats[c.seat].kind === 'human';
+        const nextToPerson = core.r.seats[c.seat ^ 2].kind === 'human';
+        if (human || nextToPerson || c.partnerHuman) expect(c.version, `seat ${c.seat} with people on ${p} and ${q}`).toBe('v2');
+      }
+    }
+  });
 });

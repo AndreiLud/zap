@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { deriveSeed, mulberry32 } from '../../engine/src/rng.ts';
-import { legalMask } from '../../engine/src/engine.ts';
+import { SIGNAL_MASK, legalMask } from '../../engine/src/engine.ts';
 import { HeuristicAgent } from '../../ai/src/heuristic.ts';
 import type { Agent } from '../../ai/src/agent.ts';
 import {
@@ -375,5 +375,108 @@ describe('match record', () => {
     expect(loaded.r.match!.seats.map((s) => s.aiVersion)).toEqual([null, 'v1', 'v1', 'v1']);
     playSolo(loaded, clock);
     expect(validateMatchRecord(buildMatchRecord(loaded.r)).ok).toBe(true);
+  });
+
+  it('matches with drawn lineups give valid records with the characters that played', () => {
+    const clock = { t: Date.UTC(2026, 10, 25, 12) };
+    const kinds = { 2: 'solo1', 4: 'solo2' } as const;
+    let matches = 0;
+    for (const players of [4, 2] as const) {
+      const settings = defaultSettings({ players, opponents: players === 2 ? ['zap'] : ['zap', 'iara'], randomOpponents: true, randomPartner: players === 4 });
+      const core = RoomCore.create('DRAWN', settings, 'dev-a', true, 'v1', deps(20 + players, clock));
+      core.connect('dev-a');
+      for (let i = 0; i < 10; i++) {
+        if (i > 0) expect(core.handle('dev-a', { t: 'rematch' }).ok).toBe(true);
+        playSolo(core, clock, 2_000, 30 + i);
+        expect(core.r.status).toBe('ended');
+        const rec = buildMatchRecord(core.r, core.match!);
+        expect(validateMatchRecord(rec).ok).toBe(true);
+        expect(rec.kind).toBe(kinds[players]);
+        const s = core.r.settings;
+        const want = players === 2 ? [null, s.opponents[0]] : [null, s.opponents[0], s.partner, s.opponents[1]];
+        expect(rec.seats.map((x) => x.persona)).toEqual(want);
+        matches++;
+      }
+    }
+    expect(matches).toBe(20);
+  });
+});
+
+describe('match records of rooms arranged by the owner (M15)', () => {
+  /** Plays random real moves for the given people while they sit, connected and not played by the AI, until the match ends. */
+  function playPeople(core: RoomCore, clock: { t: number }, people: string[], seed: number): void {
+    const rand = mulberry32(seed);
+    for (let guard = 0; core.r.status === 'playing' && guard < 5000; guard++) {
+      const movers = people.filter((p) => {
+        const i = core.seatOf(p);
+        return i >= 0 && core.r.seats[i].connected && !core.r.seats[i].takeover && (legalMask(core.match!, i) & ~SIGNAL_MASK) !== 0;
+      });
+      if (movers.length === 0) {
+        clock.t = Math.max(clock.t, core.nextAlarm() ?? clock.t) + 1;
+        core.alarm();
+        continue;
+      }
+      const p = movers[Math.floor(rand() * movers.length)];
+      clock.t += 1_000;
+      const acts = legal(legalMask(core.match!, core.seatOf(p)) & ~SIGNAL_MASK);
+      core.handle(p, { t: 'act', seq: core.r.seq, a: acts[Math.floor(rand() * acts.length)] });
+    }
+    expect(core.r.status).toBe('ended');
+  }
+
+  it('the kind follows where the owner put the people: friends with two on one team, mixed otherwise', () => {
+    const cases: [number[], string][] = [
+      [[0, 2], 'friends'],
+      [[1, 3], 'friends'],
+      [[0, 1], 'mixed'],
+      [[0, 3], 'mixed'],
+      [[1, 2], 'mixed'],
+      [[2, 3], 'mixed'],
+      [[3, 1, 0], 'mixed'],
+    ];
+    const people = ['p1', 'p2', 'p3'];
+    for (const [i, [want, kind]] of cases.entries()) {
+      const clock = { t: Date.UTC(2026, 10, 25, 12) };
+      const core = RoomCore.create('ARRKD', defaultSettings({ mode: 'room', players: 4 }), 'p1', true, 'v1', deps(40 + i, clock));
+      const here = people.slice(0, want.length);
+      for (const p of here.slice(1)) core.join(p, true);
+      for (const p of here) core.connect(p);
+      // The owner moves each person to their seat (a swap: whoever sat there takes the other seat).
+      here.forEach((p, k) => {
+        if (core.seatOf(p) !== want[k]) expect(core.handle('p1', { t: 'move', from: core.seatOf(p), to: want[k] }).ok).toBe(true);
+      });
+      expect(here.map((p) => core.seatOf(p))).toEqual(want);
+      expect(core.handle('p1', { t: 'start' }).ok).toBe(true);
+      playPeople(core, clock, here, 60 + i);
+      const rec = buildMatchRecord(core.r, core.match!);
+      expect(validateMatchRecord(rec).ok, JSON.stringify(want)).toBe(true);
+      expect(rec.kind, JSON.stringify(want)).toBe(kind);
+      expect(rec.seats.filter((s) => s.kind === 'human').map((s) => s.seat).sort()).toEqual([...want].sort());
+      expect(rec.seats.every((s) => (s.kind === 'human') === (s.persona === null))).toBe(true);
+    }
+  });
+
+  it('a person away at a start after a match is carried: a person\'s seat with automatic moves only, never abandoned', () => {
+    const clock = { t: Date.UTC(2026, 10, 25, 12) };
+    const core = RoomCore.create('CARRY', defaultSettings({ mode: 'room', players: 2, opponents: ['lia'] }), 'p1', true, 'v1', deps(50, clock));
+    core.join('p2', true);
+    core.connect('p1');
+    core.connect('p2');
+    expect(core.handle('p1', { t: 'start' }).ok).toBe(true);
+    playPeople(core, clock, ['p1', 'p2'], 3);
+    expect(core.handle('p1', { t: 'lobby' }).ok).toBe(true);
+    core.disconnect('p2');
+    clock.t += 300_000;
+    expect(core.handle('p1', { t: 'start' }).ok).toBe(true);
+    expect(core.r.seats[1]).toMatchObject({ kind: 'human', carried: true, takeover: true });
+    playPeople(core, clock, ['p1', 'p2'], 4);
+    const rec = buildMatchRecord(core.r, core.match!);
+    expect(validateMatchRecord(rec).ok).toBe(true);
+    expect(rec.kind).toBe('humans');
+    expect(rec.seats[1]).toMatchObject({ kind: 'human', persona: null, aiVersion: null });
+    const moves = rec.moves.filter((_, i) => rec.log[i] >> 4 === 1);
+    expect(moves.length).toBeGreaterThan(0);
+    expect(moves.every((m) => m.auto && m.ms === null)).toBe(true);
+    expect(rec.abandoned).toEqual([]);
   });
 });

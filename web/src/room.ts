@@ -8,8 +8,10 @@ import { ApiError, api } from './api.ts';
 import { hasCredential, noteVerifiedUntil, requestHumanCheck } from './check.ts';
 import { RoomSocket } from './connection.ts';
 import { ensureReady } from './consent.ts';
+import type { RematchChoice } from './controller.ts';
 import type { Key } from './i18n.ts';
 import { defaultLimit, heldLimit, holdLimit, readLimit } from './limit.ts';
+import { dropsFinishedMatch, noticeFor, SETUP_DRAW } from './room-rules.ts';
 import { newId, serverNow, store, type FeedItem, type RoomProblem } from './store.ts';
 import { Playback } from './table-view.ts';
 
@@ -29,16 +31,6 @@ export function autoAction(legal: number): number {
   return -1;
 }
 
-const ERROR_NOTICE: Partial<Record<ErrorCode, Key>> = {
-  too_fast: 'notice.too_fast',
-  not_owner: 'notice.not_owner',
-  seat_taken: 'notice.seat_taken',
-  room_full: 'notice.room_full',
-  not_in_lobby: 'notice.not_in_lobby',
-  expired: 'notice.expired',
-  needs_people: 'notice.needs_people',
-};
-
 export class RoomController {
   readonly code: string;
   private socket: RoomSocket | null = null;
@@ -49,6 +41,8 @@ export class RoomController {
   private readonly bubbleTimers = new Map<number, ReturnType<typeof setTimeout>>();
   private closed = false;
   private joined = false;
+  /** The seat this page last asked for with "Sentar aqui", until the room shows it there. */
+  private lastSit: number | null = null;
 
   constructor(code: string) {
     this.code = code;
@@ -210,6 +204,13 @@ export class RoomController {
     switch (m.t) {
       case 'room':
         if (m.you !== null) this.joined = true;
+        if (dropsFinishedMatch(store.get(), m)) {
+          // Back to the lobby after a match ("Mudar a mesa"): the finished match goes, so the lobby
+          // shows at once and the next match starts from before its deal, with no stale result.
+          this.playback.stop();
+          store.set({ room: m, clockOffset: m.now - Date.now(), game: null, view: null, playing: false, feed: [], cover: false, sending: false, bubbles: {} });
+          break;
+        }
         store.set({ room: m, clockOffset: m.now - Date.now() });
         break;
       case 'game': {
@@ -234,7 +235,9 @@ export class RoomController {
 
   private onError(code: ErrorCode, limit?: LimitInfo): void {
     store.set({ sending: false });
-    const key = ERROR_NOTICE[code];
+    // A refused "Sentar aqui" did not move this page: a later seat change is not its own.
+    if (code === 'seat_taken' || code === 'room_full' || code === 'not_in_lobby') this.lastSit = null;
+    const key = noticeFor(code, store.get().room?.room.status);
     if (key) this.notice(key);
     // The brake refused the start or the rematch: the match did not begin, and the person reads until when.
     if (code === 'limit_reached') {
@@ -323,7 +326,33 @@ export class RoomController {
   }
 
   sit(seat: number): void {
-    this.send({ t: 'sit', seat });
+    if (this.send({ t: 'sit', seat })) this.lastSit = seat;
+  }
+
+  /**
+   * Called when this page's seat changed: true when it asked for that seat ("Sentar aqui"). Any
+   * change uses the request up, so a later move by the owner is told as the owner's (the lobby's
+   * moved line), even back to that seat.
+   */
+  satHere(seat: number): boolean {
+    const mine = this.lastSit === seat;
+    this.lastSit = null;
+    return mine;
+  }
+
+  /** The owner swaps the occupants of two seats in the lobby. */
+  move(from: number, to: number): void {
+    this.send({ t: 'move', from, to });
+  }
+
+  /** The owner sets who sits in a seat without a connected person: a character, or null (free for a friend). */
+  plan(seat: number, ai: string | null): void {
+    this.send({ t: 'plan', seat, ai });
+  }
+
+  /** "Mudar a mesa": the owner takes the room back to the lobby after a match. Starts nothing. */
+  toLobby(): void {
+    this.send({ t: 'lobby' });
   }
 
   start(): void {
@@ -331,9 +360,18 @@ export class RoomController {
     this.send({ t: 'start' });
   }
 
-  rematch(): void {
+  /**
+   * "Jogar de novo". The switches go only to a quick play room that reads them (setup 1 or more): an
+   * older room would ignore them, and `randomPartner` exists only at a 2 against 2 table.
+   */
+  rematch(next?: RematchChoice): void {
     if (this.limitHeld()) return;
-    this.send({ t: 'rematch' });
+    const room = store.get().room?.room;
+    if (!next || !room || room.settings.mode !== 'solo' || (room.setup ?? 0) < SETUP_DRAW) {
+      this.send({ t: 'rematch' });
+      return;
+    }
+    this.send(room.settings.players === 4 ? { t: 'rematch', ...next } : { t: 'rematch', randomOpponents: next.randomOpponents });
   }
 
   /** A refusal of the brake the page still keeps (limit.ts holdLimit): shown again, nothing sent. */

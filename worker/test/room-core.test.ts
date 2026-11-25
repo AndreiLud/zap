@@ -4,8 +4,9 @@ import { A_SIGNAL0, SIGNAL_MASK, legalMask, expectedActor, type MatchState } fro
 import { agentContext, type Agent } from '../../ai/src/agent.ts';
 import { buildMatchRecord } from '../../shared/match-record.ts';
 import { HeuristicAgent } from '../../ai/src/heuristic.ts';
-import type { ServerMsg } from '../../shared/protocol.ts';
+import type { RoomSettings, ServerMsg } from '../../shared/protocol.ts';
 import { parseClientMsg } from '../../shared/protocol.ts';
+import { DEFAULT_OPPONENTS } from '../../shared/lineup.ts';
 import {
   ABANDON_AFTER_MS,
   LISTING_AHEAD_MS,
@@ -16,6 +17,7 @@ import {
   defaultSettings,
   listingUpdate,
   memberUntil,
+  validateSettings,
   type DecisionRecord,
   type RoomDeps,
 } from '../src/room-core.ts';
@@ -106,9 +108,14 @@ describe('room core', () => {
     expect(core.join('friend', false)).toEqual({ seat: 1 });
     expect(core.handle('friend', { t: 'sit', seat: 2 }).ok).toBe(true);
     expect(core.seatOf('friend')).toBe(2);
+    // The plan stays with the seats: seat 1 is free again with its character, the friend hides seat 2's.
+    expect(core.publicRoom().seats.map((s) => s.persona)).toEqual([null, 'zap', null, 'lia']);
     expect(core.handle('friend', { t: 'start' })).toEqual({ ok: false, code: 'not_owner' });
     expect(core.handle('owner', { t: 'start' }).ok).toBe(true);
     expect(core.r.seats.map((s) => s.kind)).toEqual(['human', 'ai', 'human', 'ai']);
+    // The default plan on seats 1, 2 and 3 (Zap, Iara, Lia): the AIs take the free seats' characters.
+    expect(core.r.seats.map((s) => s.persona)).toEqual(['ravi', 'zap', 'iara', 'lia']);
+    expect(core.publicRoom().seats.map((s) => s.persona)).toEqual([null, 'zap', null, 'lia']);
     expect(core.join('late', true)).toEqual({ error: 'room_full' });
   });
 
@@ -366,29 +373,49 @@ describe('no hidden information leaves the room', () => {
       for (const p of people) core.connect(p);
       core.handle(people[0], { t: 'start' });
       const rand = mulberry32(m);
-      let guard = 0;
       const seen = new Set<number>();
-      while (core.r.status === 'playing' && guard++ < 3000) {
-        for (const p of people) {
-          const seat = core.seatOf(p);
-          checkMessage(core, seat, core.gameMessage(seat), seen);
-          messages++;
+      const playChecked = () => {
+        let guard = 0;
+        while (core.r.status === 'playing' && guard++ < 3000) {
+          for (const p of people) {
+            const seat = core.seatOf(p);
+            checkMessage(core, seat, core.gameMessage(seat), seen);
+            messages++;
+          }
+          core.clearPending();
+          // Some person with a legal move acts (in turn or out of turn).
+          const movers = people.filter((p) => legalMask(core.match!, core.seatOf(p)) !== 0);
+          if (movers.length === 0) {
+            // Waiting for the alarm (a person's time running out, or AI moves left for later).
+            d.clock.t = Math.max(d.clock.t, core.nextAlarm() ?? d.clock.t) + 1;
+            core.alarm();
+            continue;
+          }
+          const p = movers[Math.floor(rand() * movers.length)];
+          const mask = legalMask(core.match!, core.seatOf(p));
+          const acts = [...Array(15).keys()].filter((a) => mask & (1 << a));
+          core.handle(p, { t: 'act', seq: core.r.seq, a: acts[Math.floor(rand() * acts.length)] });
+        }
+        expect(core.r.status).toBe('ended');
+      };
+      playChecked();
+      if (m % 8 === 0) {
+        // A trip through the lobby after the match (M15 "Mudar a mesa"): the owner moves people
+        // and AIs around; no seat hears anything of the finished match meanwhile, and the next
+        // match shows each person only their new seat's cards.
+        expect(core.handle(people[0], { t: 'lobby' }).ok).toBe(true);
+        for (let k = 0; k < 1 + (m % 3); k++) {
+          // The owner moves a person (an AI moves when a person takes its seat).
+          const held = core.r.seats.flatMap((s, i) => (s.kind === 'human' ? [i] : []));
+          const from = held[Math.floor(rand() * held.length)];
+          const to = (from + 1 + Math.floor(rand() * (players - 1))) % players;
+          expect(core.handle(people[0], { t: 'move', from, to }).ok).toBe(true);
+          for (let seat = 0; seat < players; seat++) expect(core.gameMessage(seat)).toBeNull();
         }
         core.clearPending();
-        // Some person with a legal move acts (in turn or out of turn).
-        const movers = people.filter((p) => legalMask(core.match!, core.seatOf(p)) !== 0);
-        if (movers.length === 0) {
-          // Waiting for the alarm (a person's time running out, or AI moves left for later).
-          d.clock.t = Math.max(d.clock.t, core.nextAlarm() ?? d.clock.t) + 1;
-          core.alarm();
-          continue;
-        }
-        const p = movers[Math.floor(rand() * movers.length)];
-        const mask = legalMask(core.match!, core.seatOf(p));
-        const acts = [...Array(15).keys()].filter((a) => mask & (1 << a));
-        core.handle(p, { t: 'act', seq: core.r.seq, a: acts[Math.floor(rand() * acts.length)] });
+        expect(core.handle(people[0], { t: 'start' }).ok).toBe(true);
+        playChecked();
       }
-      expect(core.r.status).toBe('ended');
     }
     expect(messages).toBeGreaterThan(100_000);
   }, 600_000);
@@ -555,7 +582,12 @@ describe('room core: clocks, signals and new matches', () => {
     expect(core.preStart(dev('a'), 'start')).toEqual({ ok: false, code: 'not_in_lobby' });
     expect(core.preStart(dev('b'), 'start')).toEqual({ ok: false, code: 'not_owner' });
     expect(core.preStart(dev('x'), 'rematch')).toEqual({ ok: false, code: 'not_seated' });
+    // While the owner is connected only the owner leads; once the owner is away, anyone seated may.
+    expect(core.preStart(dev('b'), 'rematch')).toEqual({ ok: false, code: 'not_owner' });
+    core.disconnect(dev('a'));
     expect(core.preStart(dev('b'), 'rematch')).toEqual({ ok: true });
+    core.connect(dev('a'));
+    expect(core.preStart(dev('b'), 'rematch')).toEqual({ ok: false, code: 'not_owner' });
     // B left the table: the rematch counts only A.
     core.disconnect(dev('b'));
     expect(core.handle(dev('a'), { t: 'rematch' }).ok).toBe(true);
@@ -693,6 +725,8 @@ describe('room core: a person deletes their data or moves it', () => {
     expect(core.r.match!.seats[b].kind).toBe('human');
     expect(core.handle(dev('a'), { t: 'rematch' }).ok).toBe(true);
     expect(core.r.seats[b].kind).toBe('ai');
+    // The seat's planned character plays it (opponents Lia and Ravi: Lia on seat 1).
+    expect(core.r.seats[b].persona).toBe('lia');
     expect(starts.at(-1)).toEqual([dev('a')]);
   });
 
@@ -955,7 +989,7 @@ describe("quick play's first connection (the deal made with the room)", () => {
   for (const players of [2, 4] as const) {
     it(`${players} players: the first game message starts with the deal, then the AI's opening moves`, () => {
       for (let seed = 60; seed < 66; seed++) {
-        const core = RoomCore.create('SOLOD', defaultSettings({ players, opponents: ['zap'] }), 'dev-a', true, 'v1', deps(seed));
+        const core = RoomCore.create('SOLOD', defaultSettings({ players, opponents: [...DEFAULT_OPPONENTS[players]] }), 'dev-a', true, 'v1', deps(seed));
         // The Durable Object drops what the creation produced: nobody was connected to hear it.
         core.clearPending();
         expect(core.connect('dev-a')).toBe(true);
@@ -983,5 +1017,213 @@ describe("quick play's first connection (the deal made with the room)", () => {
     core.r.match!.log.push(0);
     core.connect('dev-a');
     expect(core.pending.some((te) => te.e.t === 'deal')).toBe(false);
+  });
+});
+
+describe('quick play lineups and the random switches (M15)', () => {
+  /** Plays the person's seat (dev-a, seat 0) with random legal moves until the match ends. */
+  function finish(core: RoomCore, clock: { t: number }, seed: number): void {
+    const rand = mulberry32(seed);
+    for (let guard = 0; core.r.status === 'playing' && guard < 5000; guard++) {
+      const d = core.r.deadline;
+      if (!d || d.seat !== 0) {
+        clock.t = Math.max(clock.t, core.nextAlarm() ?? clock.t) + 1;
+        core.alarm();
+        continue;
+      }
+      clock.t = Math.max(clock.t, d.since) + 500;
+      const mask = legalMask(core.match!, 0);
+      const acts = [...Array(15).keys()].filter((a) => mask & (1 << a));
+      core.handle('dev-a', { t: 'act', seq: core.r.seq, a: acts[Math.floor(rand() * acts.length)] });
+    }
+    expect(core.r.status).toBe('ended');
+  }
+
+  const lineupOf = (core: RoomCore) => core.r.seats.map((s) => s.persona).join(',');
+
+  /** The characters at the table are the settings' lineup: opponents on seats 1 and 3, the partner on seat 2. */
+  function expectLineup(core: RoomCore): void {
+    const s = core.r.settings;
+    expect(validateSettings(s)).toBeNull();
+    const p = core.r.seats.map((x) => x.persona);
+    if (s.players === 2) expect(p).toEqual([null, ...s.opponents]);
+    else expect(p).toEqual([null, s.opponents[0], s.partner, s.opponents[1]]);
+  }
+
+  it('validateSettings refuses lineups a table cannot play and switches where they mean nothing', () => {
+    const cases: [Partial<RoomSettings>, string][] = [
+      [{ players: 4, opponents: ['zap'] }, 'opponents'],
+      [{ players: 2, opponents: ['zap', 'lia'] }, 'opponents'],
+      [{ opponents: ['zap', 'zap'] }, 'opponents'],
+      [{ opponents: ['zap', 'iara'], partner: 'iara' }, 'partner'],
+      [{ players: 2, randomPartner: true }, 'random'],
+      [{ mode: 'room', randomOpponents: true }, 'random'],
+      [{ mode: 'room', randomPartner: true }, 'random'],
+      [{ randomOpponents: 'yes' as unknown as boolean }, 'random'],
+    ];
+    for (const [over, err] of cases) {
+      expect(validateSettings(defaultSettings(over)), JSON.stringify(over)).toBe(err);
+      expect(() => RoomCore.create('BADST', defaultSettings(over), 'dev-a', true, 'v1', deps())).toThrow(`bad settings: ${err}`);
+    }
+  });
+
+  it('defaultSettings fits the table size, keeps both switches off and never seats the partner among the opponents', () => {
+    for (const s of [defaultSettings(), defaultSettings({ players: 2 }), defaultSettings({ mode: 'room' }), defaultSettings({ mode: 'room', players: 2 })]) {
+      expect(validateSettings(s)).toBeNull();
+      expect([s.randomOpponents, s.randomPartner]).toEqual([false, false]);
+    }
+    expect(defaultSettings({ players: 2 }).opponents).toEqual(['zap']);
+    expect(defaultSettings()).toMatchObject({ opponents: ['zap', 'lia'], partner: 'iara' });
+    expect(defaultSettings({ opponents: ['zap', 'iara'] }).partner).toBe('lia');
+  });
+
+  it('with both switches off the room plays the lineup it was given', () => {
+    const core = RoomCore.create('SWOFF', defaultSettings({ opponents: ['bento', 'ravi'], partner: 'otavio' }), 'dev-a', true, 'v1', deps(70));
+    expect(core.r.settings).toMatchObject({ randomOpponents: false, randomPartner: false, opponents: ['bento', 'ravi'], partner: 'otavio' });
+    expect(lineupOf(core)).toBe(',bento,otavio,ravi');
+  });
+
+  it('"Time" on at creation draws the partner for the first deal: never an opponent, the opponents as chosen', () => {
+    const partners = new Set<string>();
+    for (let seed = 0; seed < 20; seed++) {
+      const settings = defaultSettings({ opponents: ['zap', 'iara'], partner: 'lia', randomPartner: true });
+      const core = RoomCore.create('DRAWP', settings, 'dev-a', true, 'v1', deps(100 + seed));
+      expectLineup(core);
+      expect(core.r.settings.opponents).toEqual(['zap', 'iara']);
+      expect(['otavio', 'bento', 'lia', 'ravi']).toContain(core.r.seats[2].persona);
+      // The room draws into its own copy; the caller's settings stay as they were.
+      expect(settings.partner).toBe('lia');
+      partners.add(core.r.settings.partner);
+    }
+    expect(partners.size).toBeGreaterThan(1);
+  });
+
+  it('a rematch with both switches on draws a valid lineup each time, and the lineup changes', () => {
+    let changed = 0;
+    for (let seed = 0; seed < 20; seed++) {
+      const clock = { t: 1_000_000 };
+      const core = RoomCore.create('DRAWB', defaultSettings({ opponents: ['zap', 'iara'] }), 'dev-a', true, 'v1', deps(200 + seed, clock));
+      core.connect('dev-a');
+      const before = lineupOf(core);
+      finish(core, clock, seed);
+      expect(core.handle('dev-a', { t: 'rematch', randomOpponents: true, randomPartner: true }).ok).toBe(true);
+      expect(core.r.settings).toMatchObject({ randomOpponents: true, randomPartner: true });
+      expect(core.r.matchNo).toBe(2);
+      expectLineup(core);
+      if (lineupOf(core) !== before) changed++;
+    }
+    expect(changed).toBeGreaterThan(0);
+  });
+
+  it('switches off at the rematch repeat the lineup just played, also a drawn one, and an older page keeps them off', () => {
+    const clock = { t: 1_000_000 };
+    const core = RoomCore.create('REPEA', defaultSettings({ opponents: ['zap', 'iara'], randomOpponents: true, randomPartner: true }), 'dev-a', true, 'v1', deps(300, clock));
+    core.connect('dev-a');
+    expectLineup(core);
+    const played = { opponents: [...core.r.settings.opponents], partner: core.r.settings.partner };
+    const seats = lineupOf(core);
+    finish(core, clock, 1);
+    expect(core.handle('dev-a', { t: 'rematch', randomOpponents: false, randomPartner: false }).ok).toBe(true);
+    expect(core.r.settings).toMatchObject({ ...played, randomOpponents: false, randomPartner: false });
+    expect(lineupOf(core)).toBe(seats);
+    finish(core, clock, 2);
+    expect(core.handle('dev-a', { t: 'rematch' }).ok).toBe(true);
+    expect(core.r.settings).toMatchObject({ ...played, randomOpponents: false, randomPartner: false });
+    expect(lineupOf(core)).toBe(seats);
+    expect(core.r.matchNo).toBe(3);
+  });
+
+  it('a rematch without fields keeps the switches that are on', () => {
+    const clock = { t: 1_000_000 };
+    const core = RoomCore.create('KEEPS', defaultSettings({ players: 2, opponents: ['zap'], randomOpponents: true }), 'dev-a', true, 'v1', deps(310, clock));
+    core.connect('dev-a');
+    const seen = new Set([core.r.settings.opponents[0]]);
+    for (let i = 0; i < 6; i++) {
+      finish(core, clock, 10 + i);
+      expect(core.handle('dev-a', { t: 'rematch' }).ok).toBe(true);
+      expect(core.r.settings.randomOpponents).toBe(true);
+      expectLineup(core);
+      seen.add(core.r.settings.opponents[0]);
+    }
+    expect(seen.size).toBeGreaterThan(1);
+  });
+
+  it('"Time" sent with two players is stored off', () => {
+    const clock = { t: 1_000_000 };
+    const core = RoomCore.create('TWOPL', defaultSettings({ players: 2, opponents: ['lia'] }), 'dev-a', true, 'v1', deps(320, clock));
+    core.connect('dev-a');
+    finish(core, clock, 3);
+    expect(core.handle('dev-a', { t: 'rematch', randomOpponents: false, randomPartner: true }).ok).toBe(true);
+    expect(core.r.settings).toMatchObject({ randomOpponents: false, randomPartner: false, opponents: ['lia'] });
+    expect(validateSettings(core.r.settings)).toBeNull();
+  });
+
+  it('a refused rematch leaves the settings, the switches and the status as they were', () => {
+    const clock = { t: 1_000_000 };
+    const core = RoomCore.create('REFUS', defaultSettings({ opponents: ['zap', 'iara'] }), 'dev-a', true, 'v1', deps(330, clock));
+    core.connect('dev-a');
+    finish(core, clock, 4);
+    const before = JSON.stringify(core.r.settings);
+    const msg = { t: 'rematch', randomOpponents: true, randomPartner: true } as const;
+    expect(core.handle('dev-a', msg, { mayStartMatch: false })).toEqual({ ok: false, code: 'check_needed' });
+    expect(JSON.stringify(core.r.settings)).toBe(before);
+    expect(core.r.status).toBe('ended');
+    // A start refused after the switches were written (forced here: quick play has no such case
+    // today) puts them back with the status.
+    core.r.closed = true;
+    expect(core.handle('dev-a', msg)).toEqual({ ok: false, code: 'not_in_lobby' });
+    expect(JSON.stringify(core.r.settings)).toBe(before);
+    expect(core.r.status).toBe('ended');
+    expect(core.r.matchNo).toBe(1);
+  });
+
+  it('a quick play room stored before the switches loads with both off, as does one with a lineup the new rules refuse', () => {
+    const clock = { t: 1_000_000 };
+    const core = RoomCore.create('OLDSW', defaultSettings({ opponents: ['zap', 'bento'] }), 'dev-a', true, 'v1', deps(340, clock));
+    const stored = JSON.parse(JSON.stringify(core.r));
+    delete stored.settings.randomOpponents;
+    delete stored.settings.randomPartner;
+    const loaded = new RoomCore(stored, deps(340, clock));
+    expect(loaded.r.settings).toMatchObject({ randomOpponents: false, randomPartner: false });
+    loaded.connect('dev-a');
+    finish(loaded, clock, 5);
+    expect(loaded.handle('dev-a', { t: 'rematch' }).ok).toBe(true);
+    expect(lineupOf(loaded)).toBe(',zap,iara,bento');
+    // Older code took one opponent for both seats; such a room still loads and plays its rematch.
+    const legacy = JSON.parse(JSON.stringify(loaded.r));
+    delete legacy.settings.randomOpponents;
+    delete legacy.settings.randomPartner;
+    legacy.settings.opponents = ['zap'];
+    const old = new RoomCore(legacy, deps(341, clock));
+    finish(old, clock, 6);
+    expect(old.handle('dev-a', { t: 'rematch' }).ok).toBe(true);
+    expect(lineupOf(old)).toBe(',zap,iara,zap');
+  });
+
+  it('rooms with friends ignore the switches of a rematch', () => {
+    const clock = { t: 1_000_000 };
+    const core = RoomCore.create('ROOMS', defaultSettings({ mode: 'room', players: 2, opponents: ['lia'] }), 'dev-a', true, 'v1', deps(350, clock));
+    core.connect('dev-a');
+    expect(core.handle('dev-a', { t: 'start' }).ok).toBe(true);
+    finish(core, clock, 7);
+    expect(core.handle('dev-a', { t: 'rematch', randomOpponents: true, randomPartner: true }).ok).toBe(true);
+    expect(core.r.settings).toMatchObject({ randomOpponents: false, randomPartner: false, opponents: ['lia'] });
+    // The person's seat holds a hidden fallback in a room (M15 seat plan); the table shows none.
+    expect(core.publicRoom().seats.map((s) => s.persona)).toEqual([null, 'lia']);
+  });
+
+  it('every room says what its code can do: setup 2', () => {
+    expect(RoomCore.create('SETUP', defaultSettings(), 'dev-a', true, 'v1', deps()).publicRoom().setup).toBe(2);
+    expect(RoomCore.create('SETUQ', defaultSettings({ mode: 'room' }), 'dev-a', true, 'v1', deps()).publicRoom().setup).toBe(2);
+  });
+
+  it('the rematch message keeps boolean switches, drops unknown fields and refuses anything else', () => {
+    expect(parseClientMsg('{"t":"rematch"}')).toEqual({ t: 'rematch' });
+    expect(parseClientMsg('{"t":"rematch","randomOpponents":true,"randomPartner":false}')).toEqual({ t: 'rematch', randomOpponents: true, randomPartner: false });
+    expect(parseClientMsg('{"t":"rematch","randomPartner":true,"extra":1}')).toEqual({ t: 'rematch', randomPartner: true });
+    expect(parseClientMsg('{"t":"rematch","randomOpponents":"yes"}')).toBeNull();
+    expect(parseClientMsg('{"t":"rematch","randomPartner":null}')).toBeNull();
+    expect(parseClientMsg('{"t":"rematch","randomOpponents":1}')).toBeNull();
+    expect(parseClientMsg('{"t":"start","randomOpponents":true}')).toEqual({ t: 'start' });
   });
 });

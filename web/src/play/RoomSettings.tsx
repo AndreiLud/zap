@@ -1,8 +1,7 @@
-// The settings of a room with friends (CLIENT-SPEC 10.2 item 5): players, time per move, who fills
-// the empty seats (the opponents picker, rendered by the page) and the house rules. Testids and the
+// The settings of a room with friends (CLIENT-SPEC 10.2 item 5): players, time per move and the
+// house rules. Who sits where is set up in the room itself (M15), not here. Testids and the
 // option keys are the ones the old room form had.
 
-import type { ComponentChildren } from 'preact';
 import type { RuleOptions, Variant } from '../../../engine/src/config.ts';
 import type { TurnSeconds } from '../../../shared/protocol.ts';
 import { t, type Key } from '../i18n.ts';
@@ -52,7 +51,7 @@ export function turnSecondsOf(f: RoomForm): TurnSeconds {
 
 type Flag = 'bestOf3' | 'raiseAnyTime' | 'faceDownFirst' | 'allTieToMao' | 'ironNormal' | 'ladder8';
 
-export function RoomSettings(props: { form: RoomForm; variant: Variant; onChange(f: RoomForm): void; ai: ComponentChildren }) {
+export function RoomSettings(props: { form: RoomForm; variant: Variant; onChange(f: RoomForm): void }) {
   const { form, variant } = props;
   const set = (patch: Partial<RoomForm>) => props.onChange({ ...form, ...patch });
   const check = (flag: Flag, label: Key, testid: string) => (
@@ -92,7 +91,6 @@ export function RoomSettings(props: { form: RoomForm; variant: Variant; onChange
           {t('turn.noneHint')}
         </p>
       ) : null}
-      {props.ai}
       <details class="house-rules">
         <summary>
           <span>{t('play.room.house')}</span>

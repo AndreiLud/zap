@@ -1,13 +1,14 @@
 // The table's tools (CLIENT-SPEC 11.7): "Denunciar", "Silenciar frases e sinais dos outros" and "Sair
 // da partida" (not after the match ended). From 64em they sit at the foot of the side panel; below
 // 64em the table registers them as the menu sheet's group "This table". Only one instance exists at a
-// time. The rules stay in the navigation (rules-button), never here.
+// time. The rules stay in the navigation (rules-button), never here. The report dialog loads on
+// demand (room-chunks.tsx), so it never weighs on the table chunk.
 
 import { useEffect, useRef } from 'preact/hooks';
 import { Icon } from '../components/icons.tsx';
-import { ReportButton } from '../components/Report.tsx';
 import { currentController } from '../controller.ts';
 import { t } from '../i18n.ts';
+import { ReportButton } from '../room-chunks.tsx';
 import { MUTE_KEY, store, useStore } from '../store.ts';
 
 /** Mutes the phrases and the signals of the other seats (remembered in this browser). */

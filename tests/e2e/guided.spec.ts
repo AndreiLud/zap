@@ -45,6 +45,8 @@ test('the guided hand by taps, from the intro to the outro, with nothing sent to
     // The hand went to us: the score shows 3 for our team.
     await expect(page.getByTestId('score')).toHaveAttribute('aria-label', /Nós 3, Eles 0/);
     await expect(outro).toHaveAttribute('href', '/jogar?modo=solo&contra=otavio');
+    // The lesson's table is local: none of quick play's switches for a next match (M15).
+    await expect(page.locator('[data-testid^="rematch-random-"]')).toHaveCount(0);
     expect(server.api, 'requests to the API during the guided hand').toEqual([]);
     expect(server.sockets, 'sockets during the guided hand').toEqual([]);
 
@@ -52,6 +54,8 @@ test('the guided hand by taps, from the intro to the outro, with nothing sent to
     await outro.tap();
     await expect(page).toHaveURL(/\/jogar\?modo=solo&contra=otavio$/);
     await expect(page.getByTestId('play-summary')).toContainText('Otávio');
+    // The preset is a choice: its random switch is off.
+    await expect(page.getByTestId('random-opponents')).not.toBeChecked();
     expect(me.errors).toEqual([]);
   } finally {
     await me.close();

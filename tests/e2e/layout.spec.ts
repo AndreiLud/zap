@@ -5,7 +5,7 @@
 // holds the whole navigation, the external links, the four-color pill and the sound switch.
 
 import { devices, expect, test, type Page } from '@playwright/test';
-import { Player, createRoom, expectTable, passHumanCheck, startSolo } from './support/zap.ts';
+import { Player, createRoom, expectTable, expectTeams, passHumanCheck, startSolo } from './support/zap.ts';
 
 const WIDTHS = [360, 320] as const;
 const phoneAt = (width: number) => ({ ...devices['Pixel 7'], viewport: { width, height: width === 320 ? 568 : 640 } });
@@ -86,6 +86,11 @@ for (const width of WIDTHS) {
       await page.goto('/jogar');
       await page.getByTestId('opponents-toggle').click();
       await check(page, '/jogar with the opponents open', problems);
+      // "Time" off shows the partner picker after the switches (M15): both pickers open.
+      await page.getByTestId('random-partner').uncheck();
+      await page.getByTestId('partner-toggle').click();
+      await expect(page.getByTestId('partner-zap')).toBeVisible();
+      await check(page, '/jogar with the switches, the opponents and the partner open', problems);
       await page.getByTestId('menu-button').click();
       await expect(page.getByTestId('site-sheet')).toBeVisible();
       await check(page, 'menu sheet', problems);
@@ -142,7 +147,21 @@ test('no horizontal scroll at 360 px in a lobby and at a real table', async ({ b
     const owner = await Player.create(browser, 'Owner', phoneAt(360));
     players.push(owner);
     await createRoom(owner, { players: 4, turn: '30' });
+    // The owner's lobby has a select per seat (M15), as wide as its row and a full touch target.
+    for (const seat of [0, 1, 2, 3]) {
+      const select = owner.page.getByTestId(`arrange-${seat}`);
+      await expect(select).toBeVisible();
+      const box = (await select.boundingBox())!;
+      expect(box.height, `arrange-${seat} height`).toBeGreaterThanOrEqual(44);
+    }
+    // The seats by team (M17): at 360 px the two groups stack, Nós above Eles, each as wide as the page.
+    await expectTeams(owner.page, [0, 2], [1, 3]);
+    const boxes = await owner.page.locator('.lobby__teams > [role="group"]').evaluateAll((gs) => gs.map((g) => g.getBoundingClientRect().toJSON() as DOMRect));
+    expect(boxes[0].bottom, 'Nós above Eles').toBeLessThanOrEqual(boxes[1].top);
+    for (const b of boxes) expect(b.right, 'a team group inside the page').toBeLessThanOrEqual(360);
     await check(owner.page, 'lobby', problems);
+    await owner.shot('m15-room-owner-lobby-360');
+    await owner.shot('m15-room-teams-owner-360');
 
     const solo = await Player.create(browser, 'Solo', phoneAt(360));
     players.push(solo);
