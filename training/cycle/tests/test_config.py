@@ -84,6 +84,45 @@ class ConfigTest(unittest.TestCase):
         with self.assertRaises(CycleError):
             load_config(p, env={})
 
+    def test_the_rollback_needs_the_people_the_card_needs(self):
+        # [ab] min_people_per_arm is the card's floor of people per arm (contract 1.10) wherever
+        # people's data is read, so the two cannot drift; only a local test may ask for fewer.
+        import tempfile
+        from pathlib import Path
+
+        from zapcycle import summary
+        from zapcycle.config import ROOT
+        from zapcycle.formats import MIN_PEOPLE
+
+        self.assertEqual(MIN_PEOPLE, summary.MIN_PEOPLE)
+        for p in ("prod", "local", "test"):
+            c = load_config(CONFIG_DIR / f"{p}.toml", env={})
+            self.assertEqual((c.ab["min_matches_per_arm"], c.ab["min_people_per_arm"]), (200, MIN_PEOPLE), p)
+        for path in sorted((ROOT / "tests" / "sim").glob("*.toml")):
+            c = load_config(path, env={})
+            self.assertEqual(c.mode, "minio", path.name)
+            self.assertLess(c.ab["min_people_per_arm"], MIN_PEOPLE, f"{path.name}: a test override")
+        out = Path(tempfile.mkdtemp())
+        prod = (CONFIG_DIR / "prod.toml").read_text()
+        local = (CONFIG_DIR / "local.toml").read_text()
+        line = "min_people_per_arm = 20 "
+        self.assertIn(line, prod)
+        for name, text, ok in (
+            ("prod-19.toml", prod.replace(line, "min_people_per_arm = 19 "), False),
+            ("prod-21.toml", prod.replace(line, "min_people_per_arm = 21 "), False),
+            ("prod-missing.toml", prod.replace(line, "# "), False),
+            ("local-0.toml", local.replace(line, "min_people_per_arm = 0 "), False),
+            ("local-r2.toml", local.replace(line, "min_people_per_arm = 4 ").replace('mode = "minio"', 'mode = "r2"'), False),
+            ("local-4.toml", local.replace(line, "min_people_per_arm = 4 "), True),
+        ):
+            p = out / name
+            p.write_text(text)
+            if ok:
+                self.assertEqual(load_config(p, env={}).ab["min_people_per_arm"], 4)
+            else:
+                with self.assertRaises(CycleError, msg=name):
+                    load_config(p, env={})
+
     def test_temp_paths(self):
         cfg, tmp = temp_config()
         self.assertEqual(cfg.data_dir, tmp / "data")

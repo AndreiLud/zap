@@ -13,6 +13,15 @@ review's simulation). The rollback therefore reads a constant boundary near z 2.
 percentile of the bootstrap drops (`loSeq`); `lo` and `hi` (5th and 95th percentiles) are what the
 card and the summary show. detectablePoints is the true drop the rule catches 80% of the time by
 the end of a window with this spread: rollback_drop + (2.326 + 0.8416) sd.
+
+The rollback also needs people, not only matches: each arm needs `min_matches_per_arm` matches and
+`min_people_per_arm` distinct people (groups; a match without a group counts as nobody). A bootstrap
+over people has almost no spread with one or a few people (one person gives none), so their matches
+alone would roll an equal version back on noise. In profile prod `min_people_per_arm` is MIN_PEOPLE,
+the people per arm the card needs before it shows the comparison (contract 1.10; config.py checks
+it). A window that ends short of either count closes with the candidate in place, and the status
+message says that the automatic rollback could not decide and why; state.json keeps that note
+(lastAbNote, printed by `status`) until the next window ends.
 """
 
 from __future__ import annotations
@@ -23,6 +32,7 @@ import random
 from pathlib import Path
 
 from .core import Cycle, utc_date
+from .formats import MIN_PEOPLE
 from .summary import people_records, public_seats, read_records
 
 Z_SEQ = 2.326  # the rollback boundary: 1st percentile of the bootstrap drops
@@ -51,11 +61,13 @@ def seed_of(version: str) -> int:
 
 def evaluate(matches: list[dict], version: str, resamples: int, rollback_drop: float = 0.02) -> dict:
     """Counts, people, drop, its cluster bootstrap interval (5th and 95th percentiles) and the
-    rollback boundary loSeq (1st percentile)."""
+    rollback boundary loSeq (1st percentile). armPeople: distinct groups per arm, for the rollback
+    rule and the private status only (the card and the summary never show it)."""
     n = {"candidate": sum(1 for m in matches if m["arm"] == "candidate"), "control": sum(1 for m in matches if m["arm"] == "control")}
     groups = {"candidate": {m["group"] for m in matches if m["arm"] == "candidate" and m["group"]}, "control": {m["group"] for m in matches if m["arm"] == "control" and m["group"]}}
     people = len(groups["candidate"] | groups["control"])
-    out = {"matches": n, "people": people if people >= 20 else None, "bothArmsPeople": min(len(groups["candidate"]), len(groups["control"])) >= 20, "drop": None, "lo": None, "hi": None, "loSeq": None, "detectablePoints": None, "sd": None}
+    arm_people = {arm: len(g) for arm, g in groups.items()}
+    out = {"matches": n, "armPeople": arm_people, "people": people if people >= MIN_PEOPLE else None, "bothArmsPeople": min(arm_people.values()) >= MIN_PEOPLE, "drop": None, "lo": None, "hi": None, "loSeq": None, "detectablePoints": None, "sd": None}
     if not n["candidate"] or not n["control"]:
         return out
     mean = lambda arm: sum(m["score"] for m in matches if m["arm"] == arm) / n[arm]
@@ -87,9 +99,22 @@ def evaluate(matches: list[dict], version: str, resamples: int, rollback_drop: f
     return out
 
 
+def arm_people(result: dict) -> dict[str, int]:
+    """Distinct people (groups) per arm; a result without the count holds nobody."""
+    p = result.get("armPeople") or {}
+    return {arm: int(p.get(arm) or 0) for arm in ("candidate", "control")}
+
+
+def short_of(result: dict, cfg_ab: dict) -> dict[str, bool]:
+    """What keeps the rollback rule from deciding: too few matches, too few people in an arm."""
+    need_m, need_p = int(cfg_ab["min_matches_per_arm"]), int(cfg_ab["min_people_per_arm"])
+    return {"matches": min(result["matches"]["candidate"], result["matches"]["control"]) < need_m, "people": min(arm_people(result).values()) < need_p}
+
+
 def decide(result: dict, cfg_ab: dict, now: int, until: int) -> str:
-    """rollback, close or continue. The rollback reads the sequential boundary loSeq."""
-    enough = min(result["matches"]["candidate"], result["matches"]["control"]) >= int(cfg_ab["min_matches_per_arm"])
+    """rollback, close or continue. The rollback needs min_matches_per_arm matches and
+    min_people_per_arm people in each arm, then reads the sequential boundary loSeq."""
+    enough = not any(short_of(result, cfg_ab).values())
     if enough and result.get("loSeq") is not None and result["loSeq"] > float(cfg_ab["rollback_drop"]):
         return "rollback"
     if now >= until:
@@ -97,9 +122,24 @@ def decide(result: dict, cfg_ab: dict, now: int, until: int) -> str:
     return "continue"
 
 
+def undecided(result: dict, cfg_ab: dict, window: dict) -> str | None:
+    """At the close: why the automatic rollback could not decide, or None when it could (both arms
+    reached both counts). For the private status message and the command's answer."""
+    short = short_of(result, cfg_ab)
+    if not any(short.values()):
+        return None
+    p, m = arm_people(result), result["matches"]
+    parts = []
+    if short["people"]:
+        parts.append(f"too few people played ({p['candidate']} with {window['version']}, {p['control']} with {window['control']}; it needs {int(cfg_ab['min_people_per_arm'])} in each group)")
+    if short["matches"]:
+        parts.append(f"too few matches ({m['candidate']} with {window['version']}, {m['control']} with {window['control']}; it needs {int(cfg_ab['min_matches_per_arm'])} in each group)")
+    return f"The automatic rollback could not decide: {' and '.join(parts)}. Only a rollback by hand (rollback {window['control']}) brings {window['control']} back."
+
+
 def card_ab(result: dict, window: dict, rolled_back: bool) -> dict:
     """The card's A/B block. The comparison's numbers (drop, lo, hi, detectablePoints) appear only
-    once both arms have 20 people (contract 1.10); before that they stay in the private status
+    once both arms have MIN_PEOPLE people (contract 1.10); before that they stay in the private status
     message and the run's report only."""
     both = bool(result.get("bothArmsPeople"))
     r = lambda x: None if x is None or not both else round(x, 4)
@@ -136,9 +176,14 @@ def run_ab(cyc: Cycle, records_path: Path) -> dict:
         out.update(result={k: v for k, v in res.items() if k not in ("sd", "loSeq")}, action=action)
         if action == "rollback":
             msg = f"{window['version']} rolled back to {window['control']} after the A/B test: people won {100 * res['drop']:.1f} points more against it (90% interval from {100 * res['lo']:.1f} to {100 * res['hi']:.1f})."
+            cyc.state["lastAbNote"] = None  # the check decided this window (rollback saves the state)
             rollback(cyc, window["control"], card_ab(res, window, True), msg)
         elif action == "close":
-            close_window(cyc, card_ab(res, window, False))
+            note = undecided(res, cyc.cfg.ab, window)
+            if note:
+                out["undecided"] = note
+                cyc.log.info(f"A/B window of {window['version']}: {note}")
+            close_window(cyc, card_ab(res, window, False), note)
         else:
             write_summary(cyc, manifest)
     else:

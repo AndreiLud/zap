@@ -1,7 +1,9 @@
 # Test config of the local end to end proof (tests/sim/cycle-e2e.sh), never a default: the "local"
 # profile of training/cycle/config/local.toml with its own buckets and folders on the S3 stand-in,
-# and test overrides marked below: ab.min_matches_per_arm 8 instead of 200, so a few dozen simulated
-# matches can trigger the automatic rollback; the gate sizes cap_pairs 64, segment_pairs 8,
+# and test overrides marked below: ab.min_matches_per_arm 8 instead of 200 and ab.min_people_per_arm
+# 4 instead of 20, so a few dozen simulated matches of round 2 (24 simulated people, some of whom
+# leave open data or delete their data) can trigger the automatic rollback, which still needs
+# several people in each arm and never one alone; the gate sizes cap_pairs 64, segment_pairs 8,
 # panel_pairs 8 and personas_pairs 12 instead of 32, 4, 2 and 4, so that a candidate that clearly
 # beats the current version passes the real gate (at 2 pairs per segment the panel test is noise).
 # Thresholds stay as in production; the proof divides them by 25 with ZAP_CYCLE_TEST_THRESHOLDS=1
@@ -92,6 +94,7 @@ share = 0.3
 days = 14
 rollback_drop = 0.02
 min_matches_per_arm = 8                 # test override (production: 200)
+min_people_per_arm = 4                  # test override (production: 20)
 bootstrap = 2000
 
 [data]

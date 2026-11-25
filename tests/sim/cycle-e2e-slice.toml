@@ -88,6 +88,7 @@ share = 0.3
 days = 14
 rollback_drop = 0.02
 min_matches_per_arm = 8                 # test override (production: 200)
+min_people_per_arm = 4                  # test override (production: 20)
 bootstrap = 2000
 
 [data]

@@ -235,9 +235,14 @@ class Cycle:
         prev = self.read_status()
         if prev is None:
             return None
-        prev["updatedAt"] = self.clock()
-        self.put_json(self.models, STATUS_KEY, "zap-status/1", prev)
-        return prev
+        return self.restore_status(prev)
+
+    def restore_status(self, earlier: dict) -> dict:
+        """Writes a status read earlier again as it was (state, step, message, cycleId, startedAt,
+        finishedAt, lastPromotion), with a fresh updatedAt."""
+        s = {**earlier, "updatedAt": self.clock()}
+        self.put_json(self.models, STATUS_KEY, "zap-status/1", s)
+        return s
 
     # Work folders -------------------------------------------------------------------------------
 

@@ -2,14 +2,14 @@
   "provenance": {
     "script": "tools/data/facts-view.ts",
     "command": "docker compose run --rm -T node node tools/data/facts-view.ts",
-    "measuredAt": "2026-11-24T03:12:56.121Z",
+    "measuredAt": "2026-11-25T09:57:11.363Z",
     "node": "v24.22.2",
     "cpu": "QEMU Virtual CPU version 2.5+",
-    "commit": "a8a6164f2a414e49005ac04cef2a2dc7ad651e3d",
+    "commit": "926ca9245b8266b42dbab8ecda66158dc1ac6466",
     "inputs": [
       {"path":"ai/models/bootstrap/manifest-v2.json","sha256":"555a92c8f28cb31704d4761aa615b1929b65872d7bd19c269335673b07c6d3d4"},
       {"path":"ai/models/bootstrap/zap-v2.zapw","sha256":"afdc60963af013807329a18f73eb62edfeadba7756e350818759ef99af562632"},
-      {"path":"facts.json","sha256":"dbfa68384c1bd3d65925b39d19880b1b0045bdadc3bb6421e211757fa6a7c339"},
+      {"path":"facts.json","sha256":"3cf3e0376fa2dca34e8f21f47510a96a83a4bc8a43127db69538fabc3e1bd19d"},
       {"path":"tools/data/facts-view.ts","sha256":"e2329f6bbaf0312c7cfe889082b94f1ca3eb8c76ec762fb5d774abdcf4ea72e7"},
       {"path":"tools/data/sources.json","sha256":"a05b953a29bed08b15797d44cbe17eecc7968a7a1817924018e1f6c9a3f738f5"},
       {"path":"wrangler.jsonc","sha256":"150014ba9dfbab48a2199770abe918f3cb89bb1c216d62a2aa1326347c05a97c"}

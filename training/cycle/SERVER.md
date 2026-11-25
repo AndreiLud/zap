@@ -7,7 +7,7 @@ How the training cycle lives on the owner's server: what runs, where to look, an
 * One container, the compose service `scheduler` (`restart: unless-stopped`, 4 cores, 6 GB), with the production config `config/prod.toml`.
 * Every 10 minutes it looks at the clock. A cycle starts on Saturday at 22:00 (America/Sao_Paulo), or earlier when 1,000 new matches arrived since the last cycle. One cycle at a time; a cycle that passes 36 hours is stopped and marked failed.
 * Every day after 06:00 UTC it runs the A/B check and refreshes the status file, so the Worker knows the server is alive.
-* While a new version is under test (14 days after a promotion), no new cycle starts. When the window ends, the scheduler runs the closing A/B check at once (final result in the card, or a rollback) before it may start a cycle; `run` and `publish` refuse while the window is still in `state.json`.
+* While a new version is under test (14 days after a promotion), no new cycle starts. When the window ends, the scheduler runs the closing A/B check at once (final result in the card, or a rollback) before it may start a cycle; `run` and `publish` refuse while the window is still in `state.json`. When that check could not decide (too few people or matches), the window closes with the new version in place, and `state.lastAbNote` in the `status` output says why until the next window ends; the status message says it only until the cycle that follows starts.
 
 ## Secrets
 
@@ -31,6 +31,8 @@ docker compose --profile scheduler logs --tail 50 scheduler
 tail -n 50 training/logs/cycle.log          # every step of every cycle
 ls -t training/logs/runs/ | head            # one file per cycle with the output of training and gate
 ```
+
+`status.state` `running` means a cycle or a step runs, and `cycleLock` in the same output names who holds the cycle lock. A step run by hand (`$C sync`, `build`, `train`, `gate`, `explorer`) shows `running` until it ends, then the status from before it comes back (a `failed` one stays `failed`). A `running` status while `cycleLock` is `null` and no container of the cycle runs a command is out of date: a step or cycle that did not end left it, such as a step run by hand with an older version of the cycle or one that was interrupted (Ctrl+C, a stopped or killed container, a reboot). The next cycle or step that ends ok writes it again.
 
 The model card of each version is `cards/vN.json` in `zap-models`, also kept in `training/cycle/data/prod/cards/`. It holds the data counts and hashes, the training arguments, the gate result with every number, the characters' statistics and, after the window, the A/B result.
 

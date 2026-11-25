@@ -1,7 +1,10 @@
 """Local state of a profile: data/<profile>/state.json (P1 writes, P2 reads).
 
 {cursorDate, lastCycleId, lastCycleStartedAt, lastAbCheckDate, promotions: [{version, at, parent}],
- ab: {version, control, from, until} or null, seedFloor: {cycleId, pairs, mean, lo, hi} or null,
+ ab: {version, control, from, until} or null,
+ lastAbNote: {version, control, at, note} when the last A/B window closed without the automatic
+ rollback deciding (too few people or matches), until the next window ends; else null,
+ seedFloor: {cycleId, pairs, mean, lo, hi} or null,
  seedFloors: every seed floor measured, oldest first (at most 50), cyclesSinceSeedFloor,
  latestExport: {date, sha256, key} or null, lastVersionNumber,
  openDataReleases: the open data uploads, oldest first (at most 50): {release, sha256, exportDate,
@@ -24,6 +27,7 @@ DEFAULT = {
     "lastAbCheckDate": None,
     "promotions": [],
     "ab": None,
+    "lastAbNote": None,
     "seedFloor": None,
     "seedFloors": [],
     "cyclesSinceSeedFloor": 0,

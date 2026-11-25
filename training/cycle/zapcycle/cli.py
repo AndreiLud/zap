@@ -18,12 +18,12 @@ from .bridge import pull, push
 from .build import run_build
 from .config import load_config
 from .context import CycleContext, HumanResult
-from .core import Cycle, iso, new_cycle_id, read_json, write_json
+from .core import Cycle, iso, new_cycle_id, plain, read_json, write_json
 from .errors import CycleError, GuardError
 from .explorer import run_explorer
 from .gate import run_gate
 from .index import Index
-from .lock import cycle_lock
+from .lock import cycle_lock, lock_holder
 from .logs import prune_run_logs, run_log_path, setup_logging
 from .publish import ab_not_closed, adopt, init, publish, rollback, window_open
 from .summary import save_inputs
@@ -74,19 +74,48 @@ def load_human(work: Path) -> HumanResult | None:
 class Steps:
     """The steps of one cycle, each announced in the remote status; a failure marks it failed."""
 
+    # What tells the status this object wrote last from one written by anyone else since (a final
+    # status of publish or adopt, a failure). The message alone may change: a rollback by hand,
+    # which never waits for the cycle lock, keeps state and step and writes its own (keep_status).
+    SAME = ("state", "step", "cycleId", "startedAt", "finishedAt", "lastPromotion")
+
     def __init__(self, cyc: Cycle, cycle_id: str, started_at: int):
         self.cyc = cyc
         self.cycle_id = cycle_id
         self.started_at = started_at
         self.log_path = run_log_path(cyc.cfg.logs_dir, cycle_id)
         self.current = "idle"
+        self.written: dict | None = None  # the last status this object wrote
+        self.messages: set[str] = set()  # every message it wrote (a heartbeat may land and still raise)
 
     def status(self, step: str, message: str) -> None:
         self.current = step
-        self.cyc.write_status("running", step, message, cycle_id=self.cycle_id, started_at=self.started_at)
+        self.messages.add(plain(message))
+        self.written = self.cyc.write_status("running", step, message, cycle_id=self.cycle_id, started_at=self.started_at)
 
     def heartbeat(self) -> None:
-        self.cyc.write_status("running", self.current, f"Cycle {self.cycle_id}: still at step {self.current}.", cycle_id=self.cycle_id, started_at=self.started_at)
+        message = f"Cycle {self.cycle_id}: still at step {self.current}."
+        self.messages.add(plain(message))
+        self.written = self.cyc.write_status("running", self.current, message, cycle_id=self.cycle_id, started_at=self.started_at)
+
+    def restore(self, before: dict | None) -> dict | None:
+        """After a step run on its own (one_step) that ended ok. While the remote status is still the
+        one this step wrote last (nothing inside the step wrote a final status, as publish and adopt
+        do), the status from before the step comes back as it was, with a fresh updatedAt: ok stays
+        ok, failed stays failed until a cycle ends ok. Without a status before, or with a running one
+        (stale: the cycle lock is held here, so nothing else runs), ok and idle; finishedAt keeps what
+        the step carried over (null, or the end of the last cycle), since summary.json shows it as
+        the last training and a step is none. A message written by a rollback during the step stays.
+        Returns what it wrote, or None when it left the status alone."""
+        if self.written is None:
+            return None
+        now = self.cyc.read_status()
+        if now is None or any(now.get(k) != self.written.get(k) for k in self.SAME):
+            return None
+        newer = now.get("message") if now.get("message") not in self.messages else None
+        if before is None or before.get("state") == "running":
+            return self.cyc.write_status("ok", "idle", newer or f"Step {self.current} ended ok; no cycle runs.", keep_failed=False)
+        return self.cyc.restore_status({**before, "message": newer} if newer else before)
 
     def run(self, step: str, fn: Callable[[], Any]) -> Any:
         self.status(step, f"Cycle {self.cycle_id}: step {step}.")
@@ -265,23 +294,34 @@ def prune_quietly(cyc: Cycle) -> None:
 
 
 def one_step(cyc: Cycle, cycle_id: str | None, step: str, fn: Callable[[Steps], Any], new_id: bool = False, prune: bool = False) -> Any:
-    """One step under the cycle lock. prune: afterwards (also after a failure) only the newest work
-    folder keeps its per person tables, as at the end of a cycle."""
+    """One step under the cycle lock. The status says running while it runs; when it ends ok, the
+    status from before it comes back unless the step wrote a final one itself (Steps.restore); a
+    failure marks it failed. prune: afterwards (also after a failure) only the newest work folder
+    keeps its per person tables, as at the end of a cycle."""
     now = cyc.clock()
     cid = cycle_id or (new_cycle_id(now) if new_id else cyc.latest_work())
     with cycle_lock(cyc.cfg.data_dir, cid, now):
         st = Steps(cyc, cid, now)
+        st.current = step  # a failure to read the status before is a failure of this step
         try:
-            return st.run(step, lambda: fn(st))
+            before = cyc.read_status()
+            out = st.run(step, lambda: fn(st))
         except Exception as e:
             st.fail(e)
             raise
         finally:
             if prune:
                 prune_quietly(cyc)
+        try:
+            st.restore(before)
+        except Exception as e:  # the step's work is done: a status that stays running is logged, not raised
+            cyc.log.error(f"{step}: could not restore the status after the step: {type(e).__name__}")
+        return out
 
 
 def cmd_status(cyc: Cycle) -> dict:
+    # state.lastAbNote: why the last A/B window closed without the automatic rollback deciding; the
+    # status message holds it only until the next cycle starts.
     out: dict = {"profile": cyc.cfg.profile, "mode": cyc.cfg.mode, "state": dict(cyc.state)}
     out["state"].pop("receiptEtags", None)
     try:
@@ -300,6 +340,9 @@ def cmd_status(cyc: Cycle) -> dict:
         out["remote"] = f"unavailable: {type(e).__name__}"
     receipts = sorted((cyc.cfg.data_dir / "receipts").glob("*.json"))
     out["localReceipt"] = receipts[-1].name if receipts else None
+    # Who holds the cycle lock (null: no cycle, step or daily check runs). A status that says running
+    # while this is null is stale.
+    out["cycleLock"] = lock_holder(cyc.cfg.data_dir / "locks" / "cycle.lock")
     return out
 
 

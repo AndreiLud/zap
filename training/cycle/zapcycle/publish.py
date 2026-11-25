@@ -230,8 +230,10 @@ def keep_status(cyc: Cycle, message: str) -> dict:
     return cyc.write_status(prev.get("state", "ok"), prev.get("step", "idle"), message, keep_failed=False)
 
 
-def close_window(cyc: Cycle, ab_result: dict) -> dict:
-    """At controlUntil: final A/B result in the candidate's card, control and controlUntil to null."""
+def close_window(cyc: Cycle, ab_result: dict, note: str | None = None) -> dict:
+    """At controlUntil: final A/B result in the candidate's card, control and controlUntil to null.
+    note: why the automatic rollback could not decide, added to the status message and kept in
+    state.json as lastAbNote."""
     with manifest_lock(cyc.cfg.data_dir):
         manifest = cyc.require_manifest()
         now = cyc.clock()
@@ -244,9 +246,12 @@ def close_window(cyc: Cycle, ab_result: dict) -> dict:
             c["ab"] = ab_result
             cyc.put_card(c)
         cyc.state["ab"] = None
+        # Kept until the next window ends: `status` prints it, while the status message with the note
+        # lasts only until the next cycle starts, which the same scheduler tick does.
+        cyc.state["lastAbNote"] = {"version": version, "control": control, "at": now, "note": note} if note else None
         cyc.state.save()
         write_summary(cyc, manifest)
-        keep_status(cyc, f"A/B window of {version} against {control} closed; {version} stays.")
+        keep_status(cyc, f"A/B window of {version} against {control} closed; {version} stays." + (f" {note}" if note else ""))
     return {"current": version, "closed": control}
 
 

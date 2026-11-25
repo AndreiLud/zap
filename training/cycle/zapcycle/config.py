@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from .errors import CycleError
+from .formats import MIN_PEOPLE
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -144,6 +145,12 @@ def _check(c: Config) -> None:
     _need(0 < a.get("share", -1) <= 0.5, "ab.share must be in (0, 0.5]")
     _need(isinstance(a.get("days"), int) and a["days"] >= 1, "ab.days must be a positive integer")
     _need(isinstance(a.get("bootstrap"), int) and a["bootstrap"] >= 100, "ab.bootstrap must be at least 100")
+    for k in ("min_matches_per_arm", "min_people_per_arm"):
+        _need(isinstance(a.get(k), int) and not isinstance(a.get(k), bool) and a[k] >= 1, f"ab.{k} must be a positive integer")
+    # With people's data the rollback needs as many people per arm as the card needs before it shows
+    # the comparison (contract 1.10), so the two cannot drift; a local test may ask for fewer.
+    if c.mode == "r2" or c.profile == "prod":
+        _need(a["min_people_per_arm"] == MIN_PEOPLE, f"ab.min_people_per_arm must be {MIN_PEOPLE} in r2 mode and profile prod: the people per arm the card needs before it shows the comparison (contract 1.10)")
     _need(0 < c.data.get("device_cap", 0) < 1, "data.device_cap must be in (0, 1)")
     for k, v in c.thresholds.items():
         _need(isinstance(v, int) and v >= 1, f"thresholds.{k} must be a positive integer")

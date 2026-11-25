@@ -1,10 +1,11 @@
 import random
 import unittest
 
-from zapcycle.ab import ab_matches, card_ab, decide, evaluate
+from zapcycle.ab import ab_matches, card_ab, decide, evaluate, undecided
+from zapcycle.formats import MIN_PEOPLE
 
 WINDOW = {"version": "v3", "control": "v2", "from": 1_000_000, "until": 2_000_000}
-CFG = {"rollback_drop": 0.02, "min_matches_per_arm": 200, "bootstrap": 500}
+CFG = {"rollback_drop": 0.02, "min_matches_per_arm": 200, "min_people_per_arm": 20, "bootstrap": 500}
 
 
 def records(n: int, p_control: float, p_candidate: float, people: int = 60, test: bool = False, group=True, seed: int = 7) -> list[dict]:
@@ -106,7 +107,7 @@ class AbTest(unittest.TestCase):
     def test_the_rollback_reads_the_sequential_boundary(self):
         # Checked every day, the rule rolls back only when the 1st percentile of the bootstrap drops
         # is above the limit, not the 5th percentile shown as lo.
-        r = {"matches": {"candidate": 300, "control": 300}, "lo": 0.03, "hi": 0.12, "loSeq": 0.015}
+        r = {"matches": {"candidate": 300, "control": 300}, "armPeople": {"candidate": 40, "control": 40}, "lo": 0.03, "hi": 0.12, "loSeq": 0.015}
         self.assertEqual(decide(r, CFG, 1_500_000, WINDOW["until"]), "continue")
         self.assertEqual(decide(dict(r, loSeq=0.021), CFG, 1_500_000, WINDOW["until"]), "rollback")
 
@@ -115,3 +116,77 @@ class AbTest(unittest.TestCase):
         r = evaluate(m, "v3", 300)
         self.assertIsNone(r["drop"])
         self.assertEqual(decide(r, CFG, 1_500_000, WINDOW["until"]), "continue")
+
+
+def arm(name: str, people: int, n: int, p: float, seed: int, first: int = 0, group=True) -> list[dict]:
+    """n matches of one arm, as ab_matches gives them, spread round robin over `people` groups
+    (people 0 and group False: no group at all); score 1 (the AI team won) drawn at rate p."""
+    rng = random.Random(seed)
+    out = []
+    for i in range(n):
+        g = f"{first + i % people:016x}" if group and people else None
+        out.append({"arm": name, "score": int(rng.random() < p), "cluster": g or f"seat:{name}{i}:0", "group": g})
+    return out
+
+
+class RollbackNeedsPeopleTest(unittest.TestCase):
+    """The rollback needs min_people_per_arm distinct people in each arm as well as matches: with
+    one or a few people the bootstrap over people has almost no spread, and a check on their matches
+    alone rolls an equal version back on noise."""
+
+    def test_one_person_with_many_matches_and_a_big_drop_never_rolls_back(self):
+        m = ab_matches(records(800, 0.7, 0.3, people=1), WINDOW, "r2")
+        r = evaluate(m, "v3", 300)
+        self.assertEqual(r["matches"], {"candidate": 400, "control": 400})
+        self.assertEqual(r["armPeople"], {"candidate": 1, "control": 1})
+        # One cluster: every resample is the same, so the boundary equals the drop. The rule of
+        # matches alone would roll back here.
+        self.assertAlmostEqual(r["sd"], 0, places=9)
+        self.assertGreater(r["loSeq"], CFG["rollback_drop"])
+        self.assertEqual(decide(r, dict(CFG, min_people_per_arm=1), 1_500_000, WINDOW["until"]), "rollback")
+        self.assertEqual(decide(r, CFG, 1_500_000, WINDOW["until"]), "continue")
+        self.assertEqual(decide(r, CFG, WINDOW["until"], WINDOW["until"]), "close")
+
+    def test_twenty_people_in_each_arm_with_a_real_drop_roll_back(self):
+        m = arm("candidate", 25, 300, 0.3, 1) + arm("control", 25, 300, 0.7, 2, first=100)
+        r = evaluate(m, "v3", 300)
+        self.assertEqual(r["armPeople"], {"candidate": 25, "control": 25})
+        self.assertTrue(r["bothArmsPeople"])
+        self.assertGreater(r["loSeq"], CFG["rollback_drop"])
+        self.assertEqual(decide(r, CFG, 1_500_000, WINDOW["until"]), "rollback")
+        self.assertIsNone(undecided(r, CFG, WINDOW))
+
+    def test_the_boundary_is_twenty_people_in_each_arm(self):
+        self.assertEqual(CFG["min_people_per_arm"], MIN_PEOPLE)
+        for candidate, control, want in ((19, 40, "continue"), (40, 19, "continue"), (20, 20, "rollback"), (20, 40, "rollback")):
+            m = arm("candidate", candidate, 300, 0.3, 3) + arm("control", control, 300, 0.7, 4, first=100)
+            r = evaluate(m, "v3", 300)
+            self.assertEqual(r["armPeople"], {"candidate": candidate, "control": control})
+            self.assertGreater(r["loSeq"], CFG["rollback_drop"], (candidate, control))
+            self.assertEqual(decide(r, CFG, 1_500_000, WINDOW["until"]), want, (candidate, control))
+            # The card's floor is the same number: no comparison below it, so no rollback either.
+            self.assertEqual(r["bothArmsPeople"], want == "rollback")
+
+    def test_matches_without_a_group_are_nobody(self):
+        grouped = arm("candidate", 19, 150, 0.3, 5) + arm("control", 30, 300, 0.7, 6, first=100)
+        loose = arm("candidate", 0, 150, 0.3, 7, group=False)
+        r = evaluate(grouped + loose, "v3", 300)
+        self.assertEqual(r["matches"], {"candidate": 300, "control": 300})
+        self.assertEqual(r["armPeople"], {"candidate": 19, "control": 30})
+        self.assertEqual(decide(r, CFG, 1_500_000, WINDOW["until"]), "continue")
+        one_more = evaluate(grouped + loose + arm("candidate", 1, 1, 0.3, 8, first=50), "v3", 300)
+        self.assertEqual(one_more["armPeople"]["candidate"], 20)
+        self.assertEqual(decide(one_more, CFG, 1_500_000, WINDOW["until"]), "rollback")
+        # A result without the count (saved by a version before the rule) holds nobody.
+        self.assertEqual(decide({k: v for k, v in one_more.items() if k != "armPeople"}, CFG, 1_500_000, WINDOW["until"]), "continue")
+
+    def test_the_close_says_why_the_rollback_could_not_decide(self):
+        r = evaluate(ab_matches(records(800, 0.7, 0.3, people=1), WINDOW, "r2"), "v3", 300)
+        note = undecided(r, CFG, WINDOW)
+        self.assertIn("The automatic rollback could not decide: too few people played (1 with v3, 1 with v2; it needs 20 in each group)", note)
+        self.assertIn("Only a rollback by hand (rollback v2) brings v2 back.", note)
+        self.assertNotIn("too few matches", note)
+        few = evaluate(arm("candidate", 3, 50, 0.3, 9) + arm("control", 2, 20, 0.7, 10, first=100), "v3", 300)
+        self.assertIn("too few people played (3 with v3, 2 with v2; it needs 20 in each group) and too few matches (50 with v3, 20 with v2; it needs 200 in each group)", undecided(few, CFG, WINDOW))
+        enough_people = evaluate(arm("candidate", 30, 100, 0.5, 11) + arm("control", 30, 100, 0.5, 12, first=100), "v3", 300)
+        self.assertIn("could not decide: too few matches (100 with v3, 100 with v2;", undecided(enough_people, CFG, WINDOW))

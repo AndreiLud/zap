@@ -11737,7 +11737,7 @@
           "minMatchesPerArm": 200,
           "bootstrap": 2000,
           "minPeoplePerArm": 20,
-          "rule": "quick play matches: the control share plays the previous version on every AI seat; the others face the candidate with the previous version as the AI partner; rooms with friends face the candidate only in opponent seats. The daily check rolls back when the lower boundary of the drop (people's wins against the candidate minus against the control, cluster bootstrap by person, 1st percentile) passes rollbackDrop with at least minMatchesPerArm matches in each arm; the card and summary.json show the comparison once both arms have minPeoplePerArm people; at the end of the window the final result goes into the card and summary.json."
+          "rule": "quick play matches: the control share plays the previous version on every AI seat; the others face the candidate with the previous version as the AI partner; rooms with friends face the candidate only in opponent seats. The daily check rolls back when the lower boundary of the drop (people's wins against the candidate minus against the control, cluster bootstrap by person, 1st percentile) passes rollbackDrop with at least minMatchesPerArm matches and minPeoplePerArm distinct people in each arm (with fewer people the check does not decide, and the candidate stays when the window closes); the card and summary.json show the comparison once both arms have minPeoplePerArm people; at the end of the window the final result goes into the card and summary.json."
         },
         "manifest": {
           "afterAdopt": {
@@ -23344,6 +23344,13 @@
       "unit": "solo matches per arm",
       "source": "training/cycle/config/prod.toml [ab] min_matches_per_arm",
       "readAt": "2026-11-23",
+      "kind": "documented"
+    },
+    "readme.cycle.ab.min_people_per_arm": {
+      "value": 20,
+      "unit": "distinct people per arm before the automatic rollback may decide",
+      "source": "training/cycle/config/prod.toml [ab] min_people_per_arm",
+      "readAt": "2026-11-25",
       "kind": "documented"
     },
     "readme.cycle.ab.rollback_drop": {

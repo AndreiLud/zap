@@ -86,6 +86,7 @@ share = 0.3
 days = 14
 rollback_drop = 0.02
 min_matches_per_arm = 200
+min_people_per_arm = 20                # distinct people per arm before a rollback; in r2 mode always MIN_PEOPLE (zapcycle/formats.py)
 bootstrap = 2000
 
 [data]

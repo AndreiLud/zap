@@ -2,14 +2,14 @@
   "provenance": {
     "script": "tools/data/cycle-rules.ts",
     "command": "docker compose run --rm -T node node tools/data/cycle-rules.ts",
-    "measuredAt": "2026-11-24T03:12:56.573Z",
+    "measuredAt": "2026-11-25T10:17:24.426Z",
     "node": "v24.22.2",
     "cpu": "QEMU Virtual CPU version 2.5+",
-    "commit": "a8a6164f2a414e49005ac04cef2a2dc7ad651e3d",
+    "commit": "926ca9245b8266b42dbab8ecda66158dc1ac6466",
     "inputs": [
       {"path":"tools/data/cycle-rules.ts","sha256":"c352d6d401f00c348c04eb4c9cbd0cb8c1a63321f78f93c5db557a807fd7d684"},
       {"path":"tools/data/lib/toml-lite.ts","sha256":"e14cfbae5f1e0e3bb619eb9e37b32546f46cdf0f9779f7beb173fba78c44723c"},
-      {"path":"training/cycle/config/prod.toml","sha256":"b2d64daa10f7f4573ca5e4ede003b20be004798c6fe69d4c30f7fd7a55f69d73"},
+      {"path":"training/cycle/config/prod.toml","sha256":"ac9435657806aefef0a1017190991882770ef75273bdcf255eeaa2da206dd1e4"},
       {"path":"training/cycle/zapcycle/summary.py","sha256":"e4bf94d189484980a77916a6b5681b1e0c1fd648ea75f704f479d5af97a424bc"}
     ]
   },

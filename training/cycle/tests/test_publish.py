@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from zapcycle import formats
 from zapcycle.ab import run_ab
-from zapcycle.cli import cmd_run
+from zapcycle.cli import cmd_run, cmd_status
 from zapcycle.errors import CycleError, GuardError
 from zapcycle.publish import init, publish, rollback
 from zapcycle.state import load_state
@@ -124,6 +124,7 @@ class PublishTest(unittest.TestCase):
             rollback(self.cyc, "v9")
 
     def test_ab_rolls_back_a_weaker_version_automatically(self):
+        self.cyc.state["lastAbNote"] = {"version": "v1", "control": "v0", "at": T0 - DAY, "note": "The automatic rollback could not decide: too few people played."}
         v = self.cyc.next_version(self.cyc.require_manifest())
         make_candidate(self.cyc, "20261121-2200", v, "v1", passed=True)
         publish(self.cyc, "20261121-2200")
@@ -146,6 +147,7 @@ class PublishTest(unittest.TestCase):
         self.assertEqual(card["ab"]["matches"], {"candidate": 300, "control": 300})
         self.assertIn("rolled back", self.s3.json(self.M, "status/training.json")["message"])
         self.assertEqual(load_state(self.cfg.data_dir)["lastAbCheckDate"], "2026-11-25")
+        self.assertIsNone(load_state(self.cfg.data_dir)["lastAbNote"], "the check decided this window")
 
     def test_ab_closes_the_window_at_its_end(self):
         v = self.cyc.next_version(self.cyc.require_manifest())
@@ -163,6 +165,66 @@ class PublishTest(unittest.TestCase):
         self.assertEqual(card["result"], "promoted")
         self.assertFalse(card["ab"]["rolledBack"])
         formats.check("zap-summary/1", self.s3.json(self.P, "summary.json"))
+
+    def test_one_person_cannot_roll_back_and_the_close_says_so(self):
+        # One person, 600 matches, beating the new version far more often: the rule of matches
+        # alone rolled back on this; with too few people the window runs to its end, closes with
+        # v2 in place, and the status says the automatic rollback could not decide.
+        v = self.cyc.next_version(self.cyc.require_manifest())
+        make_candidate(self.cyc, "20261121-2200", v, "v1", passed=True)
+        publish(self.cyc, "20261121-2200")
+        recs = self.tmp / "one-person.jsonl"
+        lines = []
+        for i in range(600):
+            arm = "control" if i % 2 else "candidate"
+            ai_wins = (i // 2) % 10 < (8 if arm == "control" else 2)
+            lines.append(json.dumps({"key": f"k{i}", "kind": "solo1", "test": True, "arm": arm, "endedAt": T0 + 1000 + i, "winner": 1 if ai_wins else 0, "humans": [{"seat": 0, "group": "a" * 16, "weight": 1, "flagged": False, "openDataOptOut": False, "abandoned": False}]}))
+        recs.write_text("\n".join(lines) + "\n")
+        self.clock.t = T0 + 3 * DAY
+        out = run_ab(self.cyc, recs)
+        self.assertEqual(out["action"], "continue")
+        self.assertEqual(out["result"]["armPeople"], {"candidate": 1, "control": 1})
+        self.clock.t = T0 + 14 * DAY
+        out = run_ab(self.cyc, recs)
+        self.assertEqual(out["action"], "close")
+        self.assertIn("too few people played (1 with v2, 1 with v1; it needs 20 in each group)", out["undecided"])
+        m = self.s3.json(self.M, "manifest.json")
+        self.assertEqual((m["current"], m["control"]), ("v2", None))
+        card = self.s3.json(self.M, "cards/v2.json")
+        self.assertEqual(card["result"], "promoted")
+        self.assertFalse(card["ab"]["rolledBack"])
+        self.assertIsNone(card["ab"]["drop"], "no comparison on the card below 20 people in each arm")
+        status = self.s3.json(self.M, "status/training.json")
+        self.assertTrue(status["message"].startswith("A/B window of v2 against v1 closed; v2 stays. The automatic rollback could not decide: too few people played"), status["message"])
+        self.assertIn("Only a rollback by hand (rollback v1) brings v1 back.", status["message"])
+        self.assertEqual((status["state"], status["step"]), ("ok", "idle"))
+        # The cycle the same scheduler tick starts replaces that message at its first step; the note
+        # stays in state.json, which `status` prints, until the next window ends.
+        self.cyc.write_status("running", "sync", "Cycle 20261206-1200: step sync.", cycle_id="20261206-1200", started_at=self.clock.t)
+        note = {"version": "v2", "control": "v1", "at": T0 + 14 * DAY, "note": out["undecided"]}
+        self.assertEqual(cmd_status(self.cyc)["state"]["lastAbNote"], note)
+        self.assertEqual(load_state(self.cfg.data_dir)["lastAbNote"], note)
+        rollback(self.cyc, "v1")
+        self.assertEqual(load_state(self.cfg.data_dir)["lastAbNote"], note, "a rollback by hand leaves it")
+
+    def test_a_close_that_could_decide_clears_the_note(self):
+        self.cyc.state["lastAbNote"] = {"version": "v1", "control": "v0", "at": T0 - DAY, "note": "The automatic rollback could not decide: too few people played."}
+        self.cyc.state.save()
+        v = self.cyc.next_version(self.cyc.require_manifest())
+        make_candidate(self.cyc, "20261121-2200", v, "v1", passed=True)
+        publish(self.cyc, "20261121-2200")
+        recs = self.tmp / "even.jsonl"
+        lines = []
+        for i in range(600):
+            arm = "control" if i % 2 else "candidate"
+            lines.append(json.dumps({"key": f"k{i}", "kind": "solo1", "test": True, "arm": arm, "endedAt": T0 + 1000 + i, "winner": 1 if (i // 2) % 10 < 5 else 0, "humans": [{"seat": 0, "group": f"{i % 50:016x}", "weight": 1, "flagged": False, "openDataOptOut": False, "abandoned": False}]}))
+        recs.write_text("\n".join(lines) + "\n")
+        self.clock.t = T0 + 14 * DAY
+        out = run_ab(self.cyc, recs)
+        self.assertEqual(out["action"], "close")
+        self.assertNotIn("undecided", out)
+        self.assertEqual(self.s3.json(self.M, "status/training.json")["message"], "A/B window of v2 against v1 closed; v2 stays.")
+        self.assertIsNone(load_state(self.cfg.data_dir)["lastAbNote"])
 
 
 class InitBundleTest(unittest.TestCase):
